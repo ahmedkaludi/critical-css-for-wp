@@ -1,0 +1,5 @@
+{
+    "require": {
+        "jandc/css-from-html-extractor": "^0.2.1"
+    }
+}
