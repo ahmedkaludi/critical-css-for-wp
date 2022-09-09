@@ -53,7 +53,7 @@ class class_critical_css_for_wp{
 		 if ( ! wp_next_scheduled( 'isa_add_every_one_hour_crtlcss' ) ) {
 		     wp_schedule_event( time(), 'every_one_hour',  'isa_add_every_one_hour_crtlcss' );
 		 }
-		add_action( 'isa_add_every_one_hour_crtlcss', array($this, 'every_one_minutes_event_func_crtlcss' ) );		
+		add_action( 'isa_add_every_one_hour_crtlcss', array($this, 'every_one_minutes_event_func_crtlcss' ) );					
 		
 	}
 
@@ -330,14 +330,13 @@ class class_critical_css_for_wp{
 
 	public function ccfwp_save_critical_css_in_dir_php($current_url){
 		
-		$targetUrl = $current_url;
+		$targetUrl = $current_url;		
 	    $user_dirname = $this->cachepath();
 		$content = file_get_contents($targetUrl);
 		
 		$regex = '/<link(.*?)href=["|\'](.*?)["|\'] (.*?)>/';
 		preg_match_all( $regex, $content, $matches , PREG_SET_ORDER );
-		
-		
+				
 		$rowcss = '';
 		$all_css = [];
 		
@@ -345,8 +344,28 @@ class class_critical_css_for_wp{
 			
 			foreach($matches as $mat){						
 				if(strpos($mat[2], '.css') !== false) {
-					$all_css[] = $mat[2];
-					$rowcss .= @file_get_contents($mat[2]);            
+					$all_css[]  = $mat[2];					
+					$rowcssdata = @file_get_contents($mat[2]);             
+					$regexn = '/@import\s*(url)?\s*\(?([^;]+?)\)?;/';
+
+					preg_match_all( $regexn, $rowcssdata, $matchen , PREG_SET_ORDER );
+					
+					if(!empty($matchen)){
+						foreach($matchen as $matn){
+							if(isset($matn[2])){								
+								$explod = explode('/',$matn[2]);
+								if(is_array($explod)){
+									$style = trim(end($explod),'"');
+									if(strpos($style, '.css') !== false) {
+										$pthemestyle = get_template_directory_uri().'/'.$style;
+										$rowcss     .= @file_get_contents($pthemestyle);
+									}																		
+								}								
+							}
+						}
+					}
+
+					$rowcss .= $rowcssdata;
 				}				
 				
 			}
