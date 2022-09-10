@@ -22,8 +22,9 @@ define('CRITICAL_CSS_FOR_WP_PLUGIN_DIR', plugin_dir_path(__FILE__));
  **/
 define('CRITICAL_CSS_FOR_WP_CSS_DIR', WP_CONTENT_DIR . "/cache/critical-css-for-wp/css/");
 
-require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR . 'admin/settings.php';
-require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR."includes/class-critical-css.php";
+require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR . "includes/common.php";
+require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR . "admin/settings.php";
+require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR . "includes/class-critical-css.php";
 
 
 add_action('admin_enqueue_scripts','ccfwp_admin_enqueue');

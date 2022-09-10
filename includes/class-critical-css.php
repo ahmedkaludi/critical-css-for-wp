@@ -54,6 +54,7 @@ class class_critical_css_for_wp{
 		     wp_schedule_event( time(), 'every_one_hour',  'isa_add_every_one_hour_crtlcss' );
 		 }
 		add_action( 'isa_add_every_one_hour_crtlcss', array($this, 'every_one_minutes_event_func_crtlcss' ) );					
+		add_action( 'admin_init', array($this, 'every_one_minutes_event_func_crtlcss' ) );					
 		
 	}
 
@@ -332,8 +333,7 @@ class class_critical_css_for_wp{
 		
 		$targetUrl = $current_url;		
 	    $user_dirname = $this->cachepath();
-		$content = file_get_contents($targetUrl);
-		
+		$content = @file_get_contents($targetUrl);		
 		$regex = '/<link(.*?)href=["|\'](.*?)["|\'] (.*?)>/';
 		preg_match_all( $regex, $content, $matches , PREG_SET_ORDER );
 				
@@ -371,26 +371,30 @@ class class_critical_css_for_wp{
 			}
 		}
 		
-		$d = new DOMDocument;
-		$mock = new DOMDocument;
-		libxml_use_internal_errors(true);
-		$d->loadHTML($content);
-		$body = $d->getElementsByTagName('body')->item(0);
-		foreach ($body->childNodes as $child){
-			$mock->appendChild($mock->importNode($child, true));
-		}
-		
-		$rawHtml =  $mock->saveHTML();	
+		if($content){
 
-		require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR."css-extractor/vendor/autoload.php";
-				
-		$extracted_css_arr = array();
+			$d = new DOMDocument;
+			$mock = new DOMDocument;
+			libxml_use_internal_errors(true);
+			$d->loadHTML($content);
+			$body = $d->getElementsByTagName('body')->item(0);
+			foreach ($body->childNodes as $child){
+				$mock->appendChild($mock->importNode($child, true));
+			}
+			
+			$rawHtml =  $mock->saveHTML();	
 
-		$page_specific = new \PageSpecificCss\PageSpecificCss();
-		$page_specific->addBaseRules($rowcss);
-		$page_specific->addHtmlToStore($rawHtml);
-		$extractedCss = $page_specific->buildExtractedRuleSet();							
-		$extracted_css_arr[] = $extractedCss;		
+			require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR."css-extractor/vendor/autoload.php";
+					
+			$extracted_css_arr = array();
+
+			$page_specific = new \PageSpecificCss\PageSpecificCss();
+			$page_specific->addBaseRules($rowcss);
+			$page_specific->addHtmlToStore($rawHtml);
+			$extractedCss = $page_specific->buildExtractedRuleSet();							
+			$extracted_css_arr[] = $extractedCss;	
+
+		}			
 		
 		preg_match_all( "/@media [^{]*+{([^{}]++|{[^{}]*+})*+}/", $rowcss, $matchess , PREG_SET_ORDER );
 
@@ -425,11 +429,7 @@ class class_critical_css_for_wp{
 				
 		if(!empty($extracted_css_arr) && is_array($extracted_css_arr)){
 
-				$critical_css = implode("", $extracted_css_arr);
-			    
-				$critical_css = str_replace("url('wp-content/", "url('".get_site_url()."/wp-content/", $critical_css); 
-				$critical_css = str_replace('url("wp-content/', 'url("'.get_site_url().'/wp-content/', $critical_css); 
-							
+				$critical_css = implode("", $extracted_css_arr);			    								
 				$new_file = $user_dirname."/".md5($targetUrl).".css";
 				$ifp = @fopen( $new_file, 'w+' );
 				if ( ! $ifp ) {
@@ -447,7 +447,6 @@ class class_critical_css_for_wp{
 			return array('status' => false , 'message' => 'critical css does not generated from server');	
 		}
 	    	    
-
 	}
 	public function generate_css_on_interval(){
 		
@@ -543,7 +542,7 @@ class class_critical_css_for_wp{
 		$url = home_url( $wp->request );
 		$url = trailingslashit($url);		
 		
-		if(file_exists($user_dirname.md5($url).'.css')){			
+		if(file_exists($user_dirname.md5($url).'.css')){
 			$css =  file_get_contents($user_dirname.'/'.md5($url).'.css');			
 		 	echo "<style type='text/css' id='critical-css-for-wp'>$css</style>";
 		}else{
@@ -555,7 +554,6 @@ class class_critical_css_for_wp{
 			));			
 		}
 	}
-
 	
 	public function ccfwp_resend_single_url_for_cache(){
 
@@ -696,8 +694,11 @@ class class_critical_css_for_wp{
 		if ( !wp_verify_nonce( $_GET['ccfwp_security_nonce'], 'ccfwp_ajax_check_nonce' ) ){
 			return;  
 		}
+		$page   =  1;
+		if(isset($_GET['start']) && $_GET['start'] > 0){
+			$page = intval($_GET['start']) / intval($_GET['length']);
+		}		
 
-		$page   = isset($_GET['start']) && $_GET['start']> 0 ? $_GET['start']/$_GET['length'] : 1;
 		$length = isset($_GET['length']) ? intval($_GET['length']) : 10;
 		$page   = ($page + 1);
 		$offset = isset($_GET['start']) ? intval($_GET['start']) : 0;
@@ -739,13 +740,13 @@ class class_critical_css_for_wp{
 					$user_dirname = $this->cachepath();
 					$size = filesize($user_dirname.'/'.md5($value['url']).'.css');					
 					if(!$size){
-						$size = '<abbr title="File is not in cached directory. Please recheck in advance option">Deleted</abbr>';
+						$size = '<abbr title="'.ccfwp_t_string('File is not in cached directory. Please recheck in advance option').'">'.ccfwp_t_string('Deleted').'</abbr>';
 					}
 				}
 					
 				$formated_result[] = array(
-									'<div><abbr title="'.$value['cached_name'].'">'.$value['url'].'</abbr>'.($value['status'] == 'failed' ? '<a href="#" data-section="all" data-id="'.$value['id'].'" class="cwvpb-resend-single-url dashicons dashicons-controls-repeat"></a>' : '').' </div>',								   
-									'<span class="cwvpb-status-t">'.$value['status'].'</span>',
+									'<div><abbr title="'.esc_attr($value['cached_name']).'">'.esc_url($value['url']).'</abbr>'.($value['status'] == 'failed' ? '<a href="#" data-section="all" data-id="'.esc_attr($value['id']).'" class="cwvpb-resend-single-url dashicons dashicons-controls-repeat"></a>' : '').' </div>',								   
+									'<span class="cwvpb-status-t">'.esc_html($value['status']).'</span>',
 									$size,
 									$value['updated_at']
 							);
@@ -773,11 +774,14 @@ class class_critical_css_for_wp{
 			return;  
 		}
 
-		$page   = isset($_GET['start']) && $_GET['start']> 0 ? $_GET['start']/$_GET['length'] : 1;
+		$page   =  1;
+		if(isset($_GET['start']) && $_GET['start'] > 0){
+			$page = intval($_GET['start']) / intval($_GET['length']);
+		}
 		$length = isset($_GET['length']) ? intval($_GET['length']) : 10;
 		$page   = ($page + 1);
 		$offset = isset($_GET['start']) ? intval($_GET['start']) : 0;
-		$draw = intval($_GET['draw']);						
+		$draw   = intval($_GET['draw']);						
 		
 		global $wpdb, $table_prefix;
 		$table_name = $table_prefix . 'critical_css_for_wp_urls';
@@ -817,8 +821,8 @@ class class_critical_css_for_wp{
 				}
 					
 				$formated_result[] = array(
-									'<abbr title="'.$value['cached_name'].'">'.$value['url'].'</abbr>',
-									'<span class="cwvpb-status-t">'.$value['status'].'</span>',
+									'<abbr title="'.esc_attr($value['cached_name']).'">'.esc_url($value['url']).'</abbr>',
+									'<span class="cwvpb-status-t">'.esc_html($value['status']).'</span>',
 									$size,
 									$value['updated_at']
 							);
@@ -847,7 +851,10 @@ class class_critical_css_for_wp{
 			return;  
 		}
 
-		$page   = isset($_GET['start']) && $_GET['start']> 0 ? $_GET['start']/$_GET['length'] : 1;
+		$page   =  1;
+		if(isset($_GET['start']) && $_GET['start'] > 0){
+			$page = intval($_GET['start']) / intval($_GET['length']);
+		}
 		$length = isset($_GET['length']) ? intval($_GET['length']) : 10;
 		$page   = ($page + 1);
 		$offset = isset($_GET['start']) ? intval($_GET['start']) : 0;
@@ -891,10 +898,10 @@ class class_critical_css_for_wp{
 				}
 					
 				$formated_result[] = array(
-									'<div>'.$value['url'].' <a href="#" data-section="failed" data-id="'.$value['id'].'" class="cwvpb-resend-single-url dashicons dashicons-controls-repeat"></a></div>',
-									'<span class="cwvpb-status-t">'.$value['status'].'</span>',
-									$value['updated_at'],
-									'<div><a data-id="id-'.$value['id'].'" href="#" class="cwb-copy-urls-error button button-secondary">Copy Error</a><input id="id-'.$value['id'].'" class="cwb-copy-urls-text" type="hidden" value="'.$value['failed_error'].'"></div>'									
+									'<div>'.esc_url($value['url']).' <a href="#" data-section="failed" data-id="'.esc_attr($value['id']).'" class="cwvpb-resend-single-url dashicons dashicons-controls-repeat"></a></div>',
+									'<span class="cwvpb-status-t">'.esc_html($value['status']).'</span>',
+									esc_html($value['updated_at']),
+									'<div><a data-id="id-'.esc_attr($value['id']).'" href="#" class="cwb-copy-urls-error button button-secondary">'.ccfwp_t_string('Copy Error').'</a><input id="id-'.esc_attr($value['id']).'" class="cwb-copy-urls-text" type="hidden" value="'.esc_attr($value['failed_error']).'"></div>'									
 							);
 			}				
 
@@ -919,7 +926,11 @@ class class_critical_css_for_wp{
 			return;  
 		}
 
-		$page   = isset($_GET['start']) && $_GET['start']> 0 ? $_GET['start']/$_GET['length'] : 1;
+		$page   =  1;
+		if(isset($_GET['start']) && $_GET['start'] > 0){
+			$page = intval($_GET['start']) / intval($_GET['length']);
+		}
+
 		$length = isset($_GET['length']) ? intval($_GET['length']) : 10;
 		$page   = ($page + 1);
 		$offset = isset($_GET['start']) ? intval($_GET['start']) : 0;
@@ -966,8 +977,7 @@ class class_critical_css_for_wp{
 									$value['url'],
 									$value['status'],
 									$size,
-									$value['updated_at'],
-																
+									$value['updated_at']																
 							);
 			}				
 
@@ -984,7 +994,7 @@ class class_critical_css_for_wp{
 
 	}	
 
-} // class ends here ccfwp_
+} 
 
 $ccfwpgeneralcriticalCss = new class_critical_css_for_wp();
 $ccfwpgeneralcriticalCss->critical_hooks();

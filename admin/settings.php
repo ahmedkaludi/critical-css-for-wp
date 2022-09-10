@@ -38,15 +38,15 @@ function critical_css_admin_interface_render(){
     ?>
     <div class="ccfwp-container" id="ccfwp-wrap">
 
-        <h1>Critical CSS For WP</h1>
+        <h1><?php echo ccfwp_t_string('Critical CSS For WP'); ?></h1>
         <div class="ccfwp-comp-cont">
       <h2 class="nav-tab-wrapper">
           <?php
-          echo '<a href="' . esc_url(critical_css_admin_link('generatecss')) . '" class="nav-tab ' . esc_attr( $tab == 'generatecss' ? 'nav-tab-active' : '') . '">' . esc_html__('Generate CSS', 'critical-css') . '</a>';
+          echo '<a href="' . esc_url(critical_css_admin_link('generatecss')) . '" class="nav-tab ' . esc_attr( $tab == 'generatecss' ? 'nav-tab-active' : '') . '">' . ccfwp_t_string('Generate CSS') . '</a>';
 
-          echo '<a href="' . esc_url(critical_css_admin_link('advance')) . '" class="nav-tab ' . esc_attr( $tab == 'advance' ? 'nav-tab-active' : '') . '">' . esc_html__('Advance','critical-css') . '</a>';
+          echo '<a href="' . esc_url(critical_css_admin_link('advance')) . '" class="nav-tab ' . esc_attr( $tab == 'advance' ? 'nav-tab-active' : '') . '">' . ccfwp_t_string('Advance') . '</a>';
 
-          echo '<a href="' . esc_url(critical_css_admin_link('support')) . '" class="nav-tab ' . esc_attr( $tab == 'support' ? 'nav-tab-active' : '') . '">' . esc_html__('Support','critical-css') . '</a>';
+          echo '<a href="' . esc_url(critical_css_admin_link('support')) . '" class="nav-tab ' . esc_attr( $tab == 'support' ? 'nav-tab-active' : '') . '">' . ccfwp_t_string('Support') . '</a>';
            ?>
           </h2>
           <form action="options.php" method="post" enctype="multipart/form-data" class="ccfwp-settings-form">
@@ -64,11 +64,8 @@ function critical_css_admin_interface_render(){
               echo "<div class='ccfwp-section-tab ccfwp-support' ".( $tab != 'support' ? 'style="display:none;"' : '').">"; 
                    critical_css_support_settings_callback();
               echo "</div>";
-          ?>
-          <?php 
-     // Output save settings button
-          submit_button( esc_html__('Save Settings', 'critical-css') );
-          ?>
+          ?>          
+          <?php  submit_button( ccfwp_t_string('Save Settings') );?>          
           </form>
     </div>
 <?php }
@@ -76,10 +73,12 @@ function critical_css_admin_interface_render(){
 
 
 add_action( 'admin_enqueue_scripts', 'critical_css_settings_page_css' );
+
 function critical_css_settings_page_css( $hook ) {
- global $current_screen;
- $pagenow = false; 
-  if(isset($current_screen->id) && $current_screen->id == 'toplevel_page_critical-css-for-wp'){ 
+    global $current_screen;
+    $pagenow = false; 
+
+    if(isset($current_screen->id) && $current_screen->id == 'toplevel_page_critical-css-for-wp'){
         $pagenow = true;
     }
     
@@ -91,18 +90,18 @@ function critical_css_settings_page_css( $hook ) {
     }
 }
 
-function critical_css_admin_link($tab = ''){ 
+function critical_css_admin_link($tab = ''){
     
-  $page = 'critical-css-for-wp';
+    $page = 'critical-css-for-wp';
 
     $link = admin_url( 'admin.php?page=' . $page );
 
+    if ( $tab ) {
+        $link .= '&tab=' . $tab;
+    }
 
-  if ( $tab ) {
-    $link .= '&tab=' . $tab;
-  }
+    return esc_url($link);
 
-  return esc_url($link);
 }
 
 function critical_css_get_tab( $default = '', $available = array() ) {
@@ -142,6 +141,7 @@ function critical_css_get_tab( $default = '', $available = array() ) {
      * Url list will be shows
      */ 
     function critical_css_urlslist_callback(){
+
         global $wpdb, $table_prefix;
         $table_name = $table_prefix . 'critical_css_for_wp_urls';        
 
@@ -163,25 +163,25 @@ function critical_css_get_tab( $default = '', $available = array() ) {
             <!-- process section -->
             <div class="ccfwp-css-optimization-wrapper">
             
-            <strong style="font-size:18px;"><?php echo esc_html__('CSS Optimisation Status', 'criticalcssforwp') ?></strong>
-                <p><?php echo esc_html__('Optimisation is running in background. You can see latest result on page reload', 'criticalcssforwp') ?></p>
+                <strong style="font-size:18px;"><?php echo ccfwp_t_string('CSS Optimisation Status') ?></strong>
+                <p><?php echo ccfwp_t_string('Optimisation is running in background. You can see latest result on page reload') ?></p>
                 
                 <div class="ccfwp_progress_bar">
-                    <div class="ccfwp_progress_bar_body" style="width: <?php echo esc_attr($percentage); ?>%;"><?php echo $percentage; ?>%</div>
+                    <div class="ccfwp_progress_bar_body" style="width: <?php echo esc_attr($percentage); ?>%;"><?php echo esc_attr($percentage); ?>%</div>
                 </div>
                 
                 <div class="ccfwp_cached_status_bar">
-                <div style="margin-top:20px;"><strong><?php echo esc_html__('Total :', 'criticalcssforwp') ?></strong> <?php echo esc_attr($total_count). ' URLs';                                         
+                <div style="margin-top:20px;"><strong><?php echo ccfwp_t_string('Total :') ?></strong> <?php echo esc_attr($total_count). ' URLs';                                         
                  ?></div>
-                 <div><strong><?php echo esc_html__('In Progress :', 'criticalcssforwp') ?></strong> <?php echo esc_attr($queue_count). ' URLs';                                         
+                 <div><strong><?php echo ccfwp_t_string('In Progress :') ?></strong> <?php echo esc_attr($queue_count). ' URLs';                                         
                  ?></div>
-                <div><strong><?php echo esc_html__('Critical CSS Optimized  :', 'criticalcssforwp') ?></strong> <?php echo esc_attr($cached_count). ' URLs';                 
+                <div><strong><?php echo ccfwp_t_string('Critical CSS Optimized  :') ?></strong> <?php echo esc_attr($cached_count). ' URLs';                 
                 ?></div>
                 <?php
                     if(critical_css_generate_time($queue_count)){
                         ?>
                         <div>
-                        <strong><?php echo esc_html__('Remaining Time :', 'criticalcssforwp') ?></strong>
+                        <strong><?php echo ccfwp_t_string('Remaining Time :') ?></strong>
                         <?php
                             echo critical_css_generate_time($queue_count);
                         ?>
@@ -192,8 +192,8 @@ function critical_css_get_tab( $default = '', $available = array() ) {
                     if($failed_count > 0){
                         ?>   
                             <div>
-                                <strong><?php echo esc_html__('Failed      :', 'criticalcssforwp') ?></strong> <?php echo esc_attr($failed_count);?>
-                                <a href="#" class="ccfwp-resend-urls button button-secondary">Resend</a>
+                                <strong><?php echo ccfwp_t_string('Failed      :') ?></strong> <?php echo esc_attr($failed_count);?>
+                                <a href="#" class="ccfwp-resend-urls button button-secondary"><?php echo ccfwp_t_string('Resend'); ?></a>
                             </div>                                                        
                         <?php     
                     }
@@ -203,28 +203,28 @@ function critical_css_get_tab( $default = '', $available = array() ) {
             <!-- DataTable section -->
             <div class="ccfwp-table-url-wrapper">                         
              <div id="cwvpb-global-tabs" style="margin-top: 10px;">
-                <a data-id="cwvpb-general-container">All (<?php echo $total_count; ?>)</a> |
-                <a data-id="cwvpb-queue-container">In Queue (<?php echo $queue_count; ?>)</a> |
-                <a data-id="cwvpb-knowledge-container">Completed (<?php echo $cached_count; ?>)</a> |
-                <a data-id="cwvpb-default-container" >Failed (<?php echo $failed_count; ?>)</a>
+                <a data-id="cwvpb-general-container"><?php echo ccfwp_t_string('All'); ?> (<?php echo esc_html($total_count); ?>)</a> |
+                <a data-id="cwvpb-queue-container"><?php echo ccfwp_t_string('In Queue'); ?> (<?php echo esc_html($queue_count); ?>)</a> |
+                <a data-id="cwvpb-knowledge-container"><?php echo ccfwp_t_string('Completed'); ?> (<?php echo esc_html($cached_count); ?>)</a> |
+                <a data-id="cwvpb-default-container" ><?php echo ccfwp_t_string('Failed'); ?> (<?php echo esc_html($failed_count); ?>)</a>
              </div>
                                                         
                 <div class="cwvpb-global-container" id="cwvpb-general-container">
                 <table class="table ccfwp-table-class" id="table_page_cc_style_all" style="width:100%">
                 <thead>
                     <tr>
-                        <th>URL</th>
-                        <th>Status</th>
-                        <th>Size</th>
-                        <th>Created date</th>
+                        <th><?php echo ccfwp_t_string('URL'); ?></th>
+                        <th><?php echo ccfwp_t_string('Status'); ?></th>
+                        <th><?php echo ccfwp_t_string('Size'); ?></th>
+                        <th><?php echo ccfwp_t_string('Created Date'); ?></th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
-                        <th>URL</th>
-                        <th>Status</th>
-                        <th>Size</th>
-                        <th>Created date</th>
+                        <th><?php echo ccfwp_t_string('URL'); ?></th>
+                        <th><?php echo ccfwp_t_string('Status'); ?></th>
+                        <th><?php echo ccfwp_t_string('Size'); ?></th>
+                        <th><?php echo ccfwp_t_string('Created Date'); ?></th>
                     </tr>
                 </tfoot>
                 </table>
@@ -234,18 +234,18 @@ function critical_css_get_tab( $default = '', $available = array() ) {
                 <table class="table ccfwp-table-class" id="table_page_cc_style_queue" style="width:100%">
                 <thead>
                     <tr>
-                        <th>URL</th>
-                        <th>Status</th>
-                        <th>Size</th>
-                        <th>Created date</th>
+                        <th><?php echo ccfwp_t_string('URL'); ?></th>
+                        <th><?php echo ccfwp_t_string('Status'); ?></th>
+                        <th><?php echo ccfwp_t_string('Size'); ?></th>
+                        <th><?php echo ccfwp_t_string('Created Date'); ?></th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
-                        <th>URL</th>
-                        <th>Status</th>
-                        <th>Size</th>
-                        <th>Created date</th>
+                        <th><?php echo ccfwp_t_string('URL'); ?></th>
+                        <th><?php echo ccfwp_t_string('Status'); ?></th>
+                        <th><?php echo ccfwp_t_string('Size'); ?></th>
+                        <th><?php echo ccfwp_t_string('Created Date'); ?></th>
                     </tr>
                 </tfoot>
                 </table>
@@ -255,18 +255,18 @@ function critical_css_get_tab( $default = '', $available = array() ) {
                 <table class="table ccfwp-table-class" id="table_page_cc_style_completed" style="width:100%">
             <thead>
                     <tr>
-                        <th>URL</th>
-                        <th>Status</th>
-                        <th>Size</th>
-                        <th>Created date</th>
+                        <th><?php echo ccfwp_t_string('URL'); ?></th>
+                        <th><?php echo ccfwp_t_string('Status'); ?></th>
+                        <th><?php echo ccfwp_t_string('Size'); ?></th>
+                        <th><?php echo ccfwp_t_string('Created Date'); ?></th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
-                        <th>URL</th>
-                        <th>Status</th>
-                        <th>Size</th>
-                        <th>Created date</th>
+                        <th><?php echo ccfwp_t_string('URL'); ?></th>
+                        <th><?php echo ccfwp_t_string('Status'); ?></th>
+                        <th><?php echo ccfwp_t_string('Size'); ?></th>
+                        <th><?php echo ccfwp_t_string('Created Date'); ?></th>
                     </tr>
                 </tfoot>
                 </table>
@@ -276,19 +276,19 @@ function critical_css_get_tab( $default = '', $available = array() ) {
                 <table class="table ccfwp-table-class" id="table_page_cc_style_failed" style="width:100%">
                 <thead>
                     <tr>
-                        <th>URL</th>
-                        <th>Status</th>
-                        <th>Failed Date</th>
-                        <th>Error</th>
+                        <th><?php echo ccfwp_t_string('URL'); ?></th>
+                        <th><?php echo ccfwp_t_string('Status'); ?></th>
+                        <th><?php echo ccfwp_t_string('Failed Date'); ?></th>
+                        <th><?php echo ccfwp_t_string('Error'); ?></th>
                         
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
-                        <th>URL</th>
-                        <th>Status</th>
-                        <th>Failed Date</th>
-                        <th>Error</th>                        
+                        <th><?php echo ccfwp_t_string('URL'); ?></th>
+                        <th><?php echo ccfwp_t_string('Status'); ?></th>
+                        <th><?php echo ccfwp_t_string('Failed Date'); ?></th>
+                        <th><?php echo ccfwp_t_string('Error'); ?></th>                        
                     </tr>
                 </tfoot>
                 </table>
@@ -297,10 +297,10 @@ function critical_css_get_tab( $default = '', $available = array() ) {
             </div>
 
              <div class="ccfwp-advance-urls-container">
-                <span class="ccfwp-advance-toggle">Advance Settings <span class="dashicons dashicons-admin-generic"></span></span>
+                <span class="ccfwp-advance-toggle"><?php echo ccfwp_t_string('Advance Settings'); ?> <span class="dashicons dashicons-admin-generic"></span></span>
                 <div class="ccfwp-advance-btn-div cwvpb-display-none">
-                <a class="button button-primary ccfwp-recheck-url-cache"><?php _e('Recheck', 'criticalcssforwp'); ?></a>                                
-                    <a class="button button-primary ccfwp-reset-url-cache"><?php _e('Reset Cache', 'criticalcssforwp'); ?></a>                                
+                    <a class="button button-primary ccfwp-recheck-url-cache"><?php echo ccfwp_t_string('Recheck'); ?></a>
+                    <a class="button button-primary ccfwp-reset-url-cache"><?php echo ccfwp_t_string('Reset Cache'); ?></a>
                 </div>
              </div>       
             
@@ -401,15 +401,12 @@ function critical_css_defaults(){
 /*
   WP Settings API
 */
-add_action('admin_init', 'critical_css_settings_init');
+add_action('admin_init', 'ccfwp_settings_init');
 
-function critical_css_settings_init(){
+function ccfwp_settings_init(){
 
   register_setting( 'critical_css_settings_group', 'ccfwp_settings' );
 
-}
-function ccfwp_t_string($string){
-    return esc_html__( $string , 'criticalcssforwp');   
 }
 
 add_action('wp_ajax_ccfwp_send_query_message', 'ccfwp_send_query_message');
@@ -423,9 +420,9 @@ function ccfwp_send_query_message(){
        return;  
     }   
     $customer_type  = 'Are you a premium customer ? No';
-    $message        = saswp_sanitize_textarea_field($_POST['message']); 
-    $email          = saswp_sanitize_textarea_field($_POST['email']); 
-    $premium_cus    = saswp_sanitize_textarea_field($_POST['premium_cus']);   
+    $message        = ccfwp_sanitize_textarea_field($_POST['message']); 
+    $email          = sanitize_email($_POST['email']); 
+    $premium_cus    = ccfwp_sanitize_textarea_field($_POST['premium_cus']);   
                             
     if(function_exists('wp_get_current_user')){
 
@@ -447,7 +444,7 @@ function ccfwp_send_query_message(){
         }            
         //php mailer variables        
         $sendto    = 'team@magazine3.in';
-        $subject   = "Schema Customer Query";
+        $subject   = "Critical Css For WP Customer Query";
         
         $headers[] = 'Content-Type: text/html; charset=UTF-8';
         $headers[] = 'From: '. esc_attr($user_email);            
