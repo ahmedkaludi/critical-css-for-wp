@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 function critical_css_add_menu_links() {
     // Main menu page
-    add_menu_page( __( 'Critical CSS For WP', 'critical-css' ), __( 'Critical CSS For WP', 'critical-css' ), 'manage_options', 'critical-css-for-wp','critical_css_admin_interface_render', 'dashicons-performance', 100 );
+    add_menu_page( __( 'Critical CSS For WP', 'critical-css' ), __( 'Critical CSS For WP', 'critical-css' ), 'manage_options', 'critical-css-for-wp','ccfwp_admin_interface_render', 'dashicons-performance', 100 );
 }
 
 add_action( 'admin_menu', 'critical_css_add_menu_links' );
@@ -28,7 +28,7 @@ add_action( 'admin_menu', 'critical_css_add_menu_links' );
  * @since 1.0
  */
 
-function critical_css_admin_interface_render(){
+function ccfwp_admin_interface_render(){
       // Authentication
     if ( ! current_user_can( 'manage_options' ) ) {
         return;
