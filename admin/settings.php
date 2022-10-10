@@ -361,19 +361,19 @@ function critical_css_get_tab( $default = '', $available = array() ) {
             echo '<h2> '.ccfwp_t_string('Generate Critical Css For').'</h2>';
             echo '<ul>';
             echo '<li>';
-            echo '<input class="" type="checkbox" name="ccfwp_settings[ccfwp_on_home]" value="1" '.(isset($settings["ccfwp_on_home"]) ? "checked": "").' /> ' . esc_html('Home');
+            echo '<input class="" type="checkbox" name="critical_css_settings[ccfwp_on_home]" value="1" '.(isset($settings["ccfwp_on_home"]) ? "checked": "").' /> ' . esc_html('Home');
             echo '</li>';
 
             foreach ($post_types as $key => $value) {
                 echo '<li>';
-                echo '<input class="" type="checkbox" name="ccfwp_settings[ccfwp_on_cp_type]['.esc_attr($key).']" value="1" '.(isset($settings["ccfwp_on_cp_type"][$key]) ? "checked": "").' /> ' . ucwords(esc_html($value));
+                echo '<input class="" type="checkbox" name="critical_css_settings[ccfwp_on_cp_type]['.esc_attr($key).']" value="1" '.(isset($settings["ccfwp_on_cp_type"][$key]) ? "checked": "").' /> ' . ucwords(esc_html($value));
                 echo '</li>';
             }            
 
             if($taxonomies){
                 foreach ($taxonomies as $key => $value) {
                     echo '<li>';
-                    echo '<input class="" type="checkbox" name="ccfwp_settings[ccfwp_on_tax_type]['.esc_attr($key).']" value="1" '.(isset($settings["ccfwp_on_tax_type"][$key]) ? "checked": "").' /> ' . ucwords(esc_html($value));
+                    echo '<input class="" type="checkbox" name="critical_css_settings[ccfwp_on_tax_type]['.esc_attr($key).']" value="1" '.(isset($settings["ccfwp_on_tax_type"][$key]) ? "checked": "").' /> ' . ucwords(esc_html($value));
                     echo '</li>';
                 }
             }
