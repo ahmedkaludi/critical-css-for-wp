@@ -2,7 +2,7 @@
 /*
 Plugin Name: Critical CSS For WP
 Description: Critical css helps the browser to paint fast and render the above fold content of each web page, before downloading the complete css files.
-Version: 1.0.0
+Version: 1.0.1
 Author: Magazine3
 Author URI: https://magazine3.company/
 Donate link: https://www.paypal.me/Kaludi/25
@@ -13,7 +13,7 @@ License: GPL2
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define('CRITICAL_CSS_FOR_WP_VERSION','1.0.0');
+define('CRITICAL_CSS_FOR_WP_VERSION','1.0.1');
 define('CRITICAL_CSS_FOR_WP_PLUGIN_URI', plugin_dir_url(__FILE__));
 define('CRITICAL_CSS_FOR_WP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
