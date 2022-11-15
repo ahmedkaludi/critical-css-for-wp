@@ -36,8 +36,19 @@ class TokenStream
      */
     private array $used = [];
 
+    /**
+     * @var int
+     */
     private int $cursor = 0;
+
+    /**
+     * @var Token|null
+     */
     private $peeked;
+
+    /**
+     * @var bool
+     */
     private bool $peeking = false;
 
     /**
@@ -45,7 +56,7 @@ class TokenStream
      *
      * @return $this
      */
-    public function push(Token $token): static
+    public function push(Token $token): self
     {
         $this->tokens[] = $token;
 
@@ -57,7 +68,7 @@ class TokenStream
      *
      * @return $this
      */
-    public function freeze(): static
+    public function freeze(): self
     {
         return $this;
     }
@@ -109,6 +120,8 @@ class TokenStream
     /**
      * Returns next identifier token.
      *
+     * @return string The identifier token value
+     *
      * @throws SyntaxErrorException If next token is not an identifier
      */
     public function getNextIdentifier(): string
@@ -123,7 +136,9 @@ class TokenStream
     }
 
     /**
-     * Returns next identifier or null if star delimiter token is found.
+     * Returns next identifier or star delimiter token.
+     *
+     * @return string|null The identifier token value or null if star found
      *
      * @throws SyntaxErrorException If next token is not an identifier or a star delimiter
      */
