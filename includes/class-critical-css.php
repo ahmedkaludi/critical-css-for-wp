@@ -196,7 +196,7 @@ class class_critical_css_for_wp{
 
 			$settings = critical_css_defaults();
 
-			$post_types = array('post');
+			$post_types = array();
 			
 			if(!empty($settings['ccfwp_on_cp_type'])){
 				foreach ($settings['ccfwp_on_cp_type'] as $key => $value) {
