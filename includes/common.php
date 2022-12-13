@@ -47,3 +47,11 @@ function ccfwp_sanitize_textarea_field( $str ) {
 
 	return $filtered;
 }
+
+function ccwp_complete_html_after_dom_loaded( $content ) {
+    if(function_exists('is_feed')&& is_feed()){ return $content; }
+    	$content = apply_filters('ccwp_complete_html_after_dom_loaded', $content);
+    return $content;
+}
+
+add_action('wp', function(){ ob_start('ccwp_complete_html_after_dom_loaded'); }, 999);
