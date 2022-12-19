@@ -629,7 +629,7 @@ class class_critical_css_for_wp{
 				if(isset($atts_array['type'])){
 					$atts_array['data-cwvpsb-cc-type'] = $atts_array['type'];
 				}
-				$atts_array['type'] = 'ccwpdelayedstyle';
+				//$atts_array['type'] = 'ccwpdelayedstyle';
 				$delayed_atts_string = $this->ccwp_get_atts_string($atts_array);
 		        $delayed_tag = sprintf('<style %1$s>', $delayed_atts_string) . (!empty($matches1[3][$i]) ? $matches1[3][$i] : '') .'</style>';
 				$html = str_replace($tag, $delayed_tag, $html);
