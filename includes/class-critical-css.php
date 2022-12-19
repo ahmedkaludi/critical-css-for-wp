@@ -23,6 +23,7 @@ class class_critical_css_for_wp{
 	    if ( function_exists('elementor_load_plugin_textdomain') && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
 	    	return;
 		}
+		add_action('wp', array($this, 'delay_css_loadings'), 999);
 		add_action( 'create_term', function($term_id, $tt_id, $taxonomy){
             $this->on_term_create($term_id, $tt_id, $taxonomy);
         }, 10, 3 );
@@ -553,6 +554,135 @@ class class_critical_css_for_wp{
 				$url							
 			));			
 		}
+	}
+
+	public function delay_css_loadings(){
+		if ( function_exists('is_checkout') && is_checkout()  || (function_exists('is_feed')&& is_feed())) {
+        	return;
+	    }
+	    if ( function_exists('elementor_load_plugin_textdomain') && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
+	    	return;
+		}
+		add_filter('ccwp_complete_html_after_dom_loaded', array($this, 'ccwp_delay_css_html'), 1,1);
+	}
+
+	public function ccwp_delay_css_html($html){
+		$return_html = $jetpack_boost = false;
+		if(!$this->check_critical_css()){ 
+		     $return_html = true;
+		}
+
+		if(preg_match('/<style id="jetpack-boost-critical-css">/s', $html)){
+            $return_html = false;
+            $jetpack_boost = true;
+		}
+
+		if($return_html == true){
+			return $html;
+		}
+		$html_no_comments = preg_replace('/<!--(.*)-->/Uis', '', $html);
+		preg_match_all('/<link\s?([^>]+)?>/is', $html_no_comments, $matches);
+
+		if(!isset($matches[0])) {
+			return $html;
+		}
+		
+		foreach($matches[0] as $i => $tag) {
+			$atts_array = !empty($matches[1][$i]) ? $this->ccwp_get_atts_array($matches[1][$i]) : array();
+			if(isset($atts_array['rel']) && stripos($atts_array['rel'], 'stylesheet') === false) {
+				continue;
+			}
+			$delay_flag = false;
+			$excluded_scripts = array(
+				'cwvpsb-delayed-styles',
+			);
+
+			if(!empty($excluded_scripts)) {
+				foreach($excluded_scripts as $excluded_script) {
+					if(strpos($tag, $excluded_script) !== false) {
+						continue 2;
+					}
+				}
+			}
+
+			$delay_flag = true;
+			if(!empty($atts_array['rel'])) {
+				$atts_array['data-cwvpsb-rel'] = $atts_array['rel'];
+			}
+
+			$atts_array['rel'] = 'ccwpdelayedstyle';
+			$atts_array['defer'] = 'defer';
+		
+			if($delay_flag) {
+				$delayed_atts_string = $this->ccwp_get_atts_string($atts_array);
+		        $delayed_tag = sprintf('<link %1$s', $delayed_atts_string) . (!empty($matches[3][$i]) ? $matches[3][$i] : '') .'/>';
+				$html = str_replace($tag, $delayed_tag, $html); 
+				continue;
+			}
+		}
+
+		preg_match_all('#(<style\s?([^>]+)?\/?>)(.*?)<\/style>#is', $html_no_comments, $matches1);
+		if(isset($matches1[0])){
+			foreach($matches1[0] as $i => $tag) {
+				$atts_array = !empty($matches1[2][$i]) ? $this->ccwp_get_atts_array($matches1[2][$i]) : array();
+				if($atts_array['id'] == 'critical-css-for-wp'){ continue; }
+				if(isset($atts_array['type'])){
+					$atts_array['data-cwvpsb-cc-type'] = $atts_array['type'];
+				}
+				//$atts_array['type'] = 'ccwpdelayedstyle';
+				$delayed_atts_string = $this->ccwp_get_atts_string($atts_array);
+		        $delayed_tag = sprintf('<style %1$s>', $delayed_atts_string) . (!empty($matches1[3][$i]) ? $matches1[3][$i] : '') .'</style>';
+				$html = str_replace($tag, $delayed_tag, $html);
+			}
+		}
+
+		if($jetpack_boost == true && preg_match('/<style\s+id="jetpack-boost-critical-css"\s+type="ccwpdelayedstyle">/s', $html)){
+			$html = preg_replace('/<style\s+id="jetpack-boost-critical-css"\s+type="ccwpdelayedstyle">/s', '<style id="jetpack-boost-critical-css">', $html);
+		}
+		return $html;
+	}
+
+	function check_critical_css($url=''){
+		$user_dirname = $this->cachepath();
+		if(!$url){
+    		global $wp;
+    		$url = home_url( $wp->request );
+		}
+		$url = trailingslashit($url);				
+		return file_exists($user_dirname.md5($url).'.css')? true :  false; 
+	}
+
+	function ccwp_get_atts_string($atts_array) {
+
+		if(!empty($atts_array)) {
+			$assigned_atts_array = array_map(
+			function($name, $value) {
+				if($value === '') {
+					return $name;
+				}
+				return sprintf('%s="%s"', $name, esc_attr($value));
+			},
+				array_keys($atts_array),
+				$atts_array
+			);
+			$atts_string = implode(' ', $assigned_atts_array);
+			return $atts_string;
+		}
+		return false;
+	}
+
+	function ccwp_get_atts_array($atts_string) {
+
+		if(!empty($atts_string)) {
+			$atts_array = array_map(
+				function(array $attribute) {
+					return $attribute['value'];
+				},
+				wp_kses_hair($atts_string, wp_allowed_protocols())
+			);
+			return $atts_array;
+		}
+		return false;
 	}
 	
 	public function ccfwp_resend_single_url_for_cache(){

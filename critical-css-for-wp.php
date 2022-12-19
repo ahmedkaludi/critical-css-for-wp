@@ -22,6 +22,11 @@ define('CRITICAL_CSS_FOR_WP_PLUGIN_DIR', plugin_dir_path(__FILE__));
  **/
 define('CRITICAL_CSS_FOR_WP_CSS_DIR', WP_CONTENT_DIR . "/cache/critical-css-for-wp/css/");
 
+define('CCWP_CACHE_NAME', 'ccwp_cleared_timestamp');
+
+define('CCWP_JS_EXCLUDE_CACHE_DIR', WP_CONTENT_DIR . "/cache/critical-css-for-wp/excluded-js/");
+define('CCWP_JS_EXCLUDE_CACHE_URL', site_url("/wp-content/cache/critical-css-for-wp/excluded-js/"));
+
 require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR . "includes/common.php";
 require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR . "admin/settings.php";
 require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR . "includes/class-critical-css.php";
@@ -46,6 +51,10 @@ function ccfwp_admin_enqueue($check) {
     wp_enqueue_script( 'ccfwp-admin-js' );
 }
 
+add_action( 'init', 'load_js_data' );
+function load_js_data(){
+    require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR."includes/javascript/delay-js.php";
+}
 
 register_activation_hook( __FILE__, 'ccfwp_on_install' );
 
