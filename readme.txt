@@ -14,7 +14,30 @@ Critical CSS For WP intends to provide great experience to the web page visitors
 
 
 <strong>Works well with: </strong><br>
-[WP Super Cache](https://wordpress.org/plugins/wp-super-cache/), [WP Fastest Cache](https://wordpress.org/plugins/wp-fastest-cache/), [W3 Total Cache](https://wordpress.org/plugins/w3-total-cache/), [WP-Optimize – Cache, Clean, Compress.](https://wordpress.org/plugins/wp-optimize/) and More.
+* Autoptimize
+* Aruba HiSpeed Cache
+* Breeze – WordPress Cache
+* Clearfy Cache
+* Cache Enabler
+* GoDaddy Cache
+* Hummingbird
+* Kinsta Cache
+* LiteSpeed Cache
+* Nginx Helper
+* Redis Object Cache
+* SiteGround SuperCacher
+* Speed Booster Pack ⚡ PageSpeed Optimization Suite
+* WP Super Cache
+* WP Fastest Cache
+* W3 Total Cache
+* WP-Optimize
+* WPEngine Cache
+* WP Speed of Light
+* 10Web Booster – Website speed optimization, Cache & Page Speed optimizer
+
+<strong>Screenshots </strong><br>
+![Before](/images/screenshots/before.jpg?raw=true "Before")
+![After](/images/screenshots/after.jpg?raw=true "After")
 
 == Changelog ==
 
