@@ -36,8 +36,8 @@ Critical CSS For WP intends to provide great experience to the web page visitors
 * 10Web Booster – Website speed optimization, Cache & Page Speed optimizer
 
 <strong>Screenshots </strong><br>
-![Before](/images/screenshots/before.jpg?raw=true "Before")
-![After](/images/screenshots/after.jpg?raw=true "After")
+![ScreenShot](/images/screenshots/before.jpg?raw=true "Before")
+![ScreenShot](/images/screenshots/after.jpg?raw=true "After")
 
 == Changelog ==
 
