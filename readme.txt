@@ -1,4 +1,4 @@
-=== Critical CSS For WP ===
+=== Reduce Unused CSS Solution with Critical CSS For WP ===
 Contributors: magazine3
 Tags: Critical, Critical CSS, Core Web Vital, Cache, SEO
 Requires at least: 3.0
