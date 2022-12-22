@@ -13,7 +13,8 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Critical CSS For WP intends to provide great experience to the web page visitors by improving the performance of the web page. Here we'd remove the unused CSS which helps to paint fast and render the above fold content, before downloading the complete css files.
 
 
-<strong>Works well with: </strong><br>
+### Works well with:
+
 * Autoptimize
 * Aruba HiSpeed Cache
 * Breeze – WordPress Cache
@@ -34,10 +35,6 @@ Critical CSS For WP intends to provide great experience to the web page visitors
 * WPEngine Cache
 * WP Speed of Light
 * 10Web Booster – Website speed optimization, Cache & Page Speed optimizer
-
-<strong>Screenshots </strong><br>
-![ScreenShot](/images/screenshots/before.jpg?raw=true "Before")
-![ScreenShot](/images/screenshots/after.jpg?raw=true "After")
 
 == Changelog ==
 
