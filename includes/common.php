@@ -48,6 +48,20 @@ function ccfwp_sanitize_textarea_field( $str ) {
 	return $filtered;
 }
 
+function ccwp_wprocket_lazyjs()
+{
+    if(defined('WP_ROCKET_VERSION'))
+    {
+        $ccwp_wprocket_options=get_option('wp_rocket_settings',null);
+
+        if(isset($ccwp_wprocket_options['defer_all_js']) && $ccwp_wprocket_options['defer_all_js']==1)
+        {
+            return true;   
+        }
+    }
+    return false;
+}
+
 function ccwp_complete_html_after_dom_loaded( $content ) {
     if(function_exists('is_feed')&& is_feed()){ return $content; }
     	$content = apply_filters('ccwp_complete_html_after_dom_loaded', $content);

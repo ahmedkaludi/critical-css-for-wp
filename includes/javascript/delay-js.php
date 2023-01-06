@@ -53,15 +53,6 @@ function ccwp_delay_js_main() {
     if ( function_exists('elementor_load_plugin_textdomain') && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
         return;
     }
-    if(defined('WP_ROCKET_VERSION'))
-    {
-        $ccwp_wprocket_options=get_option('wp_rocket_settings',null);
-
-        if(isset($ccwp_wprocket_options['defer_all_js']) && $ccwp_wprocket_options['defer_all_js']==1)
-        {
-            return;   
-        }
-    }
 
     add_filter('ccwp_complete_html_after_dom_loaded', 'ccwp_delay_js_html', 2);
     add_filter('ccwp_complete_html_after_dom_loaded', 'ccwp_remove_js_query_param', 99);
@@ -71,6 +62,9 @@ add_action('wp', 'ccwp_delay_js_main');
 
 function ccwp_delay_js_html($html) {
 
+    if(ccwp_wprocket_lazyjs()){
+       return $html;   
+    }
     $html_no_comments = $html;//preg_replace('/<!--(.*)-->/Uis', '', $html);
     preg_match_all('#(<script\s?([^>]+)?\/?>)(.*?)<\/script>#is', $html_no_comments, $matches);
     if(!isset($matches[0])) {
@@ -149,7 +143,6 @@ function ccwp_delay_js_html($html) {
 
 function ccwp_remove_js_query_param($html){
 
-    
     $html = preg_replace('/type="ccwpdelayedscript"\s+src="(.*?)\.js\?(.*?)"/',  'type="ccwpdelayedscript" src="$1.js"', $html);
     if(preg_match('/<link(.*?)rel="ccwpdelayedstyle"(.*?)href="(.*?)\.css\?(.*?)"(.*?)>/m',$html)){
         $html = preg_replace('/<link(.*?)rel="ccwpdelayedstyle"(.*?)href="(.*?)\.css\?(.*?)"(.*?)>/',  '<link$1rel="ccwpdelayedstyle"$2href="$3.css"$5>', $html);
@@ -185,7 +178,16 @@ function ccwp_delay_exclude_js(){
 }
 add_action( 'wp_enqueue_scripts',  'ccwp_scripts_styles' , 99999);
 function ccwp_scripts_styles(){
-    
+
+    if(defined('WP_ROCKET_VERSION'))
+    {
+        $ccwp_wprocket_options=get_option('wp_rocket_settings',null);
+
+        if(isset($ccwp_wprocket_options['defer_all_js']) && $ccwp_wprocket_options['defer_all_js']==1)
+        {
+            return;   
+        }
+    }
     global $wp_scripts;
     $wp_scripts->all_deps($wp_scripts->queue);
 
@@ -274,99 +276,6 @@ function ccwp_remove_css_js_version($src, $handle ){
     $src = add_query_arg( 'time', time(), $src );
     return $src;
 }
-
-
-function ccwp_merge_js_scripts(){
-    global $wp_scripts;
-    $wp_scripts->all_deps($wp_scripts->queue);     
-   
-    $uniqueid = get_transient( CCWP_CACHE_NAME );
-    global $wp;
-    $url = home_url( $wp->request );
-    $filename = md5($url.$uniqueid);
-     $user_dirname = CCWP_JS_MERGE_FILE_CACHE_DIR;
-     $user_urlname = CCWP_JS_MERGE_FILE_CACHE_CACHE_URL;
-
-    if(!file_exists($user_dirname.'/'.$filename.'.js')){
-        $combined_ex_js_arr= array();
-        $jscontent = '';
-        $regex = ccwp_delay_exclude_js();
-        include_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
-        include_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
-        if (!class_exists('WP_Filesystem_Direct')) {
-             return false;
-        }
-        $wp_scripts->all_deps($wp_scripts->queue);
-        foreach( $wp_scripts->to_do as $key=>$handle) 
-        {
-            $localize = '';
-            $localize_handle = 'ccwp-merged-js';
-            //$src = strtok($wp_scripts->registered[$handle]->src, '?');
-            if($regex && preg_match( '#(' . $regex . ')#', $wp_scripts->registered[$handle]->src )){
-                $localize_handle = $handle;
-            }
-            if($regex && preg_match( '#(' . $regex . ')#', $handle )){
-                $localize_handle = $handle;
-            }
-            
-    
-            if($localize_handle == 'ccwp-merged-js'){
-                if(@array_key_exists('data', $wp_scripts->registered[$handle]->extra)) {
-                    $localize = $wp_scripts->registered[$handle]->extra['data'] . ';';
-                }
-                $file_url = $wp_scripts->registered[$handle]->src;
-                $parse_url = parse_url($file_url);
-                $file_path = str_replace(array(get_site_url(),'?'.@$parse_url['query']),array(ABSPATH,''),$file_url);
-
-                if(substr( $file_path, 0, 13 ) === "/wp-includes/"){
-                    $file_path = ABSPATH.$file_path;    
-                }
-                $wp_filesystem = new WP_Filesystem_Direct(null);
-                if(file_exists($file_path)){
-                    $js = $wp_filesystem->get_contents($file_path);
-                }
-                unset($wp_filesystem);
-                if (empty($js)) {
-                     $request = wp_remote_get($file_url);
-                     $js = wp_remote_retrieve_body($request);
-                }
-
-
-                //$combined_ex_js_arr[$handle] = ;
-                $jscontent .= "\n/*File: $file_url*/\n".$localize.$js;
-                
-                //wp_deregister_script($handle);
-            }
-        }
-        if($jscontent){
-            $fileSystem = new WP_Filesystem_Direct( new StdClass() );
-            if(!file_exists($user_dirname)) wp_mkdir_p($user_dirname);
-            $fileSystem->put_contents($user_dirname.'/'.$filename.'.js', $jscontent, 644 );
-            unset($fileSystem);
-        }
-    }
-
-
-    $uniqueid = get_transient( CCWP_CACHE_NAME );
-    global $wp;
-    $url = home_url( $wp->request );
-    $filename = md5($url.$uniqueid);
-     $user_dirname = CCWP_JS_MERGE_FILE_CACHE_DIR;
-     $user_urlname = CCWP_JS_MERGE_FILE_CACHE_CACHE_URL;
-     
-     if(file_exists($user_dirname.'/'.$filename.'.js')){
-        wp_register_script('corewvps-delayjs-mergedfile', $user_urlname.'/'.$filename.'.js', array(), CRITICAL_CSS_FOR_WP_VERSION, true);
-        wp_enqueue_script('corewvps-delayjs-mergedfile');
-     }
-    
-}
-
-add_action('wp_ajax_ccwp_delay_ajax_request','ccwp_delay_ajax_request');
-add_action('wp_ajax_nopriv_ccwp_delay_ajax_request','ccwp_delay_ajax_request');
-function ccwp_delay_ajax_request(){
-        echo 'success';
-        exit();
-    }
 
 function ccwp_delay_js_load() {
     $submit_url =  admin_url('admin-ajax.php?action=ccwp_delay_ajax_request');
