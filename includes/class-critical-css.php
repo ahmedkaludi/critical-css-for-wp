@@ -566,6 +566,16 @@ class class_critical_css_for_wp{
 	    if ( function_exists('elementor_load_plugin_textdomain') && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
 	    	return;
 		}
+		if(defined('WP_ROCKET_VERSION'))
+		{
+			$ccwp_wprocket_options=get_option('wp_rocket_settings',null);
+	
+			if(isset($ccwp_wprocket_options['defer_all_js']) && $ccwp_wprocket_options['defer_all_js']==1)
+			{
+				return;   
+			}
+		}
+
 		add_filter('ccwp_complete_html_after_dom_loaded', array($this, 'ccwp_delay_css_html'), 1,1);
 	}
 
@@ -579,17 +589,6 @@ class class_critical_css_for_wp{
             $return_html = false;
             $jetpack_boost = true;
 		}
-
-		if(defined('WP_ROCKET_VERSION'))
-		{
-			$ccwp_wprocket_options=get_option('wp_rocket_settings',null);
-
-			if(isset($ccwp_wprocket_options['critical_css']) && $ccwp_wprocket_options['critical_css']==1)
-			{
-				$return_html = false;   
-			}
-		}
-		
 
 		if($return_html == true){
 			return $html;
