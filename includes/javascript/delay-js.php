@@ -53,6 +53,16 @@ function ccwp_delay_js_main() {
     if ( function_exists('elementor_load_plugin_textdomain') && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
         return;
     }
+    if(defined('WP_ROCKET_VERSION'))
+    {
+        $ccwp_wprocket_options=get_option('wp_rocket_settings',null);
+
+        if(isset($ccwp_wprocket_options['defer_all_js']) && $ccwp_wprocket_options['defer_all_js']==1)
+        {
+            return;   
+        }
+    }
+
     add_filter('ccwp_complete_html_after_dom_loaded', 'ccwp_delay_js_html', 2);
     add_filter('ccwp_complete_html_after_dom_loaded', 'ccwp_remove_js_query_param', 99);
     add_action('wp_footer', 'ccwp_delay_js_load', PHP_INT_MAX);

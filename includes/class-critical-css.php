@@ -577,6 +577,17 @@ class class_critical_css_for_wp{
             $jetpack_boost = true;
 		}
 
+		if(defined('WP_ROCKET_VERSION'))
+		{
+			$ccwp_wprocket_options=get_option('wp_rocket_settings',null);
+
+			if(isset($ccwp_wprocket_options['critical_css']) && $ccwp_wprocket_options['critical_css']==1)
+			{
+				$return_html = false;   
+			}
+		}
+		
+
 		if($return_html == true){
 			return $html;
 		}
