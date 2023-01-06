@@ -391,7 +391,8 @@ function critical_css_get_tab( $default = '', $available = array() ) {
 function critical_css_defaults(){
     $defaults = array(
        'ccfwp_on_home'      => 1,
-       'ccfwp_on_cp_type'   => array( 'post' => 1 )
+       'ccfwp_on_cp_type'   => array( 'post' => 1 ),
+       'exclude_delay_js'   =>'',
     );        
     $settings = get_option( 'ccfwp_settings', $defaults );
     return $settings;
