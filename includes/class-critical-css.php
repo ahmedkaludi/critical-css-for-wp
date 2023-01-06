@@ -55,7 +55,7 @@ class class_critical_css_for_wp{
 		     wp_schedule_event( time(), 'every_one_hour',  'isa_add_every_one_hour_crtlcss' );
 		 }
 		add_action( 'isa_add_every_one_hour_crtlcss', array($this, 'every_one_minutes_event_func_crtlcss' ) );					
-		add_action( 'admin_init', array($this, 'every_one_minutes_event_func_crtlcss' ) );					
+		//add_action( 'admin_init', array($this, 'every_one_minutes_event_func_crtlcss' ) );					
 		
 	}
 
