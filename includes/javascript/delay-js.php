@@ -263,6 +263,9 @@ function ccwp_scripts_styles(){
 }
 add_filter( 'script_loader_src', 'ccwp_remove_css_js_version', 9999, 2 );
 function ccwp_remove_css_js_version($src, $handle ){
+    if(ccwp_wprocket_lazyjs()){
+        return $src;   
+     }
     $handles_with_version = [ 'corewvps-mergejsfile', 'corewvps-cc','corewvps-mergecssfile' ];
     if ( strpos( $src, 'ver=' ) && in_array( $handle, $handles_with_version, true ) ){
         //$src = remove_query_arg( 'ver', $src );
