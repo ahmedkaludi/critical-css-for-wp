@@ -575,7 +575,7 @@ class class_critical_css_for_wp{
 
 	public function ccwp_delay_css_html($html){
 
-		if(ccwp_wprocket_lazyjs()){
+		if($this->ccwp_wprocket_lazyjs()){
 			return $html;   
 		}
 
@@ -851,7 +851,7 @@ class class_critical_css_for_wp{
 																
 		if($_GET['search']['value']){
 			$search = sanitize_text_field($_GET['search']['value']);
-			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM %s WHERE `url` LIKE %s ",
+			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE `url` LIKE %s ",
 			$table_name,
 			'%' . $wpdb->esc_like($search) . '%'
 			),			
@@ -859,16 +859,16 @@ class class_critical_css_for_wp{
 			
 			$result = $wpdb->get_results(
 				stripslashes($wpdb->prepare(
-					"SELECT * FROM %s WHERE `url` LIKE %s LIMIT %d, %d",
-					$table_name,'%' . $wpdb->esc_like($search) . '%', $offset, $length
+					"SELECT * FROM $table_name WHERE `url` LIKE %s LIMIT %d, %d",
+					'%' . $wpdb->esc_like($search) . '%', $offset, $length
 				))
 			, ARRAY_A);
 		}else
 		{
-			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM %s",$table_name));
+			$total_count  = $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
 			$result = $wpdb->get_results(
 				stripslashes($wpdb->prepare(
-					"SELECT * FROM %s LIMIT %d, %d",$table_name,$offset, $length
+					"SELECT * FROM $table_name LIMIT %d, %d",$offset, $length
 				))
 			, ARRAY_A);
 		}
@@ -1149,6 +1149,20 @@ class class_critical_css_for_wp{
 			}
 	}
 	}
+
+	function ccwp_wprocket_lazyjs()
+{
+    if(defined('WP_ROCKET_VERSION'))
+    {
+        $ccwp_wprocket_options=get_option('wp_rocket_settings',null);
+
+        if(isset($ccwp_wprocket_options['defer_all_js']) && $ccwp_wprocket_options['defer_all_js']==1)
+        {
+            return true;   
+        }
+    }
+    return false;
+}
 
 } 
 

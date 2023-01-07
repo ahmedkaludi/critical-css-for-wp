@@ -54,6 +54,9 @@ function ccwp_delay_js_main() {
         return;
     }
 
+    if(ccwp_wprocket_lazyjs()){
+        return $html;   
+     }
     add_filter('ccwp_complete_html_after_dom_loaded', 'ccwp_delay_js_html', 2);
     add_filter('ccwp_complete_html_after_dom_loaded', 'ccwp_remove_js_query_param', 99);
     add_action('wp_footer', 'ccwp_delay_js_load', PHP_INT_MAX);
@@ -62,9 +65,6 @@ add_action('wp', 'ccwp_delay_js_main');
 
 function ccwp_delay_js_html($html) {
 
-    if(ccwp_wprocket_lazyjs()){
-       return $html;   
-    }
     $html_no_comments = $html;//preg_replace('/<!--(.*)-->/Uis', '', $html);
     preg_match_all('#(<script\s?([^>]+)?\/?>)(.*?)<\/script>#is', $html_no_comments, $matches);
     if(!isset($matches[0])) {
@@ -179,14 +179,8 @@ function ccwp_delay_exclude_js(){
 add_action( 'wp_enqueue_scripts',  'ccwp_scripts_styles' , 99999);
 function ccwp_scripts_styles(){
 
-    if(defined('WP_ROCKET_VERSION'))
-    {
-        $ccwp_wprocket_options=get_option('wp_rocket_settings',null);
-
-        if(isset($ccwp_wprocket_options['defer_all_js']) && $ccwp_wprocket_options['defer_all_js']==1)
-        {
-            return;   
-        }
+    if(ccwp_wprocket_lazyjs()){
+       return;   
     }
     global $wp_scripts;
     $wp_scripts->all_deps($wp_scripts->queue);
