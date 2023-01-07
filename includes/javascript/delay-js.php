@@ -55,7 +55,7 @@ function ccwp_delay_js_main() {
     }
 
     if(ccwp_wprocket_lazyjs()){
-        return $html;   
+        return;   
      }
     add_filter('ccwp_complete_html_after_dom_loaded', 'ccwp_delay_js_html', 2);
     add_filter('ccwp_complete_html_after_dom_loaded', 'ccwp_remove_js_query_param', 99);

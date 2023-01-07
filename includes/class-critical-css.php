@@ -338,11 +338,8 @@ class class_critical_css_for_wp{
 		$targetUrl = $current_url;		
 	    $user_dirname = $this->cachepath();
 		$content = @file_get_contents($targetUrl);		
-		$regex1 = '/<link(.*?)href="(.*?)"(.*?)>/';
-		preg_match_all( $regex1, $content, $matches1 , PREG_SET_ORDER );
-		$regex2 = "/<link(.*?)href='(.*?)'(.*?)>/";
-		preg_match_all( $regex2, $content, $matches2 , PREG_SET_ORDER );
-		$matches=array_merge($matches1,$matches2);
+		$regex = '/<link(.*?)href="(.*?)"(.*?)>/';
+		preg_match_all( $regex1, $content, $matches , PREG_SET_ORDER );
 				
 		$rowcss = '';
 		$all_css = [];
