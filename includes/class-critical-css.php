@@ -1140,7 +1140,7 @@ class class_critical_css_for_wp{
 
 	}
 	function ccfwp_add_admin_notices(){
-	if(filter_var( ini_get( 'allow_url_fopen' ), FILTER_VALIDATE_BOOLEAN )) {
+	if(!filter_var( ini_get( 'allow_url_fopen' ), FILTER_VALIDATE_BOOLEAN )) {
 		$user = wp_get_current_user();
 		if ( in_array( 'administrator', (array) $user->roles ) ) {
 			echo '<div class="notice notice-warning is-dismissible">
