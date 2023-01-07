@@ -17,6 +17,8 @@ class class_critical_css_for_wp{
 	}
 
 	public function critical_hooks(){
+
+		add_action('admin_notices', array($this,'ccfwp_add_admin_notices'));
 		if ( function_exists('is_checkout') && is_checkout()) {
         	return;
 	    }
@@ -56,6 +58,7 @@ class class_critical_css_for_wp{
 		 }
 		add_action( 'isa_add_every_one_hour_crtlcss', array($this, 'every_one_minutes_event_func_crtlcss' ) );					
 		//add_action( 'admin_init', array($this, 'every_one_minutes_event_func_crtlcss' ) );					
+			
 		
 	}
 
@@ -1135,7 +1138,17 @@ class class_critical_css_for_wp{
 
 		echo json_encode($retuernData);die;
 
-	}	
+	}
+	function ccfwp_add_admin_notices(){
+	if(filter_var( ini_get( 'allow_url_fopen' ), FILTER_VALIDATE_BOOLEAN )) {
+		$user = wp_get_current_user();
+		if ( in_array( 'administrator', (array) $user->roles ) ) {
+			echo '<div class="notice notice-warning is-dismissible">
+				  <p>'.esc_html('Critical CSS For WP needs ').'<strong>'.esc_html('"allow_url_fopen"').'</strong>'.esc_html(' option to be enabled in PHP configuration to work.').' </p>
+				 </div>';
+			}
+	}
+	}
 
 } 
 
