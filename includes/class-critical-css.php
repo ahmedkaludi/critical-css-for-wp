@@ -17,7 +17,7 @@ class class_critical_css_for_wp{
 	}
 
 	public function critical_hooks(){
-		if ( function_exists('is_checkout') && is_checkout()  || (function_exists('is_feed')&& is_feed())) {
+		if ( function_exists('is_checkout') && is_checkout()) {
         	return;
 	    }
 	    if ( function_exists('elementor_load_plugin_textdomain') && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
@@ -848,23 +848,24 @@ class class_critical_css_for_wp{
 																
 		if($_GET['search']['value']){
 			$search = sanitize_text_field($_GET['search']['value']);
-			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE `url` LIKE %s ",
+			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM %s WHERE `url` LIKE %s ",
+			$table_name,
 			'%' . $wpdb->esc_like($search) . '%'
 			),			
 			);
 			
 			$result = $wpdb->get_results(
 				stripslashes($wpdb->prepare(
-					"SELECT * FROM $table_name WHERE `url` LIKE %s LIMIT %d, %d",
-					'%' . $wpdb->esc_like($search) . '%', $offset, $length
+					"SELECT * FROM %s WHERE `url` LIKE %s LIMIT %d, %d",
+					$table_name,'%' . $wpdb->esc_like($search) . '%', $offset, $length
 				))
 			, ARRAY_A);
 		}else
 		{
-			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name"));
+			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM %s",$table_name));
 			$result = $wpdb->get_results(
 				stripslashes($wpdb->prepare(
-					"SELECT * FROM $table_name LIMIT %d, %d", $offset, $length
+					"SELECT * FROM %s LIMIT %d, %d",$table_name,$offset, $length
 				))
 			, ARRAY_A);
 		}
@@ -927,23 +928,24 @@ class class_critical_css_for_wp{
 																
 		if($_GET['search']['value']){
 			$search = sanitize_text_field($_GET['search']['value']);
-			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE `url` LIKE %s AND `status`='cached'",
-			'%' . $wpdb->esc_like($search) . '%'
+			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE `url` LIKE %s AND `status`=%s",
+			'%' . $wpdb->esc_like($search) . '%',
+			'cached'
 			),			
 			);
 			
 			$result = $wpdb->get_results(
 				stripslashes($wpdb->prepare(
-					"SELECT * FROM $table_name WHERE `url` LIKE %s AND `status`='cached' LIMIT %d, %d",
-					'%' . $wpdb->esc_like($search) . '%', $offset, $length
+					"SELECT * FROM $table_name WHERE `url` LIKE %s AND `status`=%s LIMIT %d, %d",
+					'%' . $wpdb->esc_like($search) . '%','cached', $offset, $length
 				))
 			, ARRAY_A);
 		}else
 		{
-			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name Where `status`='cached'"));
+			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name Where `status`=%s",'cached'));
 			$result = $wpdb->get_results(
 				stripslashes($wpdb->prepare(
-					"SELECT * FROM $table_name Where `status`='cached' LIMIT %d, %d", $offset, $length
+					"SELECT * FROM $table_name Where `status`=%s LIMIT %d, %d",'cached', $offset, $length
 				))
 			, ARRAY_A);
 		}
@@ -1004,23 +1006,24 @@ class class_critical_css_for_wp{
 																
 		if($_GET['search']['value']){
 			$search = sanitize_text_field($_GET['search']['value']);
-			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE `url` LIKE %s AND `status`='failed'",
-			'%' . $wpdb->esc_like($search) . '%'
+			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE `url` LIKE %s AND `status`=%s",
+			'%' . $wpdb->esc_like($search) . '%',
+			'failed'
 			),			
 			);
 			
 			$result = $wpdb->get_results(
 				stripslashes($wpdb->prepare(
-					"SELECT * FROM $table_name WHERE `url` LIKE %s AND `status`='failed' LIMIT %d, %d",
-					'%' . $wpdb->esc_like($search) . '%', $offset, $length
+					"SELECT * FROM $table_name WHERE `url` LIKE %s AND `status`=%s LIMIT %d, %d",
+					'%' . $wpdb->esc_like($search) . '%', 'failed',$offset, $length
 				))
 			, ARRAY_A);
 		}else
 		{
-			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name Where `status`='failed'"));
+			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name Where `status`=%s",'failed'));
 			$result = $wpdb->get_results(
 				stripslashes($wpdb->prepare(
-					"SELECT * FROM $table_name Where `status`='failed' LIMIT %d, %d", $offset, $length
+					"SELECT * FROM $table_name Where `status`=%s LIMIT %d, %d",'failed', $offset, $length
 				))
 			, ARRAY_A);
 		}
@@ -1080,23 +1083,24 @@ class class_critical_css_for_wp{
 																
 		if($_GET['search']['value']){
 			$search = sanitize_text_field($_GET['search']['value']);
-			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE `url` LIKE %s AND `status`='queue'",
-			'%' . $wpdb->esc_like($search) . '%'
+			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE `url` LIKE %s AND `status`=%s",
+			'%' . $wpdb->esc_like($search) . '%',
+			'queue'
 			),			
 			);
 			
 			$result = $wpdb->get_results(
 				stripslashes($wpdb->prepare(
-					"SELECT * FROM $table_name WHERE `url` LIKE %s AND `status`='queue' LIMIT %d, %d",
-					'%' . $wpdb->esc_like($search) . '%', $offset, $length
+					"SELECT * FROM $table_name WHERE `url` LIKE %s AND `status`=%s LIMIT %d, %d",
+					'%' . $wpdb->esc_like($search) . '%','queue', $offset, $length
 				))
 			, ARRAY_A);
 		}else
 		{
-			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name Where `status`='queue'"));
+			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name Where `status`=%s",'queue'));
 			$result = $wpdb->get_results(
 				stripslashes($wpdb->prepare(
-					"SELECT * FROM $table_name Where `status`='queue' LIMIT %d, %d", $offset, $length
+					"SELECT * FROM $table_name Where `status`=%s LIMIT %d, %d", 'queue',$offset, $length
 				))
 			, ARRAY_A);
 		}
@@ -1106,7 +1110,7 @@ class class_critical_css_for_wp{
 		if(!empty($result)){
 
 			foreach ($result as $value) {
-				
+				$size="";
 				if($value['status'] == 'cached'){
 					$user_dirname = $this->cachepath();
 					$size = filesize($user_dirname.'/'.md5($value['url']).'.css');					
