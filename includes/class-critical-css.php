@@ -18,13 +18,14 @@ class class_critical_css_for_wp{
 
 	public function critical_hooks(){
 
-		add_action('admin_notices', array($this,'ccfwp_add_admin_notices'));
+		
 		if ( function_exists('is_checkout') && is_checkout()) {
         	return;
 	    }
 	    if ( function_exists('elementor_load_plugin_textdomain') && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
 	    	return;
 		}
+		add_action('admin_notices', array($this,'ccfwp_add_admin_notices'));
 		add_action('wp', array($this, 'delay_css_loadings'), 999);
 		add_action( 'create_term', function($term_id, $tt_id, $taxonomy){
             $this->on_term_create($term_id, $tt_id, $taxonomy);
@@ -338,8 +339,12 @@ class class_critical_css_for_wp{
 		$targetUrl = $current_url;		
 	    $user_dirname = $this->cachepath();
 		$content = @file_get_contents($targetUrl);		
-		$regex = '/<link(.*?)href="(.*?)"(.*?)>/';
-		preg_match_all( $regex1, $content, $matches , PREG_SET_ORDER );
+		$regex1 = '/<link(.*?)href="(.*?)"(.*?)>/';
+		preg_match_all( $regex1, $content, $matches1 , PREG_SET_ORDER );
+		$regex2 = "/<link(.*?)href='(.*?)'(.*?)>/";
+		preg_match_all( $regex2, $content, $matches2 , PREG_SET_ORDER );
+		$matches=array_merge($matches1,$matches2);
+		
 				
 		$rowcss = '';
 		$all_css = [];
@@ -347,7 +352,7 @@ class class_critical_css_for_wp{
 		if($matches){        
 			
 			foreach($matches as $mat){						
-				if(strpos($mat[2], '.css') !== false) {
+				if((strpos($mat[2], '.css') !== false) && (strpos($mat[1], 'preload') === false)) {
 					$all_css[]  = $mat[2];					
 					$rowcssdata = @file_get_contents($mat[2]);             
 					$regexn = '/@import\s*(url)?\s*\(?([^;]+?)\)?;/';
@@ -393,14 +398,15 @@ class class_critical_css_for_wp{
 			$extracted_css_arr = array();
 
 			$page_specific = new \PageSpecificCss\PageSpecificCss();
-			$page_specific->addBaseRules($rowcss);
+			$page_specific_css = preg_replace( "/@media[^{]*+{([^{}]++|{[^{}]*+})*+}/",'', $rowcss);
+			$page_specific->addBaseRules($page_specific_css);
 			$page_specific->addHtmlToStore($rawHtml);
 			$extractedCss = $page_specific->buildExtractedRuleSet();							
 			$extracted_css_arr[] = $extractedCss;	
 
 		}			
 		
-		preg_match_all( "/@media [^{]*+{([^{}]++|{[^{}]*+})*+}/", $rowcss, $matchess , PREG_SET_ORDER );
+		preg_match_all( "/@media[^{]*+{([^{}]++|{[^{}]*+})*+}/", $rowcss, $matchess , PREG_SET_ORDER );
 
 		if($matchess){
 		
