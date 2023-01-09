@@ -323,7 +323,7 @@ function ccwp_delay_js_load() {
                 }
             }
             
-            document.onreadystatechange = (e) => {
+            document.addEventListener("readystatechange", (e) => {
                 if (e.target.readyState === "complete") {
                 calculate_load_times();
                 }
