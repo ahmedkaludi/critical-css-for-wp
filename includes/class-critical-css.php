@@ -1138,24 +1138,44 @@ class class_critical_css_for_wp{
 		echo json_encode($retuernData);die;
 
 	}
-	function ccfwp_add_admin_notices(){
-	if(!filter_var( ini_get( 'allow_url_fopen' ), FILTER_VALIDATE_BOOLEAN )) {
+	public function ccfwp_add_admin_notices(){
+	
 		$user = wp_get_current_user();
 		if ( in_array( 'administrator', (array) $user->roles ) ) {
+			if(!filter_var( ini_get( 'allow_url_fopen' ), FILTER_VALIDATE_BOOLEAN )) {
 			echo '<div class="notice notice-warning is-dismissible">
 				  <p>'.esc_html('Critical CSS For WP needs ').'<strong>'.esc_html('"allow_url_fopen"').'</strong>'.esc_html(' option to be enabled in PHP configuration to work.').' </p>
 				 </div>';
 			}
-	}
+			if($this->ccwp_wprocket_criticalcss()) {
+				echo '<div class="notice notice-warning is-dismissible">
+					  <p>'.esc_html('Please disable "Remove Unused CSS option" in "WP Rocket" for "Critical CSS For WP" to function properly ').' </p>
+					 </div>';
+				}
+		}
+	
 	}
 
-	function ccwp_wprocket_lazyjs()
+	public function ccwp_wprocket_lazyjs()
 {
     if(defined('WP_ROCKET_VERSION'))
     {
         $ccwp_wprocket_options=get_option('wp_rocket_settings',null);
 
         if(isset($ccwp_wprocket_options['defer_all_js']) && $ccwp_wprocket_options['defer_all_js']==1)
+        {
+            return true;   
+        }
+    }
+    return false;
+}
+public function ccwp_wprocket_criticalcss()
+{
+    if(defined('WP_ROCKET_VERSION'))
+    {
+        $ccwp_wprocket_options=get_option('wp_rocket_settings',null);
+
+        if(isset($ccwp_wprocket_options['critical_css']) && $ccwp_wprocket_options['critical_css']==1)
         {
             return true;   
         }
