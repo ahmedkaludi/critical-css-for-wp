@@ -578,10 +578,6 @@ class class_critical_css_for_wp{
 
 	public function ccwp_delay_css_html($html){
 
-		if($this->ccwp_wprocket_lazyjs()){
-			return $html;   
-		}
-
 		$return_html = $jetpack_boost = false;
 		if(!$this->check_critical_css()){ 
 		     $return_html = true;

@@ -54,12 +54,14 @@ function ccwp_delay_js_main() {
         return;
     }
 
+    add_action('wp_footer', 'ccwp_delay_js_load', PHP_INT_MAX);
+
     if(ccwp_wprocket_lazyjs()){
         return;   
      }
     add_filter('ccwp_complete_html_after_dom_loaded', 'ccwp_delay_js_html', 2);
     add_filter('ccwp_complete_html_after_dom_loaded', 'ccwp_remove_js_query_param', 99);
-    add_action('wp_footer', 'ccwp_delay_js_load', PHP_INT_MAX);
+    
 }
 add_action('wp', 'ccwp_delay_js_main');
 
