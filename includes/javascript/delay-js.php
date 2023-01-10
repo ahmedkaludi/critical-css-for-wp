@@ -53,9 +53,15 @@ function ccwp_delay_js_main() {
     if ( function_exists('elementor_load_plugin_textdomain') && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
         return;
     }
+
+    add_action('wp_footer', 'ccwp_delay_js_load', PHP_INT_MAX);
+
+    if(ccwp_wprocket_lazyjs()){
+        return;   
+     }
     add_filter('ccwp_complete_html_after_dom_loaded', 'ccwp_delay_js_html', 2);
     add_filter('ccwp_complete_html_after_dom_loaded', 'ccwp_remove_js_query_param', 99);
-    add_action('wp_footer', 'ccwp_delay_js_load', PHP_INT_MAX);
+    
 }
 add_action('wp', 'ccwp_delay_js_main');
 
@@ -139,7 +145,6 @@ function ccwp_delay_js_html($html) {
 
 function ccwp_remove_js_query_param($html){
 
-    
     $html = preg_replace('/type="ccwpdelayedscript"\s+src="(.*?)\.js\?(.*?)"/',  'type="ccwpdelayedscript" src="$1.js"', $html);
     if(preg_match('/<link(.*?)rel="ccwpdelayedstyle"(.*?)href="(.*?)\.css\?(.*?)"(.*?)>/m',$html)){
         $html = preg_replace('/<link(.*?)rel="ccwpdelayedstyle"(.*?)href="(.*?)\.css\?(.*?)"(.*?)>/',  '<link$1rel="ccwpdelayedstyle"$2href="$3.css"$5>', $html);
@@ -175,7 +180,10 @@ function ccwp_delay_exclude_js(){
 }
 add_action( 'wp_enqueue_scripts',  'ccwp_scripts_styles' , 99999);
 function ccwp_scripts_styles(){
-    
+
+    if(ccwp_wprocket_lazyjs()){
+       return;   
+    }
     global $wp_scripts;
     $wp_scripts->all_deps($wp_scripts->queue);
 
@@ -257,6 +265,9 @@ function ccwp_scripts_styles(){
 }
 add_filter( 'script_loader_src', 'ccwp_remove_css_js_version', 9999, 2 );
 function ccwp_remove_css_js_version($src, $handle ){
+    if(ccwp_wprocket_lazyjs()){
+        return $src;   
+     }
     $handles_with_version = [ 'corewvps-mergejsfile', 'corewvps-cc','corewvps-mergecssfile' ];
     if ( strpos( $src, 'ver=' ) && in_array( $handle, $handles_with_version, true ) ){
         //$src = remove_query_arg( 'ver', $src );
@@ -264,99 +275,6 @@ function ccwp_remove_css_js_version($src, $handle ){
     $src = add_query_arg( 'time', time(), $src );
     return $src;
 }
-
-
-function ccwp_merge_js_scripts(){
-    global $wp_scripts;
-    $wp_scripts->all_deps($wp_scripts->queue);     
-   
-    $uniqueid = get_transient( CCWP_CACHE_NAME );
-    global $wp;
-    $url = home_url( $wp->request );
-    $filename = md5($url.$uniqueid);
-     $user_dirname = CCWP_JS_MERGE_FILE_CACHE_DIR;
-     $user_urlname = CCWP_JS_MERGE_FILE_CACHE_CACHE_URL;
-
-    if(!file_exists($user_dirname.'/'.$filename.'.js')){
-        $combined_ex_js_arr= array();
-        $jscontent = '';
-        $regex = ccwp_delay_exclude_js();
-        include_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
-        include_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
-        if (!class_exists('WP_Filesystem_Direct')) {
-             return false;
-        }
-        $wp_scripts->all_deps($wp_scripts->queue);
-        foreach( $wp_scripts->to_do as $key=>$handle) 
-        {
-            $localize = '';
-            $localize_handle = 'ccwp-merged-js';
-            //$src = strtok($wp_scripts->registered[$handle]->src, '?');
-            if($regex && preg_match( '#(' . $regex . ')#', $wp_scripts->registered[$handle]->src )){
-                $localize_handle = $handle;
-            }
-            if($regex && preg_match( '#(' . $regex . ')#', $handle )){
-                $localize_handle = $handle;
-            }
-            
-    
-            if($localize_handle == 'ccwp-merged-js'){
-                if(@array_key_exists('data', $wp_scripts->registered[$handle]->extra)) {
-                    $localize = $wp_scripts->registered[$handle]->extra['data'] . ';';
-                }
-                $file_url = $wp_scripts->registered[$handle]->src;
-                $parse_url = parse_url($file_url);
-                $file_path = str_replace(array(get_site_url(),'?'.@$parse_url['query']),array(ABSPATH,''),$file_url);
-
-                if(substr( $file_path, 0, 13 ) === "/wp-includes/"){
-                    $file_path = ABSPATH.$file_path;    
-                }
-                $wp_filesystem = new WP_Filesystem_Direct(null);
-                if(file_exists($file_path)){
-                    $js = $wp_filesystem->get_contents($file_path);
-                }
-                unset($wp_filesystem);
-                if (empty($js)) {
-                     $request = wp_remote_get($file_url);
-                     $js = wp_remote_retrieve_body($request);
-                }
-
-
-                //$combined_ex_js_arr[$handle] = ;
-                $jscontent .= "\n/*File: $file_url*/\n".$localize.$js;
-                
-                //wp_deregister_script($handle);
-            }
-        }
-        if($jscontent){
-            $fileSystem = new WP_Filesystem_Direct( new StdClass() );
-            if(!file_exists($user_dirname)) wp_mkdir_p($user_dirname);
-            $fileSystem->put_contents($user_dirname.'/'.$filename.'.js', $jscontent, 644 );
-            unset($fileSystem);
-        }
-    }
-
-
-    $uniqueid = get_transient( CCWP_CACHE_NAME );
-    global $wp;
-    $url = home_url( $wp->request );
-    $filename = md5($url.$uniqueid);
-     $user_dirname = CCWP_JS_MERGE_FILE_CACHE_DIR;
-     $user_urlname = CCWP_JS_MERGE_FILE_CACHE_CACHE_URL;
-     
-     if(file_exists($user_dirname.'/'.$filename.'.js')){
-        wp_register_script('corewvps-delayjs-mergedfile', $user_urlname.'/'.$filename.'.js', array(), CRITICAL_CSS_FOR_WP_VERSION, true);
-        wp_enqueue_script('corewvps-delayjs-mergedfile');
-     }
-    
-}
-
-add_action('wp_ajax_ccwp_delay_ajax_request','ccwp_delay_ajax_request');
-add_action('wp_ajax_nopriv_ccwp_delay_ajax_request','ccwp_delay_ajax_request');
-function ccwp_delay_ajax_request(){
-        echo 'success';
-        exit();
-    }
 
 function ccwp_delay_js_load() {
     $submit_url =  admin_url('admin-ajax.php?action=ccwp_delay_ajax_request');
@@ -405,11 +323,11 @@ function ccwp_delay_js_load() {
                 }
             }
             
-            document.onreadystatechange = (e) => {
+            document.addEventListener("readystatechange", (e) => {
                 if (e.target.readyState === "complete") {
                 calculate_load_times();
                 }
-            };
+            });
              //console.log("when delay script executed log");
              //console.log(new Date().toLocaleTimeString());
             async function ccwpTriggerDelayedScripts(){ctl(),cwvpsbDelayEventListeners(),cwvpsbDelayJQueryReady(),cwvpsbProcessDocumentWrite(),cwvpsbSortDelayedScripts(),ccwpPreloadDelayedScripts(),await cwvpsbLoadDelayedScripts(ccwpDelayedScripts.normal),await cwvpsbLoadDelayedScripts(ccwpDelayedScripts.defer),await cwvpsbLoadDelayedScripts(ccwpDelayedScripts.async),await cwvpsbTriggerEventListeners()}function cwvpsbDelayEventListeners(){let e={};function t(t,n){function r(n){return e[t].delayedEvents.indexOf(n)>=0?"cwvpsb-"+n:n}e[t]||(e[t]={originalFunctions:{add:t.addEventListener,remove:t.removeEventListener},delayedEvents:[]},t.addEventListener=function(){arguments[0]=r(arguments[0]),e[t].originalFunctions.add.apply(t,arguments)},t.removeEventListener=function(){arguments[0]=r(arguments[0]),e[t].originalFunctions.remove.apply(t,arguments)}),e[t].delayedEvents.push(n)}function n(e,t){const n=e[t];Object.defineProperty(e,t,{get:n||function(){},set:function(n){e["cwvpsb"+t]=n}})}t(document,"DOMContentLoaded"),t(window,"DOMContentLoaded"),t(window,"load"),t(window,"pageshow"),t(document,"readystatechange"),n(document,"onreadystatechange"),n(window,"onload"),n(window,"onpageshow")}function cwvpsbDelayJQueryReady(){let e=window.jQuery;Object.defineProperty(window,"jQuery",{get:()=>e,set(t){if(t&&t.fn&&!jQueriesArray.includes(t)){t.fn.ready=t.fn.init.prototype.ready=function(e){ccwpDOMLoaded?e.bind(document)(t):document.addEventListener("cwvpsb-DOMContentLoaded",function(){e.bind(document)(t)})};const e=t.fn.on;t.fn.on=t.fn.init.prototype.on=function(){if(this[0]===window){function t(e){return e.split(" ").map(e=>"load"===e||0===e.indexOf("load.")?"cwvpsb-jquery-load":e).join(" ")}"string"==typeof arguments[0]||arguments[0]instanceof String?arguments[0]=t(arguments[0]):"object"==typeof arguments[0]&&Object.keys(arguments[0]).forEach(function(e){delete Object.assign(arguments[0],{[t(e)]:arguments[0][e]})[e]})}return e.apply(this,arguments),this},jQueriesArray.push(t)}e=t}})}function cwvpsbProcessDocumentWrite(){const e=new Map;document.write=document.writeln=function(t){var n=document.currentScript,r=document.createRange();let a=e.get(n);void 0===a&&(a=n.nextSibling,e.set(n,a));var o=document.createDocumentFragment();r.setStart(o,0),o.appendChild(r.createContextualFragment(t)),n.parentElement.insertBefore(o,a)}}

@@ -17,12 +17,15 @@ class class_critical_css_for_wp{
 	}
 
 	public function critical_hooks(){
-		if ( function_exists('is_checkout') && is_checkout()  || (function_exists('is_feed')&& is_feed())) {
+
+		
+		if ( function_exists('is_checkout') && is_checkout()) {
         	return;
 	    }
 	    if ( function_exists('elementor_load_plugin_textdomain') && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
 	    	return;
 		}
+		add_action('admin_notices', array($this,'ccfwp_add_admin_notices'));
 		add_action('wp', array($this, 'delay_css_loadings'), 999);
 		add_action( 'create_term', function($term_id, $tt_id, $taxonomy){
             $this->on_term_create($term_id, $tt_id, $taxonomy);
@@ -55,7 +58,8 @@ class class_critical_css_for_wp{
 		     wp_schedule_event( time(), 'every_one_hour',  'isa_add_every_one_hour_crtlcss' );
 		 }
 		add_action( 'isa_add_every_one_hour_crtlcss', array($this, 'every_one_minutes_event_func_crtlcss' ) );					
-		add_action( 'admin_init', array($this, 'every_one_minutes_event_func_crtlcss' ) );					
+		//add_action( 'admin_init', array($this, 'every_one_minutes_event_func_crtlcss' ) );					
+			
 		
 	}
 
@@ -335,8 +339,12 @@ class class_critical_css_for_wp{
 		$targetUrl = $current_url;		
 	    $user_dirname = $this->cachepath();
 		$content = @file_get_contents($targetUrl);		
-		$regex = '/<link(.*?)href=["|\'](.*?)["|\'] (.*?)>/';
-		preg_match_all( $regex, $content, $matches , PREG_SET_ORDER );
+		$regex1 = '/<link(.*?)href="(.*?)"(.*?)>/';
+		preg_match_all( $regex1, $content, $matches1 , PREG_SET_ORDER );
+		$regex2 = "/<link(.*?)href='(.*?)'(.*?)>/";
+		preg_match_all( $regex2, $content, $matches2 , PREG_SET_ORDER );
+		$matches=array_merge($matches1,$matches2);
+		
 				
 		$rowcss = '';
 		$all_css = [];
@@ -344,7 +352,7 @@ class class_critical_css_for_wp{
 		if($matches){        
 			
 			foreach($matches as $mat){						
-				if(strpos($mat[2], '.css') !== false) {
+				if((strpos($mat[2], '.css') !== false) && (strpos($mat[1], 'preload') === false)) {
 					$all_css[]  = $mat[2];					
 					$rowcssdata = @file_get_contents($mat[2]);             
 					$regexn = '/@import\s*(url)?\s*\(?([^;]+?)\)?;/';
@@ -390,14 +398,15 @@ class class_critical_css_for_wp{
 			$extracted_css_arr = array();
 
 			$page_specific = new \PageSpecificCss\PageSpecificCss();
-			$page_specific->addBaseRules($rowcss);
+			$page_specific_css = preg_replace( "/@media[^{]*+{([^{}]++|{[^{}]*+})*+}/",'', $rowcss);
+			$page_specific->addBaseRules($page_specific_css);
 			$page_specific->addHtmlToStore($rawHtml);
 			$extractedCss = $page_specific->buildExtractedRuleSet();							
 			$extracted_css_arr[] = $extractedCss;	
 
 		}			
 		
-		preg_match_all( "/@media [^{]*+{([^{}]++|{[^{}]*+})*+}/", $rowcss, $matchess , PREG_SET_ORDER );
+		preg_match_all( "/@media[^{]*+{([^{}]++|{[^{}]*+})*+}/", $rowcss, $matchess , PREG_SET_ORDER );
 
 		if($matchess){
 		
@@ -557,16 +566,25 @@ class class_critical_css_for_wp{
 	}
 
 	public function delay_css_loadings(){
+		
+		$is_admin = current_user_can('manage_options');
+
+		if(is_admin() || $is_admin){
+			return;
+		}
+
 		if ( function_exists('is_checkout') && is_checkout()  || (function_exists('is_feed')&& is_feed())) {
         	return;
 	    }
 	    if ( function_exists('elementor_load_plugin_textdomain') && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
 	    	return;
 		}
+
 		add_filter('ccwp_complete_html_after_dom_loaded', array($this, 'ccwp_delay_css_html'), 1,1);
 	}
 
 	public function ccwp_delay_css_html($html){
+
 		$return_html = $jetpack_boost = false;
 		if(!$this->check_critical_css()){ 
 		     $return_html = true;
@@ -840,6 +858,7 @@ class class_critical_css_for_wp{
 		if($_GET['search']['value']){
 			$search = sanitize_text_field($_GET['search']['value']);
 			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE `url` LIKE %s ",
+			$table_name,
 			'%' . $wpdb->esc_like($search) . '%'
 			),			
 			);
@@ -852,10 +871,10 @@ class class_critical_css_for_wp{
 			, ARRAY_A);
 		}else
 		{
-			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name"));
+			$total_count  = $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
 			$result = $wpdb->get_results(
 				stripslashes($wpdb->prepare(
-					"SELECT * FROM $table_name LIMIT %d, %d", $offset, $length
+					"SELECT * FROM $table_name LIMIT %d, %d",$offset, $length
 				))
 			, ARRAY_A);
 		}
@@ -918,23 +937,24 @@ class class_critical_css_for_wp{
 																
 		if($_GET['search']['value']){
 			$search = sanitize_text_field($_GET['search']['value']);
-			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE `url` LIKE %s AND `status`='cached'",
-			'%' . $wpdb->esc_like($search) . '%'
+			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE `url` LIKE %s AND `status`=%s",
+			'%' . $wpdb->esc_like($search) . '%',
+			'cached'
 			),			
 			);
 			
 			$result = $wpdb->get_results(
 				stripslashes($wpdb->prepare(
-					"SELECT * FROM $table_name WHERE `url` LIKE %s AND `status`='cached' LIMIT %d, %d",
-					'%' . $wpdb->esc_like($search) . '%', $offset, $length
+					"SELECT * FROM $table_name WHERE `url` LIKE %s AND `status`=%s LIMIT %d, %d",
+					'%' . $wpdb->esc_like($search) . '%','cached', $offset, $length
 				))
 			, ARRAY_A);
 		}else
 		{
-			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name Where `status`='cached'"));
+			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name Where `status`=%s",'cached'));
 			$result = $wpdb->get_results(
 				stripslashes($wpdb->prepare(
-					"SELECT * FROM $table_name Where `status`='cached' LIMIT %d, %d", $offset, $length
+					"SELECT * FROM $table_name Where `status`=%s LIMIT %d, %d",'cached', $offset, $length
 				))
 			, ARRAY_A);
 		}
@@ -995,23 +1015,24 @@ class class_critical_css_for_wp{
 																
 		if($_GET['search']['value']){
 			$search = sanitize_text_field($_GET['search']['value']);
-			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE `url` LIKE %s AND `status`='failed'",
-			'%' . $wpdb->esc_like($search) . '%'
+			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE `url` LIKE %s AND `status`=%s",
+			'%' . $wpdb->esc_like($search) . '%',
+			'failed'
 			),			
 			);
 			
 			$result = $wpdb->get_results(
 				stripslashes($wpdb->prepare(
-					"SELECT * FROM $table_name WHERE `url` LIKE %s AND `status`='failed' LIMIT %d, %d",
-					'%' . $wpdb->esc_like($search) . '%', $offset, $length
+					"SELECT * FROM $table_name WHERE `url` LIKE %s AND `status`=%s LIMIT %d, %d",
+					'%' . $wpdb->esc_like($search) . '%', 'failed',$offset, $length
 				))
 			, ARRAY_A);
 		}else
 		{
-			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name Where `status`='failed'"));
+			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name Where `status`=%s",'failed'));
 			$result = $wpdb->get_results(
 				stripslashes($wpdb->prepare(
-					"SELECT * FROM $table_name Where `status`='failed' LIMIT %d, %d", $offset, $length
+					"SELECT * FROM $table_name Where `status`=%s LIMIT %d, %d",'failed', $offset, $length
 				))
 			, ARRAY_A);
 		}
@@ -1071,23 +1092,24 @@ class class_critical_css_for_wp{
 																
 		if($_GET['search']['value']){
 			$search = sanitize_text_field($_GET['search']['value']);
-			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE `url` LIKE %s AND `status`='queue'",
-			'%' . $wpdb->esc_like($search) . '%'
+			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE `url` LIKE %s AND `status`=%s",
+			'%' . $wpdb->esc_like($search) . '%',
+			'queue'
 			),			
 			);
 			
 			$result = $wpdb->get_results(
 				stripslashes($wpdb->prepare(
-					"SELECT * FROM $table_name WHERE `url` LIKE %s AND `status`='queue' LIMIT %d, %d",
-					'%' . $wpdb->esc_like($search) . '%', $offset, $length
+					"SELECT * FROM $table_name WHERE `url` LIKE %s AND `status`=%s LIMIT %d, %d",
+					'%' . $wpdb->esc_like($search) . '%','queue', $offset, $length
 				))
 			, ARRAY_A);
 		}else
 		{
-			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name Where `status`='queue'"));
+			$total_count  = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name Where `status`=%s",'queue'));
 			$result = $wpdb->get_results(
 				stripslashes($wpdb->prepare(
-					"SELECT * FROM $table_name Where `status`='queue' LIMIT %d, %d", $offset, $length
+					"SELECT * FROM $table_name Where `status`=%s LIMIT %d, %d", 'queue',$offset, $length
 				))
 			, ARRAY_A);
 		}
@@ -1097,7 +1119,7 @@ class class_critical_css_for_wp{
 		if(!empty($result)){
 
 			foreach ($result as $value) {
-				
+				$size="";
 				if($value['status'] == 'cached'){
 					$user_dirname = $this->cachepath();
 					$size = filesize($user_dirname.'/'.md5($value['url']).'.css');					
@@ -1122,7 +1144,51 @@ class class_critical_css_for_wp{
 
 		echo json_encode($retuernData);die;
 
-	}	
+	}
+	public function ccfwp_add_admin_notices(){
+	
+		$user = wp_get_current_user();
+		if ( in_array( 'administrator', (array) $user->roles ) ) {
+			if(!filter_var( ini_get( 'allow_url_fopen' ), FILTER_VALIDATE_BOOLEAN )) {
+			echo '<div class="notice notice-warning is-dismissible">
+				  <p>'.esc_html('Critical CSS For WP needs ').'<strong>'.esc_html('"allow_url_fopen"').'</strong>'.esc_html(' option to be enabled in PHP configuration to work.').' </p>
+				 </div>';
+			}
+			if($this->ccwp_wprocket_criticalcss()) {
+				echo '<div class="notice notice-warning is-dismissible">
+					  <p>'.esc_html('For').' <strong>'.esc_html('Critical CSS For WP ').'</strong>'.esc_html(' to function properly ').esc_html('disable ').'<strong>'.esc_html('Remove Unused CSS option').'</strong> '.esc_html('in').' <strong>'.esc_html('WP Rocket').'</strong> </p>
+					 </div>';
+				}
+		}
+	
+	}
+
+	public function ccwp_wprocket_lazyjs()
+{
+    if(defined('WP_ROCKET_VERSION'))
+    {
+        $ccwp_wprocket_options=get_option('wp_rocket_settings',null);
+
+        if(isset($ccwp_wprocket_options['defer_all_js']) && $ccwp_wprocket_options['defer_all_js']==1)
+        {
+            return true;   
+        }
+    }
+    return false;
+}
+public function ccwp_wprocket_criticalcss()
+{
+    if(defined('WP_ROCKET_VERSION'))
+    {
+        $ccwp_wprocket_options=get_option('wp_rocket_settings',null);
+
+        if((isset($ccwp_wprocket_options['critical_css']) && $ccwp_wprocket_options['critical_css']==1)||(isset($ccwp_wprocket_options['remove_unused_css']) && $ccwp_wprocket_options['remove_unused_css']==1))
+        {
+            return true;   
+        }
+    }
+    return false;
+}
 
 } 
 

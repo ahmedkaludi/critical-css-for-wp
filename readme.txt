@@ -2,8 +2,8 @@
 Contributors: magazine3
 Tags: Critical, Critical CSS, Core Web Vital, Cache, SEO
 Requires at least: 3.0
-Tested up to: 6.1.1
-Stable tag: 1.0.2
+Tested up to: 6.1
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -15,6 +15,7 @@ Critical CSS For WP intends to provide great experience to the web page visitors
 
 ### Works well with:
 
+* WP Rocket
 * Autoptimize
 * Aruba HiSpeed Cache
 * Breeze – WordPress Cache
@@ -37,6 +38,10 @@ Critical CSS For WP intends to provide great experience to the web page visitors
 * 10Web Booster – Website speed optimization, Cache & Page Speed optimizer
 
 == Changelog ==
+
+= 1.0.3 (10 January 2023) = 
+* Added compatibility for WP Rocket.
+* Improved Critical CSS generation.
 
 = 1.0.2 (19 December 2022) = 
 * Added the code to improve the performance of the web page.
