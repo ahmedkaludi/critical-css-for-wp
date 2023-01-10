@@ -1156,7 +1156,7 @@ class class_critical_css_for_wp{
 			}
 			if($this->ccwp_wprocket_criticalcss()) {
 				echo '<div class="notice notice-warning is-dismissible">
-					  <p>'.esc_html('Please disable "Remove Unused CSS option" in "WP Rocket" for "Critical CSS For WP" to function properly ').' </p>
+					  <p>'.esc_html('For').' <strong>'.esc_html('Critical CSS For WP ').'</strong>'.esc_html(' to function properly ').esc_html('disable ').'<strong>'.esc_html('Remove Unused CSS option').'</strong> '.esc_html('in').' <strong>'.esc_html('WP Rocket').'</strong> </p>
 					 </div>';
 				}
 		}
