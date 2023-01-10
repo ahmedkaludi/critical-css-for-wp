@@ -93,7 +93,7 @@ jQuery( document ).ready(function($) {
 			if($.trim(email) == ''){
 				alert('Please enter the email');
 			}
-			if(saswpIsEmail(email) == false){
+			if(ccfwpIsEmail(email) == false){
 				alert('Please enter a valid email');
 			}
 				
