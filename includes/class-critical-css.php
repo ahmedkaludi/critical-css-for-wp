@@ -1182,7 +1182,7 @@ public function ccwp_wprocket_criticalcss()
     {
         $ccwp_wprocket_options=get_option('wp_rocket_settings',null);
 
-        if(isset($ccwp_wprocket_options['critical_css']) && $ccwp_wprocket_options['critical_css']==1)
+        if((isset($ccwp_wprocket_options['critical_css']) && $ccwp_wprocket_options['critical_css']==1)||(isset($ccwp_wprocket_options['remove_unused_css']) && $ccwp_wprocket_options['remove_unused_css']==1))
         {
             return true;   
         }
