@@ -56,7 +56,22 @@ function load_js_data(){
     require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR."includes/javascript/delay-js.php";
 }
 
-register_activation_hook( __FILE__, 'ccfwp_on_install' );
+register_activation_hook( __FILE__, 'ccfwp_on_activate' );
+
+function ccfwp_on_activate( $network_wide ) {
+    global $wpdb;
+
+    if ( is_multisite() && $network_wide ) {
+        $blog_ids = $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs" );
+        foreach ( $blog_ids as $blog_id ) {
+            switch_to_blog( $blog_id );
+            ccfwp_on_install();
+            restore_current_blog();
+        }
+    } else {
+        ccfwp_on_install();
+    }
+}
 
 function ccfwp_on_install(){
 
