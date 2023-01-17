@@ -600,7 +600,7 @@ class class_critical_css_for_wp{
 		if($return_html == true){
 			return $html;
 		}
-		$html_no_comments = preg_replace('/<!--(.*)-->/Uis', '', $html);
+		$html_no_comments = preg_replace('/<!--(.|\s)*?-->/', '', $html);
 		preg_match_all('/<link\s?([^>]+)?>/is', $html_no_comments, $matches);
 
 		if(!isset($matches[0])) {

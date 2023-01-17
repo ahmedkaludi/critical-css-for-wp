@@ -266,7 +266,7 @@ function ccwp_delay_js_load() {
     $js_content = '<script type="text/javascript" id="ccwp-delayed-scripts">' . 'ccwpUserInteractions=["keydown","mousemove","wheel","touchmove","touchstart","touchend","touchcancel","touchforcechange"],ccwpDelayedScripts={normal:[],defer:[],async:[]},jQueriesArray=[];var ccwpDOMLoaded=!1;function ccwpTriggerDOMListener(){' . 'ccwpUserInteractions.forEach(function(e){window.removeEventListener(e,ccwpTriggerDOMListener,{passive:!0})}),"loading"===document.readyState?document.addEventListener("DOMContentLoaded",ccwpTriggerDelayedScripts):ccwpTriggerDelayedScripts()}
 
            var time = Date.now;
-            
+           var ccfw_loaded = false; 
            function calculate_load_times() {
                 // Check performance support
                 if (performance === undefined) {
@@ -315,7 +315,8 @@ function ccwp_delay_js_load() {
             });
 
             async function ccwpTriggerDelayedScripts() {
-                ctl(), cwvpsbDelayEventListeners(), cwvpsbDelayJQueryReady(), cwvpsbProcessDocumentWrite(), cwvpsbSortDelayedScripts(), ccwpPreloadDelayedScripts(), await cwvpsbLoadDelayedScripts(ccwpDelayedScripts.normal), await cwvpsbLoadDelayedScripts(ccwpDelayedScripts.defer), await cwvpsbLoadDelayedScripts(ccwpDelayedScripts.async), await cwvpsbTriggerEventListeners()
+                if(ccfw_loaded){ return ;}
+                 ctl() , cwvpsbDelayEventListeners(), cwvpsbDelayJQueryReady(), cwvpsbProcessDocumentWrite(), cwvpsbSortDelayedScripts(), ccwpPreloadDelayedScripts(), await cwvpsbLoadDelayedScripts(ccwpDelayedScripts.normal), await cwvpsbLoadDelayedScripts(ccwpDelayedScripts.defer), await cwvpsbLoadDelayedScripts(ccwpDelayedScripts.async), await cwvpsbTriggerEventListeners()
             }
             
             function cwvpsbDelayEventListeners() {
@@ -396,36 +397,55 @@ function ccwp_delay_js_load() {
                 }
             }
             
-                    function cwvpsbSortDelayedScripts(){
-                           document.querySelectorAll("script[type=ccwpdelayedscript]").forEach(function(e){e.hasAttribute("src")?e.hasAttribute("defer")&&!1!==e.defer?ccwpDelayedScripts.defer.push(e):e.hasAttribute("async")&&!1!==e.async?ccwpDelayedScripts.async.push(e):ccwpDelayedScripts.normal.push(e):ccwpDelayedScripts.normal.push(e)})
+            function cwvpsbSortDelayedScripts() {
+                document.querySelectorAll("script[type=ccwpdelayedscript]").forEach(function(e) {
+                    e.hasAttribute("src") ? e.hasAttribute("defer") && !1 !== e.defer ? ccwpDelayedScripts.defer.push(e) : e.hasAttribute("async") && !1 !== e.async ? ccwpDelayedScripts.async.push(e) : ccwpDelayedScripts.normal.push(e) : ccwpDelayedScripts.normal.push(e)
+                })
+            }
+    
+            function ccwpPreloadDelayedScripts() {
+                var e = document.createDocumentFragment();
+                [...ccwpDelayedScripts.normal, ...ccwpDelayedScripts.defer, ...ccwpDelayedScripts.async].forEach(function(t) {
+                    var n = removeVersionFromLink(t.getAttribute("src"));
+                    if (n) {
+                        t.setAttribute("src", n);
+                        var r = document.createElement("link");
+                        r.href = n, r.rel = "preload", r.as = "script", e.appendChild(r)
                     }
-            
-            function ccwpPreloadDelayedScripts(){var e=document.createDocumentFragment();[...ccwpDelayedScripts.normal,...ccwpDelayedScripts.defer,...ccwpDelayedScripts.async].forEach(function(t){var n=removeVersionFromLink(t.getAttribute("src"));t.setAttribute("src",n);if(n){var r=document.createElement("link");r.href=n,r.rel="preload",r.as="script",e.appendChild(r)}}),document.head.appendChild(e)}async function cwvpsbLoadDelayedScripts(e){var t=e.shift();return t?(await cwvpsbReplaceScript(t),cwvpsbLoadDelayedScripts(e)):Promise.resolve()}async function cwvpsbReplaceScript(e){return await cwvpsbNextFrame(),new Promise(function(t){const n=document.createElement("script");[...e.attributes].forEach(function(e){let t=e.nodeName;"type"!==t&&("data-type"===t&&(t="type"),n.setAttribute(t,e.nodeValue))}),e.hasAttribute("src")?(n.addEventListener("load",t),n.addEventListener("error",t)):(n.text=e.text,t()),e.parentNode.replaceChild(n,e)})}
+                }), document.head.appendChild(e)
+            }
+            async function cwvpsbLoadDelayedScripts(e) {
+                var t = e.shift();
+                return t ? (await cwvpsbReplaceScript(t), cwvpsbLoadDelayedScripts(e)) : Promise.resolve()
+            }
+            async function cwvpsbReplaceScript(e) {
+                return await cwvpsbNextFrame(), new Promise(function(t) {
+                    const n = document.createElement("script");
+                    [...e.attributes].forEach(function(e) {
+                        let t = e.nodeName;
+                        "type" !== t && ("data-type" === t && (t = "type"), n.setAttribute(t, e.nodeValue))
+                    }), e.hasAttribute("src") ? (n.addEventListener("load", t), n.addEventListener("error", t)) : (n.text = e.text, t()), e.parentNode.replaceChild(n, e)
+                })
+                    }
+
+
     function ctl(){
             var cssEle = document.querySelectorAll("link[rel=ccwpdelayedstyle]");
-                console.log(cssEle.length);
                 for(var i=0; i <= cssEle.length;i++){
                     if(cssEle[i]){
-                        var cssMain = document.createElement("link");
-                        cssMain.href = removeVersionFromLink(cssEle[i].href);
-                        cssMain.rel = "stylesheet";
-                        cssMain.type = "text/css";
-                        document.getElementsByTagName("head")[0].appendChild(cssMain);
+                        cssEle[i].href = removeVersionFromLink(cssEle[i].href);
+                        cssEle[i].rel = "stylesheet";
+                        cssEle[i].type = "text/css";
                     }
                 }
-                
-                
+
                 var cssEle = document.querySelectorAll("style[type=ccwpdelayedstyle]");
                 for(var i=0; i <= cssEle.length;i++){
                     if(cssEle[i]){
-                        var cssMain = document.createElement("style");
-                        cssMain.type = "text/css";
-                        /*cssMain.rel = "stylesheet";*/
-                        /*cssMain.type = "text/css";*/
-                        cssMain.textContent = cssEle[i].textContent;
-                        document.getElementsByTagName("head")[0].appendChild(cssMain);
+                        cssEle[i] = "text/css";
                     }
                 }
+                ccfw_loaded=true;
             }
             function removeVersionFromLink(link)
             {
@@ -461,6 +481,20 @@ function ccwp_delay_js_load() {
                 return link;
             }
         
-    async function cwvpsbTriggerEventListeners(){ccwpDOMLoaded=!0,await cwvpsbNextFrame(),document.dispatchEvent(new Event("cwvpsb-DOMContentLoaded")),await cwvpsbNextFrame(),window.dispatchEvent(new Event("cwvpsb-DOMContentLoaded")),await cwvpsbNextFrame(),document.dispatchEvent(new Event("cwvpsb-readystatechange")),await cwvpsbNextFrame(),document.cwvpsbonreadystatechange&&document.cwvpsbonreadystatechange(),await cwvpsbNextFrame(),window.dispatchEvent(new Event("cwvpsb-load")),await cwvpsbNextFrame(),window.cwvpsbonload&&window.cwvpsbonload(),await cwvpsbNextFrame(),jQueriesArray.forEach(function(e){e(window).trigger("cwvpsb-jquery-load")}),window.dispatchEvent(new Event("cwvpsb-pageshow")),await cwvpsbNextFrame(),window.cwvpsbonpageshow&&window.cwvpsbonpageshow()}async function cwvpsbNextFrame(){return new Promise(function(e){requestAnimationFrame(e)})}ccwpUserInteractions.forEach(function(e){window.addEventListener(e,ccwpTriggerDOMListener,{passive:!0})});</script>';
+            async function cwvpsbTriggerEventListeners() {
+                ccwpDOMLoaded = !0, await cwvpsbNextFrame(), document.dispatchEvent(new Event("cwvpsb-DOMContentLoaded")), await cwvpsbNextFrame(), window.dispatchEvent(new Event("cwvpsb-DOMContentLoaded")), await cwvpsbNextFrame(), document.dispatchEvent(new Event("cwvpsb-readystatechange")), await cwvpsbNextFrame(), document.cwvpsbonreadystatechange && document.cwvpsbonreadystatechange(), await cwvpsbNextFrame(), window.dispatchEvent(new Event("cwvpsb-load")), await cwvpsbNextFrame(), window.cwvpsbonload && window.cwvpsbonload(), await cwvpsbNextFrame(), jQueriesArray.forEach(function(e) {
+                    e(window).trigger("cwvpsb-jquery-load")
+                }), window.dispatchEvent(new Event("cwvpsb-pageshow")), await cwvpsbNextFrame(), window.cwvpsbonpageshow && window.cwvpsbonpageshow()
+            }
+            async function cwvpsbNextFrame() {
+                return new Promise(function(e) {
+                    requestAnimationFrame(e)
+                })
+            }
+            ccwpUserInteractions.forEach(function(e) {
+                window.addEventListener(e, ccwpTriggerDOMListener, {
+                    passive: !0
+                })
+            }); </script>';
     echo $js_content;
 }
