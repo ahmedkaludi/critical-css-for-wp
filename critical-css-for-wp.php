@@ -2,7 +2,7 @@
 /*
 Plugin Name: Reduce Unused CSS Solution with Critical CSS For WP
 Description: Critical CSS For WP intends to provide great experience to the web page visitors by improving the performance of the web page. Here we'd remove the unused CSS which helps to paint fast and render the above fold content, before downloading the complete css files.
-Version: 1.0.3
+Version: 1.0.4
 Author: Magazine3
 Author URI: https://magazine3.company/
 Donate link: https://www.paypal.me/Kaludi/25
@@ -13,7 +13,7 @@ License: GPL2
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define('CRITICAL_CSS_FOR_WP_VERSION','1.0.3');
+define('CRITICAL_CSS_FOR_WP_VERSION','1.0.4');
 define('CRITICAL_CSS_FOR_WP_PLUGIN_URI', plugin_dir_url(__FILE__));
 define('CRITICAL_CSS_FOR_WP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
@@ -56,7 +56,22 @@ function load_js_data(){
     require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR."includes/javascript/delay-js.php";
 }
 
-register_activation_hook( __FILE__, 'ccfwp_on_install' );
+register_activation_hook( __FILE__, 'ccfwp_on_activate' );
+
+function ccfwp_on_activate( $network_wide ) {
+    global $wpdb;
+
+    if ( is_multisite() && $network_wide ) {
+        $blog_ids = $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs" );
+        foreach ( $blog_ids as $blog_id ) {
+            switch_to_blog( $blog_id );
+            ccfwp_on_install();
+            restore_current_blog();
+        }
+    } else {
+        ccfwp_on_install();
+    }
+}
 
 function ccfwp_on_install(){
 
