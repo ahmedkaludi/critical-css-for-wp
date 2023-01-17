@@ -60,7 +60,7 @@ function ccwp_delay_js_main() {
         return;   
      }
     add_filter('ccwp_complete_html_after_dom_loaded', 'ccwp_delay_js_html', 2);
-    add_filter('ccwp_complete_html_after_dom_loaded', 'ccwp_remove_js_query_param', 99);
+    //add_filter('ccwp_complete_html_after_dom_loaded', 'ccwp_remove_js_query_param', 99);
     
 }
 add_action('wp', 'ccwp_delay_js_main');
@@ -102,34 +102,33 @@ function ccwp_delay_js_html($html) {
         $atts_array['type'] = 'ccwpdelayedscript';
         $atts_array['defer'] = 'defer';
 
-        $include = true;
-        if(isset($atts_array['src'])){
-            $regex = ccwp_delay_exclude_js();
+        // if(isset($atts_array['src']) && !empty($atts_array['src'])){
+        //     $regex = ccwp_delay_exclude_js();
         
-            if($regex && preg_match( '#(' . $regex . ')#', $atts_array['src'] )){
-                $combined_ex_js_arr[] = $atts_array['src'];
-                //$html = str_replace($tag, '', $html);
-                $include = false;       
-            }
-        }
-        if($include && isset($atts_array['id'])){
-            $regex = ccwp_delay_exclude_js();
-            $file_path =  $atts_array['id'];
-            if($regex && preg_match( '#(' . $regex . ')#',  $file_path)){
-                $include = false;       
-            }
-        }
-        if($include && isset($matches[3][$i])){
-            $regex = ccwp_delay_exclude_js();
-            $file_path =  $matches[3][$i];
-            if($regex && preg_match( '#(' . $regex . ')#',  $file_path)){
-                $include = false;       
-            }
-        }
-        if(isset($atts_array['src']) && !$include){
-            $include = true;
-        }
-        if($delay_flag && $include ) {//
+        //     if($regex && preg_match( '#(' . $regex . ')#', $atts_array['src'] )){
+        //         $combined_ex_js_arr[] = $atts_array['src'];
+        //         //$html = str_replace($tag, '', $html);
+        //         $include = false;       
+        //     }
+        // }
+        // if($include && isset($atts_array['id'])){
+        //     $regex = ccwp_delay_exclude_js();
+        //     $file_path =  $atts_array['id'];
+        //     if($regex && preg_match( '#(' . $regex . ')#',  $file_path)){
+        //         $include = false;       
+        //     }
+        // }
+        // if($include && isset($matches[3][$i])){
+        //     $regex = ccwp_delay_exclude_js();
+        //     $file_path =  $matches[3][$i];
+        //     if($regex && preg_match( '#(' . $regex . ')#',  $file_path)){
+        //         $include = false;       
+        //     }
+        // }
+        // if(isset($atts_array['src']) && !$include){
+        //     $include = true;
+        // }
+        if($delay_flag) {
     
             $delayed_atts_string = ccwp_get_atts_string($atts_array);
             $delayed_tag = sprintf('<script %1$s>', $delayed_atts_string) . (!empty($matches[3][$i]) ? $matches[3][$i] : '') .'</script>';
@@ -137,14 +136,10 @@ function ccwp_delay_js_html($html) {
             continue;
         }
     }
-    /*if($combined_ex_js_arr){
-        $html = cwvpsb_combine_js_files($combined_ex_js_arr, $html);
-    }*/
     return $html;
 }
 
 function ccwp_remove_js_query_param($html){
-
     $html = preg_replace('/type="ccwpdelayedscript"\s+src="(.*?)\.js\?(.*?)"/',  'type="ccwpdelayedscript" src="$1.js"', $html);
     if(preg_match('/<link(.*?)rel="ccwpdelayedstyle"(.*?)href="(.*?)\.css\?(.*?)"(.*?)>/m',$html)){
         $html = preg_replace('/<link(.*?)rel="ccwpdelayedstyle"(.*?)href="(.*?)\.css\?(.*?)"(.*?)>/',  '<link$1rel="ccwpdelayedstyle"$2href="$3.css"$5>', $html);
@@ -154,17 +149,7 @@ function ccwp_remove_js_query_param($html){
 
 function ccwp_delay_exclude_js(){
     $settings = critical_css_defaults();
-    $inputs['exclude_js'] = $settings['exclude_delay_js'];
-    if ( ! empty( $inputs['exclude_js'] ) ) {
-        if ( ! is_array( $inputs['exclude_js'] ) ) {
-            $inputs['exclude_js'] = explode( "\n", $inputs['exclude_js'] );
-        }
-        $inputs['exclude_js'] = array_map( 'trim', $inputs['exclude_js'] );
-        $inputs['exclude_js'] = (array) array_filter( $inputs['exclude_js'] );
-        $inputs['exclude_js'] = array_unique( $inputs['exclude_js'] );
-    } else {
-        $inputs['exclude_js'] = array();
-    }
+    $inputs['exclude_js'] = array();
     $excluded_files = array();
     if($inputs['exclude_js']){
         foreach ( $inputs['exclude_js'] as $i => $excluded_file ) {
@@ -328,9 +313,88 @@ function ccwp_delay_js_load() {
                 calculate_load_times();
                 }
             });
-             //console.log("when delay script executed log");
-             //console.log(new Date().toLocaleTimeString());
-            async function ccwpTriggerDelayedScripts(){ctl(),cwvpsbDelayEventListeners(),cwvpsbDelayJQueryReady(),cwvpsbProcessDocumentWrite(),cwvpsbSortDelayedScripts(),ccwpPreloadDelayedScripts(),await cwvpsbLoadDelayedScripts(ccwpDelayedScripts.normal),await cwvpsbLoadDelayedScripts(ccwpDelayedScripts.defer),await cwvpsbLoadDelayedScripts(ccwpDelayedScripts.async),await cwvpsbTriggerEventListeners()}function cwvpsbDelayEventListeners(){let e={};function t(t,n){function r(n){return e[t].delayedEvents.indexOf(n)>=0?"cwvpsb-"+n:n}e[t]||(e[t]={originalFunctions:{add:t.addEventListener,remove:t.removeEventListener},delayedEvents:[]},t.addEventListener=function(){arguments[0]=r(arguments[0]),e[t].originalFunctions.add.apply(t,arguments)},t.removeEventListener=function(){arguments[0]=r(arguments[0]),e[t].originalFunctions.remove.apply(t,arguments)}),e[t].delayedEvents.push(n)}function n(e,t){const n=e[t];Object.defineProperty(e,t,{get:n||function(){},set:function(n){e["cwvpsb"+t]=n}})}t(document,"DOMContentLoaded"),t(window,"DOMContentLoaded"),t(window,"load"),t(window,"pageshow"),t(document,"readystatechange"),n(document,"onreadystatechange"),n(window,"onload"),n(window,"onpageshow")}function cwvpsbDelayJQueryReady(){let e=window.jQuery;Object.defineProperty(window,"jQuery",{get:()=>e,set(t){if(t&&t.fn&&!jQueriesArray.includes(t)){t.fn.ready=t.fn.init.prototype.ready=function(e){ccwpDOMLoaded?e.bind(document)(t):document.addEventListener("cwvpsb-DOMContentLoaded",function(){e.bind(document)(t)})};const e=t.fn.on;t.fn.on=t.fn.init.prototype.on=function(){if(this[0]===window){function t(e){return e.split(" ").map(e=>"load"===e||0===e.indexOf("load.")?"cwvpsb-jquery-load":e).join(" ")}"string"==typeof arguments[0]||arguments[0]instanceof String?arguments[0]=t(arguments[0]):"object"==typeof arguments[0]&&Object.keys(arguments[0]).forEach(function(e){delete Object.assign(arguments[0],{[t(e)]:arguments[0][e]})[e]})}return e.apply(this,arguments),this},jQueriesArray.push(t)}e=t}})}function cwvpsbProcessDocumentWrite(){const e=new Map;document.write=document.writeln=function(t){var n=document.currentScript,r=document.createRange();let a=e.get(n);void 0===a&&(a=n.nextSibling,e.set(n,a));var o=document.createDocumentFragment();r.setStart(o,0),o.appendChild(r.createContextualFragment(t)),n.parentElement.insertBefore(o,a)}}
+
+            async function ccwpTriggerDelayedScripts() {
+                ctl(), cwvpsbDelayEventListeners(), cwvpsbDelayJQueryReady(), cwvpsbProcessDocumentWrite(), cwvpsbSortDelayedScripts(), ccwpPreloadDelayedScripts(), await cwvpsbLoadDelayedScripts(ccwpDelayedScripts.normal), await cwvpsbLoadDelayedScripts(ccwpDelayedScripts.defer), await cwvpsbLoadDelayedScripts(ccwpDelayedScripts.async), await cwvpsbTriggerEventListeners()
+            }
+            
+            function cwvpsbDelayEventListeners() {
+                let e = {};
+            
+                function t(t, n) {
+                    function r(n) {
+                        return e[t].delayedEvents.indexOf(n) >= 0 ? "cwvpsb-" + n : n
+                    }
+                    e[t] || (e[t] = {
+                        originalFunctions: {
+                            add: t.addEventListener,
+                            remove: t.removeEventListener
+                        },
+                        delayedEvents: []
+                    }, t.addEventListener = function() {
+                        arguments[0] = r(arguments[0]), e[t].originalFunctions.add.apply(t, arguments)
+                    }, t.removeEventListener = function() {
+                        arguments[0] = r(arguments[0]), e[t].originalFunctions.remove.apply(t, arguments)
+                    }), e[t].delayedEvents.push(n)
+                }
+            
+                function n(e, t) {
+                    const n = e[t];
+                    Object.defineProperty(e, t, {
+                        get: n || function() {},
+                        set: function(n) {
+                            e["cwvpsb" + t] = n
+                        }
+                    })
+                }
+                t(document, "DOMContentLoaded"), t(window, "DOMContentLoaded"), t(window, "load"), t(window, "pageshow"), t(document, "readystatechange"), n(window, "onload"), n(window, "onpageshow")
+            }
+            
+            function cwvpsbDelayJQueryReady() {
+              if(!window.hasOwnProperty("jQuery"))
+              {
+                let e = window.jQuery;
+                Object.defineProperty(window, "jQuery", {
+                    get: () => e,
+                    set(t) {
+                        if (t && t.fn && !jQueriesArray.includes(t)) {
+                            t.fn.ready = t.fn.init.prototype.ready = function(e) {
+                                ccwpDOMLoaded ? e.bind(document)(t) : document.addEventListener("cwvpsb-DOMContentLoaded", function() {
+                                    e.bind(document)(t)
+                                })
+                            };
+                            const e = t.fn.on;
+                            t.fn.on = t.fn.init.prototype.on = function() {
+                                if (this[0] === window) {
+                                    function t(e) {
+                                        return e.split(" ").map(e => "load" === e || 0 === e.indexOf("load.") ? "cwvpsb-jquery-load" : e).join(" ")
+                                    }
+                                    "string" == typeof arguments[0] || arguments[0] instanceof String ? arguments[0] = t(arguments[0]) : "object" == typeof arguments[0] && Object.keys(arguments[0]).forEach(function(e) {
+                                        delete Object.assign(arguments[0], {
+                                            [t(e)]: arguments[0][e]
+                                        })[e]
+                                    })
+                                }
+                                return e.apply(this, arguments), this
+                            }, jQueriesArray.push(t)
+                        }
+                        e = t
+                    }
+                })
+              }
+            }
+            
+            function cwvpsbProcessDocumentWrite() {
+                const e = new Map;
+                document.write = document.writeln = function(t) {
+                    var n = document.currentScript,
+                        r = document.createRange();
+                    let a = e.get(n);
+                    void 0 === a && (a = n.nextSibling, e.set(n, a));
+                    var o = document.createDocumentFragment();
+                    r.setStart(o, 0), o.appendChild(r.createContextualFragment(t)), n.parentElement.insertBefore(o, a)
+                }
+            }
             
                     function cwvpsbSortDelayedScripts(){
                            document.querySelectorAll("script[type=ccwpdelayedscript]").forEach(function(e){e.hasAttribute("src")?e.hasAttribute("defer")&&!1!==e.defer?ccwpDelayedScripts.defer.push(e):e.hasAttribute("async")&&!1!==e.async?ccwpDelayedScripts.async.push(e):ccwpDelayedScripts.normal.push(e):ccwpDelayedScripts.normal.push(e)})
@@ -365,12 +429,36 @@ function ccwp_delay_js_load() {
             }
             function removeVersionFromLink(link)
             {
-                if(!link)
-                { return "";}
-                const url = new URL(link);
-                url.searchParams.delete("ver");
-                url.searchParams.delete("time");
-                return url.href;
+                if(ccfwIsValidUrl(link))
+                {
+                    const url = new URL(ccfwFormatLink(link));
+                    url.searchParams.delete("ver");
+                    url.searchParams.delete("time");
+                    return url.href;
+                }
+                else{
+                    return link;
+                }
+               
+            }
+            function ccfwIsValidUrl(urlString)
+            {
+                if(urlString){
+                    var expression =/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
+                    var regex = new RegExp(expression);
+                    return urlString.match(regex);
+                }
+                return false;
+            }
+            function ccfwFormatLink(link)
+            {
+                let http_check=link.match("http:");
+                let https_check=link.match("https:");
+                if(!http_check && !https_check)
+                {
+                    return location.protocol+link;
+                }
+                return link;
             }
         
     async function cwvpsbTriggerEventListeners(){ccwpDOMLoaded=!0,await cwvpsbNextFrame(),document.dispatchEvent(new Event("cwvpsb-DOMContentLoaded")),await cwvpsbNextFrame(),window.dispatchEvent(new Event("cwvpsb-DOMContentLoaded")),await cwvpsbNextFrame(),document.dispatchEvent(new Event("cwvpsb-readystatechange")),await cwvpsbNextFrame(),document.cwvpsbonreadystatechange&&document.cwvpsbonreadystatechange(),await cwvpsbNextFrame(),window.dispatchEvent(new Event("cwvpsb-load")),await cwvpsbNextFrame(),window.cwvpsbonload&&window.cwvpsbonload(),await cwvpsbNextFrame(),jQueriesArray.forEach(function(e){e(window).trigger("cwvpsb-jquery-load")}),window.dispatchEvent(new Event("cwvpsb-pageshow")),await cwvpsbNextFrame(),window.cwvpsbonpageshow&&window.cwvpsbonpageshow()}async function cwvpsbNextFrame(){return new Promise(function(e){requestAnimationFrame(e)})}ccwpUserInteractions.forEach(function(e){window.addEventListener(e,ccwpTriggerDOMListener,{passive:!0})});</script>';

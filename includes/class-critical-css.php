@@ -439,7 +439,9 @@ class class_critical_css_for_wp{
 				
 		if(!empty($extracted_css_arr) && is_array($extracted_css_arr)){
 
-				$critical_css = implode("", $extracted_css_arr);			    								
+				$critical_css = implode("", $extracted_css_arr);
+				$critical_css = str_replace("url('wp-content/", "url('".get_site_url()."/wp-content/", $critical_css); 
+				$critical_css = str_replace('url("wp-content/', 'url("'.get_site_url().'/wp-content/', $critical_css); 			    								
 				$new_file = $user_dirname."/".md5($targetUrl).".css";
 				$ifp = @fopen( $new_file, 'w+' );
 				if ( ! $ifp ) {
@@ -460,8 +462,8 @@ class class_critical_css_for_wp{
 	}
 	public function generate_css_on_interval(){
 		
-		global $wpdb, $table_prefix;
-		$table_name = $table_prefix . 'critical_css_for_wp_urls';
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'critical_css_for_wp_urls';
 		
 		$result = $wpdb->get_results(
 			stripslashes($wpdb->prepare(
