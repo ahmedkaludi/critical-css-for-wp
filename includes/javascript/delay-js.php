@@ -442,7 +442,7 @@ function ccwp_delay_js_load() {
                 var cssEle = document.querySelectorAll("style[type=ccwpdelayedstyle]");
                 for(var i=0; i <= cssEle.length;i++){
                     if(cssEle[i]){
-                        cssEle[i] = "text/css";
+                        cssEle[i].type = "text/css";
                     }
                 }
                 ccfw_loaded=true;
