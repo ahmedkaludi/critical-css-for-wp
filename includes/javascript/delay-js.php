@@ -57,6 +57,7 @@ function ccwp_delay_js_main() {
     add_action('wp_footer', 'ccwp_delay_js_load', PHP_INT_MAX);
 
     if(ccwp_wprocket_lazyjs()){
+        add_filter('rocket_delay_js_exclusions', 'ccwp_add_rocket_delay_js_exclusions');
         return;   
      }
     add_filter('ccwp_complete_html_after_dom_loaded', 'ccwp_delay_js_html', 2);
@@ -64,6 +65,11 @@ function ccwp_delay_js_main() {
     
 }
 add_action('wp', 'ccwp_delay_js_main');
+
+function ccwp_add_rocket_delay_js_exclusions( $patterns ) {
+    $patterns[] = 'ccwp-delayed-scripts';	
+	return $patterns;
+}
 
 function ccwp_delay_js_html($html) {
 
