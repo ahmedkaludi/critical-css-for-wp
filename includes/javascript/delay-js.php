@@ -56,7 +56,7 @@ function ccwp_delay_js_main() {
 
     add_action('wp_footer', 'ccwp_delay_js_load', PHP_INT_MAX);
 
-    if(ccwp_wprocket_lazyjs()){
+    if(ccwp_check_js_defer()){
         add_filter('rocket_delay_js_exclusions', 'ccwp_add_rocket_delay_js_exclusions');
         return;   
      }
@@ -108,32 +108,32 @@ function ccwp_delay_js_html($html) {
         $atts_array['type'] = 'ccwpdelayedscript';
         $atts_array['defer'] = 'defer';
 
-        // if(isset($atts_array['src']) && !empty($atts_array['src'])){
-        //     $regex = ccwp_delay_exclude_js();
+        if(isset($atts_array['src']) && !empty($atts_array['src'])){
+            $regex = ccwp_delay_exclude_js();
         
-        //     if($regex && preg_match( '#(' . $regex . ')#', $atts_array['src'] )){
-        //         $combined_ex_js_arr[] = $atts_array['src'];
-        //         //$html = str_replace($tag, '', $html);
-        //         $include = false;       
-        //     }
-        // }
-        // if($include && isset($atts_array['id'])){
-        //     $regex = ccwp_delay_exclude_js();
-        //     $file_path =  $atts_array['id'];
-        //     if($regex && preg_match( '#(' . $regex . ')#',  $file_path)){
-        //         $include = false;       
-        //     }
-        // }
-        // if($include && isset($matches[3][$i])){
-        //     $regex = ccwp_delay_exclude_js();
-        //     $file_path =  $matches[3][$i];
-        //     if($regex && preg_match( '#(' . $regex . ')#',  $file_path)){
-        //         $include = false;       
-        //     }
-        // }
-        // if(isset($atts_array['src']) && !$include){
-        //     $include = true;
-        // }
+            if($regex && preg_match( '#(' . $regex . ')#', $atts_array['src'] )){
+                $combined_ex_js_arr[] = $atts_array['src'];
+                //$html = str_replace($tag, '', $html);
+                $include = false;       
+            }
+        }
+        if($include && isset($atts_array['id'])){
+            $regex = ccwp_delay_exclude_js();
+            $file_path =  $atts_array['id'];
+            if($regex && preg_match( '#(' . $regex . ')#',  $file_path)){
+                $include = false;       
+            }
+        }
+        if($include && isset($matches[3][$i])){
+            $regex = ccwp_delay_exclude_js();
+            $file_path =  $matches[3][$i];
+            if($regex && preg_match( '#(' . $regex . ')#',  $file_path)){
+                $include = false;       
+            }
+        }
+        if(isset($atts_array['src']) && !$include){
+            $include = true;
+        }
         if($delay_flag) {
     
             $delayed_atts_string = ccwp_get_atts_string($atts_array);
@@ -172,7 +172,7 @@ function ccwp_delay_exclude_js(){
 add_action( 'wp_enqueue_scripts',  'ccwp_scripts_styles' , 99999);
 function ccwp_scripts_styles(){
 
-    if(ccwp_wprocket_lazyjs()){
+    if(ccwp_check_js_defer()){
        return;   
     }
     global $wp_scripts;
@@ -256,7 +256,7 @@ function ccwp_scripts_styles(){
 }
 add_filter( 'script_loader_src', 'ccwp_remove_css_js_version', 9999, 2 );
 function ccwp_remove_css_js_version($src, $handle ){
-    if(ccwp_wprocket_lazyjs()){
+    if(ccwp_check_js_defer()){
         return $src;   
      }
     $handles_with_version = [ 'corewvps-mergejsfile', 'corewvps-cc','corewvps-mergecssfile' ];
@@ -268,239 +268,18 @@ function ccwp_remove_css_js_version($src, $handle ){
 }
 
 function ccwp_delay_js_load() {
-    $submit_url =  admin_url('admin-ajax.php?action=ccwp_delay_ajax_request');
-    $js_content = '<script type="text/javascript" id="ccwp-delayed-scripts">' . 'ccwpUserInteractions=["keydown","mousemove","wheel","touchmove","touchstart","touchend","touchcancel","touchforcechange"],ccwpDelayedScripts={normal:[],defer:[],async:[]},jQueriesArray=[];var ccwpDOMLoaded=!1;function ccwpTriggerDOMListener(){' . 'ccwpUserInteractions.forEach(function(e){window.removeEventListener(e,ccwpTriggerDOMListener,{passive:!0})}),"loading"===document.readyState?document.addEventListener("DOMContentLoaded",ccwpTriggerDelayedScripts):ccwpTriggerDelayedScripts()}
+    if(ccwp_check_js_defer()){
+        $js_content = '<script type="text/javascript" id="ccwp-delayed-scripts">
+        /* ccwpPreloadStyles(); */ var time=Date.now,ccfw_loaded=!1;function calculate_load_times(){if(void 0===performance){console.log("= Calculate Load Times: performance NOT supported"),setTimeout(function(){ccwpTriggerDelayedScripts()},400),console.log("performance === undefined");return}var e=0,r=performance.getEntriesByType("resource");(void 0===r||r.length<=0)&&console.log("= Calculate Load Times: there are NO `resource` performance records"),r.length&&(e=r.length);let t=0;for(var l=0;l<r.length;l++)r[l].responseEnd>0&&(t+=1);let c=navigator.userAgent,a=c.match(/\sGoogle\s/gm),n=c.match(/\sChrome-/gm),o=400;(a||n)&&(o=3e3),t==r.length&&setTimeout(function(){console.log("is_last_resource==resources.length"),ccwpTriggerDelayedScripts()},o)}async function ccwpTriggerDelayedScripts(){!ccfw_loaded&&ctl()}function ccwpPreloadStyles(){for(var e=document.createDocumentFragment(),r=document.querySelectorAll("link[rel=ccwpdelayedstyle]"),t=0;t<=r.length;t++)if(r[t]){r[t].href=removeVersionFromLink(r[t].href);var l=document.createElement("link");l.href=r[t].href,l.rel="preload",l.as="style",e.appendChild(l)}document.head.appendChild(e)}function ctl(){console.log("ctl");for(var e=document.querySelectorAll("link[rel=ccwpdelayedstyle]"),r=0;r<=e.length;r++)e[r]&&(e[r].href=removeVersionFromLink(e[r].href),e[r].rel="stylesheet",e[r].type="text/css");for(var e=document.querySelectorAll("style[type=ccwpdelayedstyle]"),r=0;r<=e.length;r++)e[r]&&(e[r].type="text/css");ccfw_loaded=!0}function removeVersionFromLink(e){if(!ccfwIsValidUrl(e))return e;{let r=new URL(ccfwFormatLink(e));return r.searchParams.delete("ver"),r.searchParams.delete("time"),r.href}}function ccfwIsValidUrl(e){if(e){var r=RegExp(/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi);return e.match(r)}return!1}function ccfwFormatLink(e){let r=e.match("http:"),t=e.match("https:");return r||t?e:location.protocol+e}document.addEventListener("readystatechange",e=>{"complete"===e.target.readyState&&calculate_load_times()});
+      </script>';  
+     }
 
-           var time = Date.now;
-           var ccfw_loaded = false; 
-           function calculate_load_times() {
-                // Check performance support
-                if (performance === undefined) {
-                    console.log("= Calculate Load Times: performance NOT supported");
-                    return;
-                }
-            
-                // Get a list of "resource" performance entries
-                var resources_length=0;
-                var resources = performance.getEntriesByType("resource");
-                if (resources === undefined || resources.length <= 0) {
-                    console.log("= Calculate Load Times: there are NO `resource` performance records");
-                }
-                if(resources.length)
-                {
-                    resources_length=resources.length;
-                }
+     else{
 
-                let is_last_resource = 0;
-                for (var i=0; i < resources.length; i++) {
-                    if(resources[i].responseEnd>0){
-                        is_last_resource = is_last_resource + 1;
-                    }
-                }
-            
-                let uag = navigator.userAgent;
-                let gpat = /\sGoogle\s/gm;
-                let gres = uag.match(gpat);
-                let cpat = /\sChrome-/gm;
-                let cres = uag.match(cpat);
-                let wait_till=400;
-                if(gres || cres){
-                    wait_till = 3000;
-                }
-                if(is_last_resource==resources.length){
-                    setTimeout(function(){
-                        ccwpTriggerDelayedScripts();
-                    },wait_till);
-                }
-            }
-            
-            document.addEventListener("readystatechange", (e) => {
-                if (e.target.readyState === "complete") {
-                calculate_load_times();
-                }
-            });
-
-            async function ccwpTriggerDelayedScripts() {
-                if(ccfw_loaded){ return ;}
-                 ctl() , cwvpsbDelayEventListeners(), cwvpsbDelayJQueryReady(), cwvpsbProcessDocumentWrite(), cwvpsbSortDelayedScripts(), ccwpPreloadDelayedScripts(), await cwvpsbLoadDelayedScripts(ccwpDelayedScripts.normal), await cwvpsbLoadDelayedScripts(ccwpDelayedScripts.defer), await cwvpsbLoadDelayedScripts(ccwpDelayedScripts.async), await cwvpsbTriggerEventListeners()
-            }
-            
-            function cwvpsbDelayEventListeners() {
-                let e = {};
-            
-                function t(t, n) {
-                    function r(n) {
-                        return e[t].delayedEvents.indexOf(n) >= 0 ? "cwvpsb-" + n : n
-                    }
-                    e[t] || (e[t] = {
-                        originalFunctions: {
-                            add: t.addEventListener,
-                            remove: t.removeEventListener
-                        },
-                        delayedEvents: []
-                    }, t.addEventListener = function() {
-                        arguments[0] = r(arguments[0]), e[t].originalFunctions.add.apply(t, arguments)
-                    }, t.removeEventListener = function() {
-                        arguments[0] = r(arguments[0]), e[t].originalFunctions.remove.apply(t, arguments)
-                    }), e[t].delayedEvents.push(n)
-                }
-            
-                function n(e, t) {
-                    const n = e[t];
-                    Object.defineProperty(e, t, {
-                        get: n || function() {},
-                        set: function(n) {
-                            e["cwvpsb" + t] = n
-                        }
-                    })
-                }
-                t(document, "DOMContentLoaded"), t(window, "DOMContentLoaded"), t(window, "load"), t(window, "pageshow"), t(document, "readystatechange"), n(window, "onload"), n(window, "onpageshow")
-            }
-            
-            function cwvpsbDelayJQueryReady() {
-              if(!window.hasOwnProperty("jQuery"))
-              {
-                let e = window.jQuery;
-                Object.defineProperty(window, "jQuery", {
-                    get: () => e,
-                    set(t) {
-                        if (t && t.fn && !jQueriesArray.includes(t)) {
-                            t.fn.ready = t.fn.init.prototype.ready = function(e) {
-                                ccwpDOMLoaded ? e.bind(document)(t) : document.addEventListener("cwvpsb-DOMContentLoaded", function() {
-                                    e.bind(document)(t)
-                                })
-                            };
-                            const e = t.fn.on;
-                            t.fn.on = t.fn.init.prototype.on = function() {
-                                if (this[0] === window) {
-                                    function t(e) {
-                                        return e.split(" ").map(e => "load" === e || 0 === e.indexOf("load.") ? "cwvpsb-jquery-load" : e).join(" ")
-                                    }
-                                    "string" == typeof arguments[0] || arguments[0] instanceof String ? arguments[0] = t(arguments[0]) : "object" == typeof arguments[0] && Object.keys(arguments[0]).forEach(function(e) {
-                                        delete Object.assign(arguments[0], {
-                                            [t(e)]: arguments[0][e]
-                                        })[e]
-                                    })
-                                }
-                                return e.apply(this, arguments), this
-                            }, jQueriesArray.push(t)
-                        }
-                        e = t
-                    }
-                })
-              }
-            }
-            
-            function cwvpsbProcessDocumentWrite() {
-                const e = new Map;
-                document.write = document.writeln = function(t) {
-                    var n = document.currentScript,
-                        r = document.createRange();
-                    let a = e.get(n);
-                    void 0 === a && (a = n.nextSibling, e.set(n, a));
-                    var o = document.createDocumentFragment();
-                    r.setStart(o, 0), o.appendChild(r.createContextualFragment(t)), n.parentElement.insertBefore(o, a)
-                }
-            }
-            
-            function cwvpsbSortDelayedScripts() {
-                document.querySelectorAll("script[type=ccwpdelayedscript]").forEach(function(e) {
-                    e.hasAttribute("src") ? e.hasAttribute("defer") && !1 !== e.defer ? ccwpDelayedScripts.defer.push(e) : e.hasAttribute("async") && !1 !== e.async ? ccwpDelayedScripts.async.push(e) : ccwpDelayedScripts.normal.push(e) : ccwpDelayedScripts.normal.push(e)
-                })
-            }
+        $js_content = '<script type="text/javascript" id="ccwp-delayed-scripts">ccwpUserInteractions=["keydown","mousemove","wheel","touchmove","touchstart","touchend","touchcancel","touchforcechange"],ccwpDelayedScripts={normal:[],defer:[],async:[]},jQueriesArray=[];var ccwpDOMLoaded=!1;function ccwpTriggerDOMListener(){' . 'ccwpUserInteractions.forEach(function(e){window.removeEventListener(e,ccwpTriggerDOMListener,{passive:!0})}),"loading"===document.readyState?document.addEventListener("DOMContentLoaded",ccwpTriggerDelayedScripts):ccwpTriggerDelayedScripts()}
+            var time=Date.now,ccfw_loaded=!1;function calculate_load_times(){if(void 0===performance){console.log("= Calculate Load Times: performance NOT supported");return}var e=0,t=performance.getEntriesByType("resource");(void 0===t||t.length<=0)&&console.log("= Calculate Load Times: there are NO `resource` performance records"),t.length&&(e=t.length);let n=0;for(var a=0;a<t.length;a++)t[a].responseEnd>0&&(n+=1);let r=navigator.userAgent,c=r.match(/\sGoogle\s/gm),s=r.match(/\sChrome-/gm),o=400;(c||s)&&(o=3e3),n==t.length&&setTimeout(function(){ccwpTriggerDelayedScripts()},o)}async function ccwpTriggerDelayedScripts(){!ccfw_loaded&&(ctl(),cwvpsbDelayEventListeners(),cwvpsbDelayJQueryReady(),cwvpsbProcessDocumentWrite(),cwvpsbSortDelayedScripts(),ccwpPreloadDelayedScripts(),await cwvpsbLoadDelayedScripts(ccwpDelayedScripts.normal),await cwvpsbLoadDelayedScripts(ccwpDelayedScripts.defer),await cwvpsbLoadDelayedScripts(ccwpDelayedScripts.async),await cwvpsbTriggerEventListeners())}function cwvpsbDelayEventListeners(){let e={};function t(t,n){function a(n){return e[t].delayedEvents.indexOf(n)>=0?"cwvpsb-"+n:n}e[t]||(e[t]={originalFunctions:{add:t.addEventListener,remove:t.removeEventListener},delayedEvents:[]},t.addEventListener=function(){arguments[0]=a(arguments[0]),e[t].originalFunctions.add.apply(t,arguments)},t.removeEventListener=function(){arguments[0]=a(arguments[0]),e[t].originalFunctions.remove.apply(t,arguments)}),e[t].delayedEvents.push(n)}function n(e,t){let n=e[t];Object.defineProperty(e,t,{get:n||function(){},set:function(n){e["cwvpsb"+t]=n}})}t(document,"DOMContentLoaded"),t(window,"DOMContentLoaded"),t(window,"load"),t(window,"pageshow"),t(document,"readystatechange"),n(window,"onload"),n(window,"onpageshow")}function cwvpsbDelayJQueryReady(){let e=window.jQuery;Object.defineProperty(window,"jQuery",{get:()=>e,set(t){if(t&&t.fn&&!jQueriesArray.includes(t)){t.fn.ready=t.fn.init.prototype.ready=function(e){ccwpDOMLoaded?e.bind(document)(t):document.addEventListener("cwvpsb-DOMContentLoaded",function(){e.bind(document)(t)})};let n=t.fn.on;t.fn.on=t.fn.init.prototype.on=function(){if(this[0]===window){function e(e){return e.split(" ").map(e=>"load"===e||0===e.indexOf("load.")?"cwvpsb-jquery-load":e).join(" ")}"string"==typeof arguments[0]||arguments[0]instanceof String?arguments[0]=e(arguments[0]):"object"==typeof arguments[0]&&Object.keys(arguments[0]).forEach(function(t){delete Object.assign(arguments[0],{[e(t)]:arguments[0][t]})[t]})}return n.apply(this,arguments),this},jQueriesArray.push(t)}e=t}})}function cwvpsbProcessDocumentWrite(){let e=new Map;document.write=document.writeln=function(t){var n=document.currentScript,a=document.createRange();let r=e.get(n);void 0===r&&(r=n.nextSibling,e.set(n,r));var c=document.createDocumentFragment();a.setStart(c,0),c.appendChild(a.createContextualFragment(t)),n.parentElement.insertBefore(c,r)}}function cwvpsbSortDelayedScripts(){document.querySelectorAll("script[type=ccwpdelayedscript]").forEach(function(e){e.hasAttribute("src")?e.hasAttribute("defer")&&!1!==e.defer?ccwpDelayedScripts.defer.push(e):e.hasAttribute("async")&&!1!==e.async?ccwpDelayedScripts.async.push(e):ccwpDelayedScripts.normal.push(e):ccwpDelayedScripts.normal.push(e)})}function ccwpPreloadDelayedScripts(){var e=document.createDocumentFragment();[...ccwpDelayedScripts.normal,...ccwpDelayedScripts.defer,...ccwpDelayedScripts.async].forEach(function(t){var n=removeVersionFromLink(t.getAttribute("src"));if(n){t.setAttribute("src",n);var a=document.createElement("link");a.href=n,a.rel="preload",a.as="script",e.appendChild(a)}}),document.head.appendChild(e)}async function cwvpsbLoadDelayedScripts(e){var t=e.shift();return t?(await cwvpsbReplaceScript(t),cwvpsbLoadDelayedScripts(e)):Promise.resolve()}async function cwvpsbReplaceScript(e){return await cwvpsbNextFrame(),new Promise(function(t){let n=document.createElement("script");[...e.attributes].forEach(function(e){let t=e.nodeName;"type"!==t&&("data-type"===t&&(t="type"),n.setAttribute(t,e.nodeValue))}),e.hasAttribute("src")?(n.addEventListener("load",t),n.addEventListener("error",t)):(n.text=e.text,t()),e.parentNode.replaceChild(n,e)})}function ctl(){for(var e=document.querySelectorAll("link[rel=ccwpdelayedstyle]"),t=0;t<=e.length;t++)e[t]&&(e[t].href=removeVersionFromLink(e[t].href),e[t].rel="stylesheet",e[t].type="text/css");for(var e=document.querySelectorAll("style[type=ccwpdelayedstyle]"),t=0;t<=e.length;t++)e[t]&&(e[t].type="text/css");ccfw_loaded=!0}function removeVersionFromLink(e){if(!ccfwIsValidUrl(e))return e;{let t=new URL(ccfwFormatLink(e));return t.searchParams.delete("ver"),t.searchParams.delete("time"),t.href}}function ccfwIsValidUrl(e){if(e){var t=RegExp(/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi);return e.match(t)}return!1}function ccfwFormatLink(e){let t=e.match("http:"),n=e.match("https:");return t||n?e:location.protocol+e}async function cwvpsbTriggerEventListeners(){ccwpDOMLoaded=!0,await cwvpsbNextFrame(),document.dispatchEvent(new Event("cwvpsb-DOMContentLoaded")),await cwvpsbNextFrame(),window.dispatchEvent(new Event("cwvpsb-DOMContentLoaded")),await cwvpsbNextFrame(),document.dispatchEvent(new Event("cwvpsb-readystatechange")),await cwvpsbNextFrame(),document.cwvpsbonreadystatechange&&document.cwvpsbonreadystatechange(),await cwvpsbNextFrame(),window.dispatchEvent(new Event("cwvpsb-load")),await cwvpsbNextFrame(),window.cwvpsbonload&&window.cwvpsbonload(),await cwvpsbNextFrame(),jQueriesArray.forEach(function(e){e(window).trigger("cwvpsb-jquery-load")}),window.dispatchEvent(new Event("cwvpsb-pageshow")),await cwvpsbNextFrame(),window.cwvpsbonpageshow&&window.cwvpsbonpageshow()}async function cwvpsbNextFrame(){return new Promise(function(e){requestAnimationFrame(e)})}document.addEventListener("readystatechange",e=>{"complete"===e.target.readyState&&calculate_load_times()}),ccwpUserInteractions.forEach(function(e){window.addEventListener(e,ccwpTriggerDOMListener,{passive:!0})});
+           </script>';
+     }
     
-            function ccwpPreloadDelayedScripts() {
-                var e = document.createDocumentFragment();
-                [...ccwpDelayedScripts.normal, ...ccwpDelayedScripts.defer, ...ccwpDelayedScripts.async].forEach(function(t) {
-                    var n = removeVersionFromLink(t.getAttribute("src"));
-                    if (n) {
-                        t.setAttribute("src", n);
-                        var r = document.createElement("link");
-                        r.href = n, r.rel = "preload", r.as = "script", e.appendChild(r)
-                    }
-                }), document.head.appendChild(e)
-            }
-            async function cwvpsbLoadDelayedScripts(e) {
-                var t = e.shift();
-                return t ? (await cwvpsbReplaceScript(t), cwvpsbLoadDelayedScripts(e)) : Promise.resolve()
-            }
-            async function cwvpsbReplaceScript(e) {
-                return await cwvpsbNextFrame(), new Promise(function(t) {
-                    const n = document.createElement("script");
-                    [...e.attributes].forEach(function(e) {
-                        let t = e.nodeName;
-                        "type" !== t && ("data-type" === t && (t = "type"), n.setAttribute(t, e.nodeValue))
-                    }), e.hasAttribute("src") ? (n.addEventListener("load", t), n.addEventListener("error", t)) : (n.text = e.text, t()), e.parentNode.replaceChild(n, e)
-                })
-                    }
-
-
-    function ctl(){
-            var cssEle = document.querySelectorAll("link[rel=ccwpdelayedstyle]");
-                for(var i=0; i <= cssEle.length;i++){
-                    if(cssEle[i]){
-                        cssEle[i].href = removeVersionFromLink(cssEle[i].href);
-                        cssEle[i].rel = "stylesheet";
-                        cssEle[i].type = "text/css";
-                    }
-                }
-
-                var cssEle = document.querySelectorAll("style[type=ccwpdelayedstyle]");
-                for(var i=0; i <= cssEle.length;i++){
-                    if(cssEle[i]){
-                        cssEle[i].type = "text/css";
-                    }
-                }
-                ccfw_loaded=true;
-            }
-            function removeVersionFromLink(link)
-            {
-                if(ccfwIsValidUrl(link))
-                {
-                    const url = new URL(ccfwFormatLink(link));
-                    url.searchParams.delete("ver");
-                    url.searchParams.delete("time");
-                    return url.href;
-                }
-                else{
-                    return link;
-                }
-               
-            }
-            function ccfwIsValidUrl(urlString)
-            {
-                if(urlString){
-                    var expression =/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
-                    var regex = new RegExp(expression);
-                    return urlString.match(regex);
-                }
-                return false;
-            }
-            function ccfwFormatLink(link)
-            {
-                let http_check=link.match("http:");
-                let https_check=link.match("https:");
-                if(!http_check && !https_check)
-                {
-                    return location.protocol+link;
-                }
-                return link;
-            }
-        
-            async function cwvpsbTriggerEventListeners() {
-                ccwpDOMLoaded = !0, await cwvpsbNextFrame(), document.dispatchEvent(new Event("cwvpsb-DOMContentLoaded")), await cwvpsbNextFrame(), window.dispatchEvent(new Event("cwvpsb-DOMContentLoaded")), await cwvpsbNextFrame(), document.dispatchEvent(new Event("cwvpsb-readystatechange")), await cwvpsbNextFrame(), document.cwvpsbonreadystatechange && document.cwvpsbonreadystatechange(), await cwvpsbNextFrame(), window.dispatchEvent(new Event("cwvpsb-load")), await cwvpsbNextFrame(), window.cwvpsbonload && window.cwvpsbonload(), await cwvpsbNextFrame(), jQueriesArray.forEach(function(e) {
-                    e(window).trigger("cwvpsb-jquery-load")
-                }), window.dispatchEvent(new Event("cwvpsb-pageshow")), await cwvpsbNextFrame(), window.cwvpsbonpageshow && window.cwvpsbonpageshow()
-            }
-            async function cwvpsbNextFrame() {
-                return new Promise(function(e) {
-                    requestAnimationFrame(e)
-                })
-            }
-            ccwpUserInteractions.forEach(function(e) {
-                window.addEventListener(e, ccwpTriggerDOMListener, {
-                    passive: !0
-                })
-            }); </script>';
     echo $js_content;
 }

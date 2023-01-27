@@ -48,7 +48,7 @@ function ccfwp_sanitize_textarea_field( $str ) {
 	return $filtered;
 }
 
-function ccwp_wprocket_lazyjs()
+function ccwp_check_js_defer()
 {
     if(defined('WP_ROCKET_VERSION'))
     {

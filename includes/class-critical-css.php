@@ -553,9 +553,14 @@ class class_critical_css_for_wp{
 			   $table_name = $table_prefix . 'critical_css_for_wp_urls';	
 		$url = home_url( $wp->request );
 		$url = trailingslashit($url);		
-		
+		$custom_css='';
+		if(in_array( 'elementor/elementor.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ))
+		{
+			$custom_css='.elementor-location-footer:before{content:"";display:table;clear:both;}.elementor-icon-list-items .elementor-icon-list-item .elementor-icon-list-text{display:inline-block;}.elementor-posts__hover-gradient .elementor-post__card .elementor-post__thumbnail__link:after {display: block;content: "";background-image: -o-linear-gradient(bottom,rgba(0,0,0,.35) 0,transparent 75%);background-image: -webkit-gradient(linear,left bottom,left top,from(rgba(0,0,0,.35)),color-stop(75%,transparent));background-image: linear-gradient(0deg,rgba(0,0,0,.35),transparent 75%);background-repeat: no-repeat;height: 100%;width: 100%;position: absolute;bottom: 0;opacity: 1;-webkit-transition: all .3s ease-out;-o-transition: all .3s ease-out;transition: all .3s ease-out;}';
+		}
 		if(file_exists($user_dirname.md5($url).'.css')){
-			$css =  file_get_contents($user_dirname.'/'.md5($url).'.css');			
+			$css =  file_get_contents($user_dirname.'/'.md5($url).'.css');
+			$css .=  $custom_css;			
 		 	echo "<style type='text/css' id='critical-css-for-wp'>$css</style>";
 		}else{
 			$wpdb->query($wpdb->prepare(
@@ -1165,7 +1170,7 @@ class class_critical_css_for_wp{
 	
 	}
 
-	public function ccwp_wprocket_lazyjs()
+	public function ccwp_check_js_defer()
 {
     if(defined('WP_ROCKET_VERSION'))
     {
