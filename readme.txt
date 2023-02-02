@@ -40,8 +40,8 @@ Critical CSS For WP intends to provide great experience to the web page visitors
 == Changelog ==
 
 = 1.0.5 (02 February 2023) = 
-* Make plugin compatible with WP rocket and Elementor enhancementNew feature or request #12
-* Images and Google Ads not loading bugSomething isnt working #8
+* Make plugin compatible with WP rocket and Elementor #12
+* Images and Google Ads not loading #8
 
 = 1.0.4 (17 January 2023) = 
 * Make plugin WP multisite compatible #9
