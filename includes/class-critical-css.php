@@ -57,8 +57,10 @@ class class_critical_css_for_wp{
 		 if ( ! wp_next_scheduled( 'isa_add_every_one_hour_crtlcss' ) ) {
 		     wp_schedule_event( time(), 'every_one_hour',  'isa_add_every_one_hour_crtlcss' );
 		 }
-		add_action( 'isa_add_every_one_hour_crtlcss', array($this, 'every_one_minutes_event_func_crtlcss' ) );					
-		//add_action( 'admin_init', array($this, 'every_one_minutes_event_func_crtlcss' ) );					
+		add_action( 'isa_add_every_one_hour_crtlcss', array($this, 'every_one_minutes_event_func_crtlcss' ) );
+		if(defined('DISABLE_WP_CRON') && DISABLE_WP_CRON==true){					
+		add_action( 'admin_init', array($this, 'every_one_minutes_event_func_crtlcss' ) );	
+		}				
 			
 		
 	}
@@ -619,7 +621,7 @@ class class_critical_css_for_wp{
 			}
 			$delay_flag = false;
 			$excluded_scripts = array(
-				'cwvpsb-delayed-styles',
+				'ccwp-delayed-styles',
 			);
 
 			if(!empty($excluded_scripts)) {
@@ -632,7 +634,7 @@ class class_critical_css_for_wp{
 
 			$delay_flag = true;
 			if(!empty($atts_array['rel'])) {
-				$atts_array['data-cwvpsb-rel'] = $atts_array['rel'];
+				$atts_array['data-ccwp-rel'] = $atts_array['rel'];
 			}
 
 			$atts_array['rel'] = 'ccwpdelayedstyle';
@@ -652,7 +654,7 @@ class class_critical_css_for_wp{
 				$atts_array = !empty($matches1[2][$i]) ? $this->ccwp_get_atts_array($matches1[2][$i]) : array();
 				if($atts_array['id'] == 'critical-css-for-wp'){ continue; }
 				if(isset($atts_array['type'])){
-					$atts_array['data-cwvpsb-cc-type'] = $atts_array['type'];
+					$atts_array['data-ccwp-cc-type'] = $atts_array['type'];
 				}
 				//$atts_array['type'] = 'ccwpdelayedstyle';
 				$delayed_atts_string = $this->ccwp_get_atts_string($atts_array);
