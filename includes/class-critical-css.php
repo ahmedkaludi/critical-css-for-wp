@@ -58,14 +58,21 @@ class class_critical_css_for_wp{
 		     wp_schedule_event( time(), 'every_one_hour',  'isa_add_every_one_hour_crtlcss' );
 		 }
 		add_action( 'isa_add_every_one_hour_crtlcss', array($this, 'every_one_minutes_event_func_crtlcss' ) );
-		if(defined('DISABLE_WP_CRON') && DISABLE_WP_CRON==true){					
-			add_action( 'admin_init', array($this, 'every_one_minutes_event_func_crtlcss' ) );	
-		}				
-			
-		
+		if(defined('DISABLE_WP_CRON') && DISABLE_WP_CRON==true){
+			add_action( 'current_screen', array($this,'ccfwp_custom_critical_css_generate' ));
+		}
 	}
 
-
+	public function ccfwp_custom_critical_css_generate()
+	{
+		if ( is_admin() ) {
+			$current_screen = get_current_screen();
+			if(isset($current_screen->id) && $current_screen->id == 'toplevel_page_critical-css-for-wp')
+			{
+				$this->every_one_minutes_event_func_crtlcss();
+			}
+		}
+	}
 	public function on_term_create($term_id, $tt_id, $taxonomy){
 
 		$settings = critical_css_defaults();
@@ -529,7 +536,6 @@ class class_critical_css_for_wp{
 	}
 
 	public function every_one_minutes_event_func_crtlcss() {
-		
 		$this->save_posts_url();
 		$this->save_terms_urls();
 		$this->save_others_urls();
