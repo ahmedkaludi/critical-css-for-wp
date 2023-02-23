@@ -164,154 +164,13 @@ function ccwp_delay_exclude_js(){
 }
 
 function ccwp_delay_js_load() {
-    if(ccwp_check_js_defer()){
-        $js_content = '<script type="text/javascript" id="ccwp-delayed-scripts">
-        /* ccwpPreloadStyles(); */
-        let time = Date.now();
-		  let ccfw_loaded = false;
-		  let resources_length =0;
-		  let resources = undefined;
-		  ccwpUserInteractions=["keydown","mousemove","wheel","touchmove","touchstart","touchend","touchcancel","touchforcechange"];
-		  
-		  ccwpUserInteractions.forEach(function(e){
-					window.addEventListener(e,calculate_load_times);
-				});
-        function calculate_load_times() {
-             // Check performance support
-             if (performance === undefined) {
-                 console.log("Performance NOT supported");
-                 setTimeout(function(){
-                    ccwpTriggerDelayedScripts();
-                },4000);
-                console.log("performance === undefined");
-                 return;
-             }
-             // Get a list of "resource" performance entries
-
-             resources = performance.getEntriesByType("resource");
-             if (resources === undefined || resources.length <= 0) {
-                 console.log(" NO Resource performance records");
-             }
-             if(resources.length)
-             {
-                 resources_length=resources.length;
-             }
-
-             let is_last_resource = 0;
-             for (let i=0; i < resources.length; i++) {
-                 if(resources[i].responseEnd>0){
-                     is_last_resource = is_last_resource + 1;
-                 }
-             }
-             let uag = navigator.userAgent;
-            let gpat = /Google Page Speed Insights/gm;
-            let gres = uag.match(gpat);
-            let cpat = /Chrome-Lighthouse/gm;
-            let cres = uag.match(cpat);
-            let wait_till=2000;
-            if(cres || gres){
-                 wait_till = 4000;
-             }
-             if(is_last_resource==resources.length){
-                 setTimeout(function(){
-                    console.log("is_last_resource==resources.length");
-                     ccwpTriggerDelayedScripts();
-                 },wait_till);
-             }
-         }
-
-         document.addEventListener("load", function(e) {
-            calculate_load_times();
-         });
-
-          function ccwpTriggerDelayedScripts() {
-             if(ccfw_loaded){ return ;}
-			  ccwpPreloadStyles();
-              ccwpLoadCss();
-         }
-
-          function ccwpPreloadStyles() {
-              let e = document.createDocumentFragment();
-              var cssEle = document.querySelectorAll("link[rel=ccwpdelayedstyle]");
-              for(let i=0; i <= cssEle.length;i++){
-                  if(cssEle[i]){
-                      cssEle[i].href = removeVersionFromLink(cssEle[i].href);
-                      let r = document.createElement("link");
-                      r.href = cssEle[i].href;
-                      r.rel = "preload";
-                      r.as = "style";
-                      e.appendChild(r);
-                  }
-                  }
-             document.head.appendChild(e);
-          }
-
- function ccwpLoadCss(){
-    console.log("ccwpLoadCss");
-         var cssEle = document.querySelectorAll("link[rel=ccwpdelayedstyle]");
-             for(let i=0; i <= cssEle.length;i++){
-                 if(cssEle[i]){
-                     cssEle[i].href = removeVersionFromLink(cssEle[i].href);
-                     cssEle[i].rel = "stylesheet";
-                     cssEle[i].type = "text/css";
-                 }
-             }
-
-             var cssEle2 = document.querySelectorAll("style[type=ccwpdelayedstyle]");
-             for(let i=0; i <= cssEle2.length;i++){
-                 if(cssEle2[i]){
-                     cssEle2[i].type = "text/css";
-                 }
-             }
-             ccfw_loaded=true;
-         }
-         function removeVersionFromLink(link)
-         {
-             if(ccfwIsValidUrl(link))
-             {
-                 const url = new URL(ccfwFormatLink(link));
-                 url.searchParams.delete("ver");
-                 url.searchParams.delete("time");
-                 return url.href;
-             }
-             else{
-                 return link;
-             }
-         }
-         function ccfwIsValidUrl(urlString)
-         {
-             if(urlString){
-                 var expression =/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
-                 var regex = new RegExp(expression);
-                 return urlString.match(regex);
-             }
-             return false;
-         }
-         function ccfwFormatLink(link)
-         {
-             let http_check=link.match("http:");
-             let https_check=link.match("https:");
-             if(!http_check && !https_check)
-             {
-                 return location.protocol+link;
-             }
-             return link;
-         }
-      </script>';  
-     }
-
-     else{
-
         $js_content = '<script type="text/javascript" id="ccwp-delayed-scripts">
 			let ccwpDOMLoaded=!1;
-			let time = Date.now();
 			let ccwp_loaded = false;
 			let resources_length=0;
 			let resources =undefined;
 			let is_last_resource = 0;
 			ccwpUserInteractions=["keydown","mousemove","wheel","touchmove","touchstart","touchend","touchcancel","touchforcechange"];
-			ccwpDelayedScripts={async:[],defer:[],normal:[]};
-			jQueriesArray=[];
 			
 				ccwpUserInteractions.forEach(function(e){
 					window.addEventListener(e,calculate_load_times);
@@ -457,7 +316,6 @@ function ccwp_delay_js_load() {
                 return link;
             }
 			</script>';
-     }
     
     echo $js_content;
 }
