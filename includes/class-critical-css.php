@@ -25,6 +25,10 @@ class class_critical_css_for_wp{
 	    if ( function_exists('elementor_load_plugin_textdomain') && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
 	    	return;
 		}
+		if(class_exists('FlexMLS_IDX'))
+		{
+			add_action('init', array($this, 'ccwp_flexmls_fix'));
+		}
 		add_action('admin_notices', array($this,'ccfwp_add_admin_notices'));
 		add_action('wp', array($this, 'delay_css_loadings'), 999);
 		add_action( 'create_term', function($term_id, $tt_id, $taxonomy){
@@ -62,7 +66,10 @@ class class_critical_css_for_wp{
 			add_action( 'current_screen', array($this,'ccfwp_custom_critical_css_generate' ));
 		}
 	}
-
+	public function ccwp_flexmls_fix()
+	{
+		$_SESSION['ccwp_current_uri'] = $_SERVER['REQUEST_URI'];
+	}
 	public function ccfwp_custom_critical_css_generate()
 	{
 		if ( is_admin() ) {
@@ -561,8 +568,13 @@ class class_critical_css_for_wp{
 		$user_dirname = $this->cachepath();		
 		$settings = critical_css_defaults();		
 		global $wp, $wpdb, $table_prefix;
-			   $table_name = $table_prefix . 'critical_css_for_wp_urls';	
+			   $table_name = $table_prefix . 'critical_css_for_wp_urls';
+
 		$url = home_url( $wp->request );
+		if(class_exists('FlexMLS_IDX'))
+		{
+			$url = esc_url(home_url($_SESSION['ccwp_current_uri']));
+		}
 		$url = trailingslashit($url);		
 		$custom_css='';
 		if(in_array( 'elementor/elementor.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ))
@@ -604,7 +616,15 @@ class class_critical_css_for_wp{
 	public function ccwp_delay_css_html($html){
 
 		$return_html = $jetpack_boost = false;
-		if(!$this->check_critical_css()){ 
+
+		$url_arg="";
+
+		if(class_exists('FlexMLS_IDX'))
+		{
+			$url_arg = esc_url(home_url($_SESSION['ccwp_current_uri']));
+		}
+
+		if(!$this->check_critical_css($url_arg)){ 
 		     $return_html = true;
 		}
 
