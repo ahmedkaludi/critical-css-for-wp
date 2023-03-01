@@ -164,6 +164,11 @@ function ccwp_delay_exclude_js(){
 }
 
 function ccwp_delay_js_load() {
+    $settings = critical_css_defaults();
+    if((isset($settings["ccfwp_defer_css"]) && $settings["ccfwp_defer_css"]=='off'))
+    {
+        return;
+    }
         $js_content = '<script type="text/javascript" id="ccwp-delayed-scripts">
 			let ccwpDOMLoaded=!1;
 			let ccwp_loaded = false;

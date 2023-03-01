@@ -616,7 +616,7 @@ class class_critical_css_for_wp{
 	public function ccwp_delay_css_html($html){
 
 		$return_html = $jetpack_boost = false;
-
+		$settings = critical_css_defaults();
 		$url_arg="";
 
 		if(class_exists('FlexMLS_IDX'))
@@ -632,7 +632,11 @@ class class_critical_css_for_wp{
             $return_html = false;
             $jetpack_boost = true;
 		}
-
+		
+		if((isset($settings["ccfwp_defer_css"]) && $settings["ccfwp_defer_css"]=='off'))
+		{
+			$return_html = true;
+		}
 		if($return_html == true){
 			return $html;
 		}
