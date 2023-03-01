@@ -200,7 +200,7 @@ function ccwp_delay_js_load() {
                 let gres = uag.match(gpat);
                 let cpat = /Chrome-Lighthouse/gm;
                 let cres = uag.match(cpat);
-                let wait_till=1000;
+                let wait_till=500;
                 if(gres || cres){
                     wait_till = 3000;
                   }
@@ -215,7 +215,7 @@ function ccwp_delay_js_load() {
 				   console.log("load complete");
 				    setTimeout(function(){
                         calculate_load_times();
-                    },2000);
+                    },500);
             });
 
             async function ccwpTriggerDelayedScripts() {
