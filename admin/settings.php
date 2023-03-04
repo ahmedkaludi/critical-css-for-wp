@@ -379,8 +379,17 @@ function critical_css_get_tab( $default = '', $available = array() ) {
             }
 
         echo '</ul>';
+
+        echo '<h2>'.ccfwp_t_string('CSS Defer').'</h2>';
+   
+        echo '<select name="ccfwp_settings[ccfwp_defer_css]">';
+        $ccwp_defer_on=(isset($settings["ccfwp_defer_css"]) && $settings["ccfwp_defer_css"]=='on')?'selected':'';
+        $ccwp_defer_off=(isset($settings["ccfwp_defer_css"]) && $settings["ccfwp_defer_css"]=='off')?'selected':'';
+        echo '<option value="on" '.esc_attr($ccwp_defer_on).'>'.esc_html('Enable').' </option>';
+        echo '<option value="off" '.esc_attr($ccwp_defer_off).'>'.esc_html('Disable').'</option></select>';
+  
+
     }
-    
     ?> 
 
     <?php
@@ -391,7 +400,8 @@ function critical_css_get_tab( $default = '', $available = array() ) {
 function critical_css_defaults(){
     $defaults = array(
        'ccfwp_on_home'      => 1,
-       'ccfwp_on_cp_type'   => array( 'post' => 1 )
+       'ccfwp_on_cp_type'   => array( 'post' => 1 ),
+       'ccfwp_defer_css'    => 'on',
     );        
     $settings = get_option( 'ccfwp_settings', $defaults );
     return $settings;

@@ -3,7 +3,7 @@ Contributors: magazine3
 Tags: Critical, Critical CSS, Core Web Vital, Cache, SEO
 Requires at least: 3.0
 Tested up to: 6.1
-Stable tag: 1.0.6
+Stable tag: 1.0.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -38,6 +38,12 @@ Critical CSS For WP intends to provide great experience to the web page visitors
 * 10Web Booster – Website speed optimization, Cache & Page Speed optimizer
 
 == Changelog ==
+
+= 1.0.7 (04 March 2023) = 
+* Fixed : Critical css is not generated while using file_get_contents #17
+* Fixed : Critical css not loading on frontend using FlexMLS_IDX plugin #18
+* Fixed : Delayed CSS loading only on scroll/click event #19
+* Fixed : Option to load critical CSS without Delay #20
 
 = 1.0.6 (10 February 2023) = 
 * jQuery is not defined and related js issues #15
