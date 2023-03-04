@@ -385,8 +385,8 @@ function critical_css_get_tab( $default = '', $available = array() ) {
         echo '<select name="ccfwp_settings[ccfwp_defer_css]">';
         $ccwp_defer_on=(isset($settings["ccfwp_defer_css"]) && $settings["ccfwp_defer_css"]=='on')?'selected':'';
         $ccwp_defer_off=(isset($settings["ccfwp_defer_css"]) && $settings["ccfwp_defer_css"]=='off')?'selected':'';
-        echo '<option value="on" '.$ccwp_defer_on.'>'.esc_html('Enable').' </option>';
-        echo '<option value="off" '.$ccwp_defer_off.'>'.esc_html('Disable').'</option></select>';
+        echo '<option value="on" '.esc_attr($ccwp_defer_on).'>'.esc_html('Enable').' </option>';
+        echo '<option value="off" '.esc_attr($ccwp_defer_off).'>'.esc_html('Disable').'</option></select>';
   
 
     }
