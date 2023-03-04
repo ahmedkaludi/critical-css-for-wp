@@ -39,7 +39,7 @@ Critical CSS For WP intends to provide great experience to the web page visitors
 
 == Changelog ==
 
-= 1.0.7 (02 March 2023) = 
+= 1.0.7 (04 March 2023) = 
 * Fixed : Critical css is not generated while using file_get_contents #17
 * Fixed : Critical css not loading on frontend using FlexMLS_IDX plugin #18
 * Fixed : Delayed CSS loading only on scroll/click event #19
