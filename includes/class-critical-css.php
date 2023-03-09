@@ -571,7 +571,7 @@ class class_critical_css_for_wp{
 			   $table_name = $table_prefix . 'critical_css_for_wp_urls';
 
 		$url = home_url( $wp->request );
-		if(class_exists('FlexMLS_IDX'))
+		if(class_exists('FlexMLS_IDX') && isset($_SESSION['ccwp_current_uri']))
 		{
 			$url = esc_url(home_url($_SESSION['ccwp_current_uri']));
 		}
@@ -619,7 +619,7 @@ class class_critical_css_for_wp{
 		$settings = critical_css_defaults();
 		$url_arg="";
 
-		if(class_exists('FlexMLS_IDX'))
+		if(class_exists('FlexMLS_IDX') && isset($_SESSION['ccwp_current_uri']))
 		{
 			$url_arg = esc_url(home_url($_SESSION['ccwp_current_uri']));
 		}
