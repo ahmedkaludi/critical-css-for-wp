@@ -354,14 +354,13 @@ class class_critical_css_for_wp{
 		
 		$targetUrl = $current_url;		
 	    $user_dirname = $this->cachepath();
-		$response = wp_remote_get($targetUrl);
+		$response = wp_remote_get($targetUrl,array('sslverify'=>false));
 		$content = wp_remote_retrieve_body( $response );
 		$regex1 = '/<link(.*?)href="(.*?)"(.*?)>/';
 		preg_match_all( $regex1, $content, $matches1 , PREG_SET_ORDER );
 		$regex2 = "/<link(.*?)href='(.*?)'(.*?)>/";
 		preg_match_all( $regex2, $content, $matches2 , PREG_SET_ORDER );
 		$matches=array_merge($matches1,$matches2);
-		
 				
 		$rowcss = '';
 		$all_css = [];
@@ -371,7 +370,7 @@ class class_critical_css_for_wp{
 			foreach($matches as $mat){						
 				if((strpos($mat[2], '.css') !== false) && (strpos($mat[1], 'preload') === false)) {
 					$all_css[]  = $mat[2];	
-					$response2 = wp_remote_get($mat[2]);
+					$response2 = wp_remote_get($mat[2],array('sslverify'=>false));
 					$rowcssdata = wp_remote_retrieve_body( $response2 );            
 					$regexn = '/@import\s*(url)?\s*\(?([^;]+?)\)?;/';
 
@@ -385,7 +384,7 @@ class class_critical_css_for_wp{
 									$style = trim(end($explod),'"');
 									if(strpos($style, '.css') !== false) {
 										$pthemestyle = get_template_directory_uri().'/'.$style;
-										$response3 = wp_remote_get($pthemestyle);
+										$response3 = wp_remote_get($pthemestyle,array('sslverify'=>false));
 										$rowcss   .= wp_remote_retrieve_body( $response3 );
 									}																		
 								}								
