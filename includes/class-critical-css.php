@@ -458,6 +458,7 @@ class class_critical_css_for_wp{
 		if(!empty($extracted_css_arr) && is_array($extracted_css_arr)){
 
 				$critical_css = implode("", $extracted_css_arr);
+				$targetUrl = trailingslashit( $targetUrl );
 				$critical_css = str_replace("url('wp-content/", "url('".get_site_url()."/wp-content/", $critical_css); 
 				$critical_css = str_replace('url("wp-content/', 'url("'.get_site_url().'/wp-content/', $critical_css); 			    								
 				$new_file = $user_dirname."/".md5($targetUrl).".css";
@@ -579,6 +580,7 @@ class class_critical_css_for_wp{
 		{
 			$custom_css='.elementor-location-footer:before{content:"";display:table;clear:both;}.elementor-icon-list-items .elementor-icon-list-item .elementor-icon-list-text{display:inline-block;}.elementor-posts__hover-gradient .elementor-post__card .elementor-post__thumbnail__link:after {display: block;content: "";background-image: -o-linear-gradient(bottom,rgba(0,0,0,.35) 0,transparent 75%);background-image: -webkit-gradient(linear,left bottom,left top,from(rgba(0,0,0,.35)),color-stop(75%,transparent));background-image: linear-gradient(0deg,rgba(0,0,0,.35),transparent 75%);background-repeat: no-repeat;height: 100%;width: 100%;position: absolute;bottom: 0;opacity: 1;-webkit-transition: all .3s ease-out;-o-transition: all .3s ease-out;transition: all .3s ease-out;}';
 		}
+		$url = trailingslashit($url);
 		if(file_exists($user_dirname.md5($url).'.css')){
 			$css =  file_get_contents($user_dirname.'/'.md5($url).'.css');
 			$css .=  $custom_css;			
