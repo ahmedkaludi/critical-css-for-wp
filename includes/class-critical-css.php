@@ -574,7 +574,6 @@ class class_critical_css_for_wp{
 		{
 			$url = esc_url(home_url($_SESSION['ccwp_current_uri']));
 		}
-		$url = trailingslashit($url);		
 		$custom_css='';
 		if(in_array( 'elementor/elementor.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ))
 		{
