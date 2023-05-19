@@ -39,9 +39,10 @@ Critical CSS For WP intends to provide great experience to the web page visitors
 
 == Changelog ==
 
-= 1.0.8 (28 April 2023) = 
+= 1.0.8 (20 May 2023) = 
 * Fixed : Critical css not loading on frontend using FlexMLS_IDX plugin #18
 * Fixed : Critical CSS not generated in subdomain due to SSL issue #22
+* Fixed : Reduce Used CSS showing on PageSpeed
 * Improved : Fixed  assets links with double slash(//)
 
 

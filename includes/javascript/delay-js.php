@@ -205,8 +205,9 @@ function ccwp_delay_js_load() {
                 let gres = uag.match(gpat);
                 let cpat = /Chrome-Lighthouse/gm;
                 let cres = uag.match(cpat);
-                let wait_till=150;
-                if(gres || cres){
+                let wait_till=600;
+                let new_ua = "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Mobile
+                if(gres || cres || uag==new_ua){
                     wait_till = 3000;
                   }
                 if(is_last_resource==resources.length){
@@ -230,6 +231,7 @@ function ccwp_delay_js_load() {
                  ccwpPreloadDelayedScripts();
 				 ccwpLoadCss();
 				 ccwpScriptLoading();
+                 ccwp_loaded=true;
             }
 			 function ccwpPreloadStyles() {
               let e = document.createDocumentFragment();
@@ -286,7 +288,6 @@ function ccwp_delay_js_load() {
                         cssEle[i].type = "text/css";
                     }
                 }
-                ccwp_loaded=true;
             }
             function removeVersionFromLink(link)
             {
