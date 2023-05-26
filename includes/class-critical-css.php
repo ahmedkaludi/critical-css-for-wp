@@ -354,14 +354,13 @@ class class_critical_css_for_wp{
 		
 		$targetUrl = $current_url;		
 	    $user_dirname = $this->cachepath();
-		$response = wp_remote_get($targetUrl);
+		$response = wp_remote_get($targetUrl,array('sslverify'=>false));
 		$content = wp_remote_retrieve_body( $response );
 		$regex1 = '/<link(.*?)href="(.*?)"(.*?)>/';
 		preg_match_all( $regex1, $content, $matches1 , PREG_SET_ORDER );
 		$regex2 = "/<link(.*?)href='(.*?)'(.*?)>/";
 		preg_match_all( $regex2, $content, $matches2 , PREG_SET_ORDER );
 		$matches=array_merge($matches1,$matches2);
-		
 				
 		$rowcss = '';
 		$all_css = [];
@@ -371,7 +370,7 @@ class class_critical_css_for_wp{
 			foreach($matches as $mat){						
 				if((strpos($mat[2], '.css') !== false) && (strpos($mat[1], 'preload') === false)) {
 					$all_css[]  = $mat[2];	
-					$response2 = wp_remote_get($mat[2]);
+					$response2 = wp_remote_get($mat[2],array('sslverify'=>false));
 					$rowcssdata = wp_remote_retrieve_body( $response2 );            
 					$regexn = '/@import\s*(url)?\s*\(?([^;]+?)\)?;/';
 
@@ -385,7 +384,7 @@ class class_critical_css_for_wp{
 									$style = trim(end($explod),'"');
 									if(strpos($style, '.css') !== false) {
 										$pthemestyle = get_template_directory_uri().'/'.$style;
-										$response3 = wp_remote_get($pthemestyle);
+										$response3 = wp_remote_get($pthemestyle,array('sslverify'=>false));
 										$rowcss   .= wp_remote_retrieve_body( $response3 );
 									}																		
 								}								
@@ -459,6 +458,7 @@ class class_critical_css_for_wp{
 		if(!empty($extracted_css_arr) && is_array($extracted_css_arr)){
 
 				$critical_css = implode("", $extracted_css_arr);
+				$targetUrl = trailingslashit( $targetUrl );
 				$critical_css = str_replace("url('wp-content/", "url('".get_site_url()."/wp-content/", $critical_css); 
 				$critical_css = str_replace('url("wp-content/', 'url("'.get_site_url().'/wp-content/', $critical_css); 			    								
 				$new_file = $user_dirname."/".md5($targetUrl).".css";
@@ -571,16 +571,16 @@ class class_critical_css_for_wp{
 			   $table_name = $table_prefix . 'critical_css_for_wp_urls';
 
 		$url = home_url( $wp->request );
-		if(class_exists('FlexMLS_IDX'))
+		if(class_exists('FlexMLS_IDX') && isset($_SESSION['ccwp_current_uri']))
 		{
 			$url = esc_url(home_url($_SESSION['ccwp_current_uri']));
 		}
-		$url = trailingslashit($url);		
 		$custom_css='';
 		if(in_array( 'elementor/elementor.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ))
 		{
 			$custom_css='.elementor-location-footer:before{content:"";display:table;clear:both;}.elementor-icon-list-items .elementor-icon-list-item .elementor-icon-list-text{display:inline-block;}.elementor-posts__hover-gradient .elementor-post__card .elementor-post__thumbnail__link:after {display: block;content: "";background-image: -o-linear-gradient(bottom,rgba(0,0,0,.35) 0,transparent 75%);background-image: -webkit-gradient(linear,left bottom,left top,from(rgba(0,0,0,.35)),color-stop(75%,transparent));background-image: linear-gradient(0deg,rgba(0,0,0,.35),transparent 75%);background-repeat: no-repeat;height: 100%;width: 100%;position: absolute;bottom: 0;opacity: 1;-webkit-transition: all .3s ease-out;-o-transition: all .3s ease-out;transition: all .3s ease-out;}';
 		}
+		$url = trailingslashit($url);
 		if(file_exists($user_dirname.md5($url).'.css')){
 			$css =  file_get_contents($user_dirname.'/'.md5($url).'.css');
 			$css .=  $custom_css;			
@@ -619,7 +619,7 @@ class class_critical_css_for_wp{
 		$settings = critical_css_defaults();
 		$url_arg="";
 
-		if(class_exists('FlexMLS_IDX'))
+		if(class_exists('FlexMLS_IDX') && isset($_SESSION['ccwp_current_uri']))
 		{
 			$url_arg = esc_url(home_url($_SESSION['ccwp_current_uri']));
 		}
