@@ -99,7 +99,6 @@ class class_critical_css_for_wp{
 			}
 		}
 			
-		update_option('save_ccfwp_terms_offset', 0);	
 	}
 
 	public function on_post_change($post_id, $post){
@@ -120,9 +119,7 @@ class class_critical_css_for_wp{
 			if($post->post_status == 'publish'){
 				$this->insert_update_posts_url($post_id);
 			}
-		}
-
-		update_option('save_ccfwp_posts_offset', 0);				
+		}			
 
 	}
 
@@ -157,7 +154,24 @@ class class_critical_css_for_wp{
 				array('%d','%s', '%s', '%s', '%s', '%s') 
 			);
 
-		} 
+		}
+		else{
+			$wpdb->update( 
+				$table_name, 
+				array( 					
+					'status'   		  => 'queue', 					
+					'created_at'      => date('Y-m-d h:i:sa'), 					
+				), 
+				array('%s','%s') ,
+				array('url',$permalink)
+			);
+			$user_dirname = $this->cachepath();
+			$user_dirname = trailingslashit( $user_dirname );
+			$new_file = $user_dirname."/".md5($user_dirname).".css";
+			if(file_exists($new_file)){
+				@unlink($new_file);
+			}
+			} 
 		
 		}				  
 
@@ -204,7 +218,24 @@ class class_critical_css_for_wp{
 					array('%d','%s', '%s', '%s', '%s', '%s') 
 				);
 
-			} 			
+			}
+			else{
+				$wpdb->update( 
+					$table_name, 
+					array( 					
+						'status'   		  => 'queue', 					
+						'created_at'      => date('Y-m-d h:i:sa'), 					
+					), 
+					array('%s','%s') ,
+					array('url',$permalink)
+				);
+				$user_dirname = $this->cachepath();
+				$user_dirname = trailingslashit( $user_dirname );
+				$new_file = $user_dirname."/".md5($user_dirname).".css";
+				if(file_exists($new_file)){
+					@unlink($new_file);
+				}
+				} 			
 
 			}			   
 
@@ -213,8 +244,6 @@ class class_critical_css_for_wp{
 	public function save_posts_url(){
 
 			global $wpdb, $table_prefix;
-			$table_name = $table_prefix . 'critical_css_for_wp_urls';
-
 			$settings = critical_css_defaults();
 
 			$post_types = array();
@@ -228,26 +257,23 @@ class class_critical_css_for_wp{
 			}
 			
 								
-			$start = get_option('save_ccfwp_posts_offset') ? get_option('save_ccfwp_posts_offset') : 0 ;
-			$batch = 30;
-			$offset = $start * $batch;
+			$start = get_option('ccfwp_current_post') ? get_option('ccfwp_current_post') : 0 ;
+			$limit = (get_option('ccfwp_scan_urls') > 0) ? intval(get_option('ccfwp_scan_urls')) : 30 ;
 			$posts = $wpdb->get_results(
 				stripslashes($wpdb->prepare(
-					"SELECT `ID` FROM $wpdb->posts WHERE post_status='publish' 
-					AND post_type IN(%s) LIMIT %d, %d",
-					implode("', '", $post_types) , $offset, $batch
+					"SELECT `ID` FROM $wpdb->posts WHERE post_status='publish' AND ID >= %d
+					AND post_type IN(%s) LIMIT %d",
+					$start,implode("', '", $post_types), $limit
 				))
 				, ARRAY_A);
 									        
-			if(!empty($posts)){
-				$start = $start + 1;					
+			if(!empty($posts)){					
 	            foreach($posts as $post){					
-	                $this->insert_update_posts_url($post['ID']);									
+	                $this->insert_update_posts_url($post['ID']);
+					$start = $post['ID']; 									
 	            }
-	        }else{
-				$start = 0;				
-			}
-			update_option('save_ccfwp_posts_offset', $start);	
+	        }
+			update_option('ccfwp_current_post', $start);	
 
 	}
 
@@ -324,29 +350,25 @@ class class_critical_css_for_wp{
 		}
 					
 			
-			$start = get_option('save_ccfwp_terms_offset') ? get_option('save_ccfwp_terms_offset') : 0 ;
-			$batch = 30;
-			$offset = $start * $batch;
+			$start = get_option('ccfwp_current_term') ? get_option('ccfwp_current_term') : 0 ;
+			$limit = (get_option('ccfwp_scan_urls') > 0)  ? intval(get_option('ccfwp_scan_urls')) : 30 ;
 			$terms = $wpdb->get_results(
 				stripslashes($wpdb->prepare(
 					"SELECT `term_id`, `taxonomy` FROM $wpdb->term_taxonomy 
-					WHERE taxonomy IN(%s) LIMIT %d, %d",
-					implode("', '", $taxonomy_types) , $offset, $batch
+					WHERE  taxonomy IN(%s) AND term_id>= %d LIMIT %d",
+					implode("', '", $taxonomy_types) , $start, $limit
 				))
 				, ARRAY_A);
 									        			
-			if(!empty($terms)){
-				$start = $start + 1;				
+			if(!empty($terms)){			
 	            foreach($terms as $term){										
 	                $term = get_term( $term['term_id']);					
 					if(!is_wp_error($term)){
 						$this->insert_update_terms_url($term);					
-					}						                
+					}	$start = $term;				                
 	            }
-	        }else{
-				$start = 0;				
-			}
-			update_option('save_ccfwp_terms_offset', $start);	
+	        }
+			update_option('ccfwp_current_term', $start);	
 
 	}
 
@@ -483,11 +505,13 @@ class class_critical_css_for_wp{
 		
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'critical_css_for_wp_urls';
+		$settings = critical_css_defaults();
+		$limit =  (intval($settings['ccfwp_generate_urls']) > 0 )?intval($settings['ccfwp_generate_urls']):4;
 		
 		$result = $wpdb->get_results(
 			stripslashes($wpdb->prepare(
 				"SELECT * FROM $table_name WHERE `status` IN  (%s) LIMIT %d",
-				'queue', 4
+				'queue', $limit
 			))
 		, ARRAY_A);
 				
@@ -865,7 +889,8 @@ class class_critical_css_for_wp{
 		global $wpdb;	
 		$table = $wpdb->prefix.'critical_css_for_wp_urls';
 	    $result = $wpdb->query( "TRUNCATE TABLE {$table}" );
-
+		update_option('ccfwp_current_post',0);
+		update_option('ccfwp_current_term',0);
 		$dir = $this->cachepath();				
 		WP_Filesystem();
 		global $wp_filesystem;
@@ -929,7 +954,7 @@ class class_critical_css_for_wp{
 				
 				if($value['status'] == 'cached'){
 					$user_dirname = $this->cachepath();
-					$size = filesize($user_dirname.'/'.md5($value['url']).'.css');					
+					$size = @filesize($user_dirname.'/'.md5($value['url']).'.css');					
 					if(!$size){
 						$size = '<abbr title="'.ccfwp_t_string('File is not in cached directory. Please recheck in advance option').'">'.ccfwp_t_string('Deleted').'</abbr>';
 					}

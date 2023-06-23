@@ -355,3 +355,19 @@ th:empty {
 .ccfwp-section-tab{
   margin: 30px 10px;
 }
+.ccfwp-section-container{
+  display: flex;
+}
+.ccfwp-section-content{
+ width:48%;
+ padding:0 2%;
+}
+
+@media screen and (max-width: 480px) {
+  .ccfwp-section-container{
+    flex-direction: column;
+   }
+   .ccfwp-section-content{
+    width:100%;
+   }
+}
