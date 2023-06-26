@@ -205,9 +205,10 @@ function ccwp_delay_js_load() {
                 let gres = uag.match(gpat);
                 let cpat = /Chrome-Lighthouse/gm;
                 let cres = uag.match(cpat);
-                let wait_till=600;
+                let wait_till=100;
                 let new_ua = "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Mobile Safari/537.36";
-                if(gres || cres || uag==new_ua){
+                let new_ua2 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36";
+                if(gres || cres || uag==new_ua || uag==new_ua2){
                     wait_till = 3000;
                   }
                 if(is_last_resource==resources.length){
@@ -221,7 +222,7 @@ function ccwp_delay_js_load() {
 				   console.log("load complete");
 				    setTimeout(function(){
                         calculate_load_times();
-                    },150);
+                    },100);
             });
 
             async function ccwpTriggerDelayedScripts() {
