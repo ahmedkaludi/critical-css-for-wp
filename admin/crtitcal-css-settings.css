@@ -371,3 +371,30 @@ th:empty {
     width:100%;
    }
 }
+
+.ccfwp-tooltip-box {
+  position: relative;
+  display: inline-block;
+}
+.ccfwp-tooltip-box .ccfwp-tooltip-text {
+  visibility: hidden;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  position: absolute;
+  z-index: 1;
+  width: 200px;
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: normal;
+  font-size: 12px;
+}
+.ccfwp-tooltip-box:hover .ccfwp-tooltip-text {
+  visibility: visible;
+}
+.ccfwp-heading-title{
+  color: #1d2327;
+  font-size: 1.3em;
+  margin: 1em 0;
+  font-weight: 500;
+}

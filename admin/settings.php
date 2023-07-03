@@ -383,23 +383,43 @@ function critical_css_get_tab( $default = '', $available = array() ) {
     }
     echo '<div class="ccfwp-section-content">';
   
-    echo '<h2>'.ccfwp_t_string('Pages to scan').'</h2>';
-    echo '<p><strong>'.ccfwp_t_string('By default plugin will scan 30 urls and add that to processing queue. You can increase this value to quickly add pages to queue.In case your website seems slow you can decrease this value.We recommed not to increase this value above 1000.').'</strong><p>';
+    echo '<div class="ccfwp-heading-title">'.ccfwp_t_string('Pages to scan');
+    echo '<div class="ccfwp-tooltip-box"><span class="dashicons dashicons-info"></span>
+    <span class="ccfwp-tooltip-text">'.ccfwp_t_string('By default plugin will scan 30 urls and add that to processing queue. You can increase this value to quickly add pages to queue.In case your website seems slow you can decrease this value.We recommed not to increase this value above 1000.').'</span>
+  </div></div>';
+   // echo '<p><strong>'.ccfwp_t_string('By default plugin will scan 30 urls and add that to processing queue. You can increase this value to quickly add pages to queue.In case your website seems slow you can decrease this value.We recommed not to increase this value above 1000.').'</strong><p>';
     $ccfwp_scan_urls=(isset($settings["ccfwp_scan_urls"]))?$settings["ccfwp_scan_urls"]:30;
     echo '<input type="text" value="'.esc_attr( $ccfwp_scan_urls ).'" name="ccfwp_settings[ccfwp_scan_urls]">';
+   
 
-    echo '<h2>'.ccfwp_t_string('Pages to generate critical css').'</h2>';
-    echo '<p><strong>'.ccfwp_t_string('By default plugin will generate critical css for 4 urls in every 30 seconds. You can increase this value to  quickly generate critical css.In case your website seems slow you can decrease this value.We recommed not to increase this value above 12.').'</strong><p>';
+    echo '<div class="ccfwp-heading-title">'.ccfwp_t_string('Pages to generate critical css');
+    echo '<div class="ccfwp-tooltip-box"><span class="dashicons dashicons-info"></span>
+    <span class="ccfwp-tooltip-text">'.ccfwp_t_string('By default plugin will generate critical css for 4 urls in every 30 seconds. You can increase this value to  quickly generate critical css.In case your website seems slow you can decrease this value.We recommed not to increase this value above 12.').'</span>
+  </div></div>';
+  //  echo '<p><strong>'.ccfwp_t_string('By default plugin will generate critical css for 4 urls in every 30 seconds. You can increase this value to  quickly generate critical css.In case your website seems slow you can decrease this value.We recommed not to increase this value above 12.').'</strong><p>';
     $ccfwp_generate_urls=(isset($settings["ccfwp_generate_urls"]))?$settings["ccfwp_generate_urls"]:4;
     echo '<input type="text" value="'.esc_attr( $ccfwp_generate_urls ).'" name="ccfwp_settings[ccfwp_generate_urls]">';
+   
 
-    echo '<h2>'.ccfwp_t_string('CSS Defer').'</h2>';
-    echo '<p><strong>'.ccfwp_t_string('By default plugin our plugin will add critical css and defer css loading. You can disable the deferring  of css if you have any issue.').'</strong><p>';
+    echo '<div class="ccfwp-heading-title">'.ccfwp_t_string('CSS Defer');
+    echo '<div class="ccfwp-tooltip-box"><span class="dashicons dashicons-info"></span>
+    <span class="ccfwp-tooltip-text">'.ccfwp_t_string('By default plugin our plugin will add critical css and defer css loading. You can disable the deferring  of css if you have any issue.').'</span>
+  </div></div>';
+   // echo '<p><strong>'.ccfwp_t_string('By default plugin our plugin will add critical css and defer css loading. You can disable the deferring  of css if you have any issue.').'</strong><p>';
     echo '<select name="ccfwp_settings[ccfwp_defer_css]">';
     $ccwp_defer_on=(isset($settings["ccfwp_defer_css"]) && $settings["ccfwp_defer_css"]=='on')?'selected':'';
     $ccwp_defer_off=(isset($settings["ccfwp_defer_css"]) && $settings["ccfwp_defer_css"]=='off')?'selected':'';
     echo '<option value="on" '.esc_attr($ccwp_defer_on).'>'.esc_html('Enable').' </option>';
     echo '<option value="off" '.esc_attr($ccwp_defer_off).'>'.esc_html('Disable').'</option></select>';
+   
+    echo '<div class="ccfwp-heading-title">'.ccfwp_t_string('CSS Defer Delay');
+    echo '<div class="ccfwp-tooltip-box"><span class="dashicons dashicons-info"></span>
+    <span class="ccfwp-tooltip-text">'.ccfwp_t_string('Amount of time all css is deferred to load. You can add any value for delay which seems good for your website.This value is in milliseconds(ms). [1000ms = 1sec] ').'</span>
+  </div></div>';
+    echo '<input type="number" value="'.esc_attr( intval($settings["ccfwp_defer_time"]) ).'" name="ccfwp_settings[ccfwp_defer_time]"> ms';
+ 
+    //echo '<p><strong>'.ccfwp_t_string('Amount of time all css is deferred to load. You can add any value for delay which seems good for your website.This value is in milliseconds(ms). [1000ms = 1sec] ').'</strong><p>';
+   
 
     echo '</div>';
     ?> 
@@ -416,6 +436,7 @@ function critical_css_defaults(){
        'ccfwp_defer_css'    => 'on',
        'ccfwp_scan_urls'    => 30,
        'ccfwp_generate_urls'=> 4,
+       'ccfwp_defer_time'=> 300,
     );        
     $settings = get_option( 'ccfwp_settings', $defaults );
     return $settings;
