@@ -10,7 +10,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 == Description ==
 
-Critical CSS For WP intends to provide great experience to the web page visitors by improving the performance of the web page. Here we'd remove the unused CSS which helps to paint fast and render the above fold content, before downloading the complete css files.
+Critical CSS For WP removes the unused CSS which helps to paint fast and render the above fold content, before downloading the complete css files. We intends to provide great experience to the web page visitors by improving the performance of the web page.
 
 
 ### Works well with:
