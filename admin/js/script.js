@@ -67,11 +67,11 @@ jQuery( document ).ready(function($) {
 						data:{action:"ccfwp_send_query_message", premium_cus:premium_cus,message:message,email:email, ccfwp_security_nonce:ccfwp_localize_data.ccfwp_security_nonce},
 						success:function(response){                       
 						  if(response['status'] =='t'){
-							$(".saswp-query-success").show();
-							$(".saswp-query-error").hide();
+							$(".ccfwp-query-success").show();
+							$(".ccfwp-query-error").hide();
 						  }else{                                  
-							$(".saswp-query-success").hide();  
-							$(".saswp-query-error").show();
+							$(".ccfwp-query-success").hide();  
+							$(".ccfwp-query-error").show();
 						  }
 						},
 						error: function(response){                    

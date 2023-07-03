@@ -321,8 +321,8 @@ function critical_css_get_tab( $default = '', $available = array() ) {
                 </li>
                 <li>                    
                     <div><textarea rows="5" cols="60" id="ccfwp_query_message" name="ccfwp_query_message" placeholder="Write your query"></textarea></div>
-                    <span class="ccfwp-query-success ccfwp_hide"><?php echo ccfwp_t_string('Message sent successfully, Please wait we will get back to you shortly'); ?></span>
-                    <span class="ccfwp-query-error ccfwp_hide"><?php echo ccfwp_t_string('Message not sent. please check your network connection'); ?></span>
+                    <span class="ccfwp-query-success ccfwp_hide"><strong><?php echo ccfwp_t_string('Message sent successfully, Please wait we will get back to you shortly'); ?></strong></span>
+                    <span class="ccfwp-query-error ccfwp_hide"><strong><?php echo ccfwp_t_string('Message not sent. please check your network connection'); ?></strong></span>
                 </li>
                 <li>
                     <strong><?php echo ccfwp_t_string('Are you a premium customer ?'); ?></strong>  

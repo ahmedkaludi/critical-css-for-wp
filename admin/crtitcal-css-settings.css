@@ -398,3 +398,14 @@ th:empty {
   margin: 1em 0;
   font-weight: 500;
 }
+
+.ccfwp-query-success{
+color:green;
+border:1 px green;
+padding:5px;
+}
+.ccfwp-query-error{
+  color:red;
+  border:1 px red;
+  padding:5px;
+  }
