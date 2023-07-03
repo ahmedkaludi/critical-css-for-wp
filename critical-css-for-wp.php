@@ -115,3 +115,13 @@ function ccfwp_on_install(){
     }   
 
 }
+
+function ccfwp_plugin_settings_links($links) { 
+    $custom_urls=[];
+    $custom_urls[] = '<a href="'.admin_url( 'admin.php?page=critical-css-for-wp' ).'">'.__('Dashboard').'</a>';
+    $custom_urls[] = '<a href="'.admin_url( 'admin.php?page=critical-css-for-wp&tab=advance' ).'">'.__('Settings').'</a>'; 
+    $custom_urls[] = '<a href="'.admin_url( 'admin.php?page=critical-css-for-wp&tab=support' ).'">'.__('Support').'</a>'; 
+    return array_merge($custom_urls,$links); 
+  }
+  $plugin = plugin_basename(__FILE__); 
+  add_filter("plugin_action_links_$plugin", 'ccfwp_plugin_settings_links' );
