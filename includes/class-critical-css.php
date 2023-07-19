@@ -167,7 +167,7 @@ class class_critical_css_for_wp{
 			);
 			$user_dirname = $this->cachepath();
 			$user_dirname = trailingslashit( $user_dirname );
-			$new_file = $user_dirname."/".md5($user_dirname).".css";
+			$new_file = $user_dirname."/".md5($permalink).".css";
 			if(file_exists($new_file)){
 				@unlink($new_file);
 			}
