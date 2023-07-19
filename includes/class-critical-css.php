@@ -954,7 +954,7 @@ class class_critical_css_for_wp{
 				
 				if($value['status'] == 'cached'){
 					$user_dirname = $this->cachepath();
-					$size = @filesize($user_dirname.'/'.md5($value['url']).'.css');					
+					$size = @filesize($user_dirname.'/'.md5(trailingslashit($value['url'])).'.css');					
 					if(!$size){
 						$size = '<abbr title="'.ccfwp_t_string('File is not in cached directory. Please recheck in advance option').'">'.ccfwp_t_string('Deleted').'</abbr>';
 					}
