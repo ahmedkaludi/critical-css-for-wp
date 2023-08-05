@@ -9,7 +9,12 @@ class class_critical_css_for_wp{
 
 
 	public function cachepath(){
-		if(defined(CRITICAL_CSS_FOR_WP_CSS_DIR)){
+		$cp_settings=critical_css_defaults();
+		if(defined(CRITICAL_CSS_FOR_WP_CSS_DIR) || isset($cp_settings['ccfwp_alt_cachepath'])){
+			if($cp_settings['ccfwp_alt_cachepath']==1)
+			{
+				return CRITICAL_CSS_FOR_WP_CSS_DIR_ALT;
+			}
 			return CRITICAL_CSS_FOR_WP_CSS_DIR;
 		}else{
 			return WP_CONTENT_DIR . "/cache/critical-css-for-wp/css/";
@@ -954,9 +959,10 @@ class class_critical_css_for_wp{
 				
 				if($value['status'] == 'cached'){
 					$user_dirname = $this->cachepath();
-					$size = @filesize($user_dirname.'/'.md5(trailingslashit($value['url'])).'.css');					
+					$size = @filesize($user_dirname.'/'.md5(trailingslashit($value['url'])).'.css');
+					$cp_settings=implode(',',critical_css_defaults());					
 					if(!$size){
-						$size = '<abbr title="'.ccfwp_t_string('File is not in cached directory. Please recheck in advance option').'">'.ccfwp_t_string('Deleted').'</abbr>';
+						$size = '<abbr title="'.ccfwp_t_string('File is not in cached directory. Please recheck in advance option').'">'.ccfwp_t_string('Deleted|'.$user_dirname.'|'.$value['url'].'|'.md5(trailingslashit($value['url']).'|'.$cp_settings)).'</abbr>';
 					}
 				}
 					

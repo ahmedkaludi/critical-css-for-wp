@@ -20,12 +20,12 @@ define('CRITICAL_CSS_FOR_WP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 /**
  * Critical css cache path
  **/
-define('CRITICAL_CSS_FOR_WP_CSS_DIR', WP_CONTENT_DIR . "/cache/critical-css-for-wp/css/");
 
 define('CCWP_CACHE_NAME', 'ccwp_cleared_timestamp');
-
+define('CRITICAL_CSS_FOR_WP_CSS_DIR', WP_CONTENT_DIR . "/cache/critical-css-for-wp/css/");
 define('CCWP_JS_EXCLUDE_CACHE_DIR', WP_CONTENT_DIR . "/cache/critical-css-for-wp/excluded-js/");
 define('CCWP_JS_EXCLUDE_CACHE_URL', site_url("/wp-content/cache/critical-css-for-wp/excluded-js/"));
+define('CRITICAL_CSS_FOR_WP_CSS_DIR_ALT', WP_CONTENT_DIR . "/ccwp-cache/css/");
 
 require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR . "includes/common.php";
 require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR . "admin/settings.php";

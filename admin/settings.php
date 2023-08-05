@@ -417,8 +417,14 @@ function critical_css_get_tab( $default = '', $available = array() ) {
     <span class="ccfwp-tooltip-text">'.ccfwp_t_string('Amount of time all css is deferred to load. You can add any value for delay which seems good for your website.This value is in milliseconds(ms). [1000ms = 1sec] ').'</span>
   </div></div>';
     echo '<input type="number" value="'.esc_attr( intval($settings["ccfwp_defer_time"]) ).'" name="ccfwp_settings[ccfwp_defer_time]"> ms';
+
+    echo '<div class="ccfwp-heading-title">'.ccfwp_t_string('Cache Alt path');
+    echo '<div class="ccfwp-tooltip-box"><span class="dashicons dashicons-info"></span>
+    <span class="ccfwp-tooltip-text">'.ccfwp_t_string('Check this options if you critical css is getting overwritten or deleted ').'</span>
+  </div></div>';
+  $alt_check = (isset($settings['ccfwp_alt_cachepath']) && $settings['ccfwp_alt_cachepath']==1)? 'checked':'';
+    echo '<p><input type="checkbox" value="1" name="ccfwp_settings[ccfwp_alt_cachepath]" '.$alt_check.'> Alternative cache path</p>';
  
-    //echo '<p><strong>'.ccfwp_t_string('Amount of time all css is deferred to load. You can add any value for delay which seems good for your website.This value is in milliseconds(ms). [1000ms = 1sec] ').'</strong><p>';
    
 
     echo '</div>';
@@ -437,6 +443,7 @@ function critical_css_defaults(){
        'ccfwp_scan_urls'    => 30,
        'ccfwp_generate_urls'=> 4,
        'ccfwp_defer_time'=> 300,
+       'ccfwp_alt_cachepath'=> 0,
     );        
     $settings = get_option( 'ccfwp_settings', $defaults );
     return $settings;
