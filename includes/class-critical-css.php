@@ -962,7 +962,7 @@ class class_critical_css_for_wp{
 					$size = @filesize($user_dirname.'/'.md5(trailingslashit($value['url'])).'.css');
 					$cp_settings=implode(',',critical_css_defaults());					
 					if(!$size){
-						$size = '<abbr title="'.ccfwp_t_string('File is not in cached directory. Please recheck in advance option').'">'.ccfwp_t_string('Deleted|'.$user_dirname.'|'.$value['url'].'|'.md5(trailingslashit($value['url']).'|'.$cp_settings)).'</abbr>';
+						$size = '<abbr title="'.ccfwp_t_string('File is not in cached directory. Please recheck in advance option').'">'.ccfwp_t_string('Deleted').'</abbr>';
 					}
 				}
 					
