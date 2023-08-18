@@ -714,7 +714,7 @@ class class_critical_css_for_wp{
 		if(isset($matches1[0])){
 			foreach($matches1[0] as $i => $tag) {
 				$atts_array = !empty($matches1[2][$i]) ? $this->ccwp_get_atts_array($matches1[2][$i]) : array();
-				if($atts_array['id'] == 'critical-css-for-wp'){ continue; }
+				if(isset($atts_array['id']) && $atts_array['id'] == 'critical-css-for-wp'){ continue; }
 				if(isset($atts_array['type'])){
 					$atts_array['data-ccwp-cc-type'] = $atts_array['type'];
 				}
