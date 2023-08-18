@@ -37,6 +37,17 @@ Critical CSS For WP removes the unused CSS which helps to paint fast and render 
 * WP Speed of Light
 * 10Web Booster – Website speed optimization, Cache & Page Speed optimizer
 
+
+**We Act Fast on Feedback!**
+We are actively developing this plugin and our aim is to make this plugin into the #1 solution for generating Critical CSS in the world. You can [Request a Feature or Report a Bug](https://github.com/ahmedkaludi/critical-css-for-wp/issues).
+
+**Technical Support**
+Support is provided in [Forum](https://wordpress.org/support/plugin/critical-css-for-wp/).
+
+**Would you like to contribute?**
+You may now contribute to this Critical CSS For WP plugin on Github: [View repository](https://github.com/ahmedkaludi/critical-css-for-wp) on Github
+
+
 == Changelog ==
 
 = 1.0.8 (26 May 2023) = 
