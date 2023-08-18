@@ -335,7 +335,7 @@ class Class_critical_css_for_wp {
 				} else {
 					$wpdb->query(
 						$wpdb->prepare(
-							'UPDATE %s SET `url` = %s WHERE `url_id` = %d',
+							'UPDATE %i SET `url` = %s WHERE `url_id` = %d',
 							$table_name,
 							$value,
 							$id
@@ -585,7 +585,7 @@ class Class_critical_css_for_wp {
 
 		$result = $wpdb->query(
 			$wpdb->prepare(
-				'UPDATE %s SET `status` = %s,  `cached_name` = %s,  `updated_at` = %s,  `failed_error` = %s WHERE `url` = %s',
+				'UPDATE %i SET `status` = %s,  `cached_name` = %s,  `updated_at` = %s,  `failed_error` = %s WHERE `url` = %s',
 				$table_name,
 				$status,
 				$cached_name,
@@ -645,7 +645,7 @@ class Class_critical_css_for_wp {
 		} else {
 			$wpdb->query(
 				$wpdb->prepare(
-					'UPDATE %s SET `status` = %s,  `cached_name` = %s WHERE `url` = %s',
+					'UPDATE %i SET `status` = %s,  `cached_name` = %s WHERE `url` = %s',
 					$table_name,
 					'queue',
 					'',
@@ -821,7 +821,7 @@ class Class_critical_css_for_wp {
 
 			$result = $wpdb->query(
 				$wpdb->prepare(
-					'UPDATE %s SET `status` = %s, `cached_name` = %s, `failed_error` = %s WHERE `id` = %d',
+					'UPDATE %i SET `status` = %s, `cached_name` = %s, `failed_error` = %s WHERE `id` = %d',
 					$table_name,
 					'queue',
 					'',
@@ -875,7 +875,7 @@ class Class_critical_css_for_wp {
 				if ( ! file_exists( $user_dirname . $value['cached_name'] . '.css' ) ) {
 					$updated = $wpdb->query(
 						$wpdb->prepare(
-							'UPDATE %s SET `status` = %s,  `cached_name` = %s WHERE `url` = %s',
+							'UPDATE %i SET `status` = %s,  `cached_name` = %s WHERE `url` = %s',
 							$table_name,
 							'queue',
 							'',
@@ -918,7 +918,7 @@ class Class_critical_css_for_wp {
 
 		$result = $wpdb->query(
 			$wpdb->prepare(
-				'UPDATE %s SET `status` = %s, `cached_name` = %s, `failed_error` = %s WHERE `status` = %s',
+				'UPDATE %i SET `status` = %s, `cached_name` = %s, `failed_error` = %s WHERE `status` = %s',
 				$table_name,
 				'queue',
 				'',
@@ -1074,7 +1074,7 @@ class Class_critical_css_for_wp {
 			$search      = sanitize_text_field( $_GET['search']['value'] );
 			$total_count = $wpdb->get_var(
 				$wpdb->prepare(
-					'SELECT COUNT(*) FROM  %s WHERE `url` LIKE %s AND `status`=%s',
+					'SELECT COUNT(*) FROM  %i WHERE `url` LIKE %s AND `status`=%s',
 					$table_name,
 					'%' . $wpdb->esc_like( $search ) . '%',
 					'cached'
