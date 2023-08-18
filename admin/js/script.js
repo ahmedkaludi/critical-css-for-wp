@@ -57,6 +57,8 @@ jQuery( document ).ready(function($) {
 		var message     = $("#ccfwp_query_message").val();  
 		var email       = $("#ccfwp_query_email").val();  
 		var premium_cus = $("#ccfwp_query_premium_cus").val(); 
+		$(this).text('Sending...');
+		$(this).attr('disabled',true);
 		
 		if($.trim(message) !='' && premium_cus && $.trim(email) !='' && ccfwpIsEmail(email) == true){
 			
@@ -69,17 +71,24 @@ jQuery( document ).ready(function($) {
 						  if(response['status'] =='t'){
 							$(".ccfwp-query-success").show();
 							$(".ccfwp-query-error").hide();
+							$(".ccfwp-send-query").text('Send Message');
+							$(".ccfwp-send-query").attr('disabled',false);
 						  }else{                                  
 							$(".ccfwp-query-success").hide();  
 							$(".ccfwp-query-error").show();
+							$(".ccfwp-send-query").text('Send Message');
+							$(".ccfwp-send-query").attr('disabled',false);
 						  }
 						},
 						error: function(response){                    
 							console.log(response);
+							$(".ccfwp-send-query").text('Send Message');
+							$(".ccfwp-send-query").attr('disabled',false);
 						}
 						});   
 		}else{
-			
+			$(".ccfwp-send-query").text('Send Message');
+			$(".ccfwp-send-query").attr('disabled',false);
 			if($.trim(message) =='' && premium_cus =='' && $.trim(email) ==''){
 				alert('Please enter the message, email and select customer type');
 			}else{
