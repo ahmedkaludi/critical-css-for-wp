@@ -148,11 +148,11 @@ function critical_css_urlslist_callback() {
 	global $wpdb, $table_prefix;
 	$table_name = $table_prefix . 'critical_css_for_wp_urls';
 
-	$total_count  = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %s', $table_name ) );
-	$cached_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %s Where `status`=%s', $table_name, 'cached' ) );
-	$inprogress   = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %s Where `status`=%s', $table_name, 'inprocess' ) );
-	$failed_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %s Where `status`=%s', $table_name, 'failed' ) );
-	$queue_count  = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %s Where `status`=%s', $table_name, 'queue' ) );
+	$total_count  = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table_name ) );
+	$cached_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i Where `status`=%s', $table_name, 'cached' ) );
+	$inprogress   = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i Where `status`=%s', $table_name, 'inprocess' ) );
+	$failed_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i Where `status`=%s', $table_name, 'failed' ) );
+	$queue_count  = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i Where `status`=%s', $table_name, 'queue' ) );
 	$inprogress   = 0;
 	$percentage   = 0;
 

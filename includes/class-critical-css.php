@@ -149,7 +149,7 @@ class Class_critical_css_for_wp {
 
 			$pid = $wpdb->get_var(
 				$wpdb->prepare(
-					'SELECT `url` FROM %s WHERE `url`=%s limit 1',
+					'SELECT `url` FROM %i WHERE `url`=%s limit 1',
 					$table_name,
 					$permalink
 				)
@@ -212,7 +212,7 @@ class Class_critical_css_for_wp {
 
 			$pid = $wpdb->get_var(
 				$wpdb->prepare(
-					'SELECT `url` FROM %s WHERE `url`=%s limit 1',
+					'SELECT `url` FROM %i WHERE `url`=%s limit 1',
 					$table_name,
 					$permalink
 				)
@@ -311,7 +311,7 @@ class Class_critical_css_for_wp {
 
 				$pid = $wpdb->get_var(
 					$wpdb->prepare(
-						'SELECT `url` FROM %s WHERE `url`=%s limit 1',
+						'SELECT `url` FROM %i WHERE `url`=%s limit 1',
 						$table_name,
 						$value
 					)
@@ -369,7 +369,7 @@ class Class_critical_css_for_wp {
 			$limit = ( get_option( 'ccfwp_scan_urls' ) > 0 ) ? intval( get_option( 'ccfwp_scan_urls' ) ) : 30;
 			$terms = $wpdb->get_results(
 				$wpdb->prepare(
-					'SELECT `term_id`, `taxonomy` FROM %s
+					'SELECT `term_id`, `taxonomy` FROM %i
 					WHERE  taxonomy IN(%s) AND term_id>= %d LIMIT %d',
 					$wpdb->term_taxonomy,
 					implode( "', '", $taxonomy_types ),
@@ -537,7 +537,7 @@ class Class_critical_css_for_wp {
 
 		$result = $wpdb->get_results(
 			$wpdb->prepare(
-				'SELECT * FROM %s WHERE `status` IN  (%s) LIMIT %d',
+				'SELECT * FROM %i WHERE `status` IN  (%s) LIMIT %d',
 				$table_name,
 				'queue',
 				$limit
@@ -859,7 +859,7 @@ class Class_critical_css_for_wp {
 
 		$result = $wpdb->get_results(
 			$wpdb->prepare(
-				'SELECT * FROM %s WHERE `status` = %s LIMIT %d, %d',
+				'SELECT * FROM %i WHERE `status` = %s LIMIT %d, %d',
 				$table_name,
 				'cached',
 				$offset,
@@ -983,7 +983,7 @@ class Class_critical_css_for_wp {
 			$search      = sanitize_text_field( $_GET['search']['value'] );
 			$total_count = $wpdb->get_var(
 				$wpdb->prepare(
-					'SELECT COUNT(*) FROM %s WHERE `url` LIKE %s ',
+					'SELECT COUNT(*) FROM %i WHERE `url` LIKE %s ',
 					$table_name,
 					'%' . $wpdb->esc_like( $search ) . '%'
 				),
@@ -991,7 +991,7 @@ class Class_critical_css_for_wp {
 
 			$result = $wpdb->get_results(
 				$wpdb->prepare(
-					'SELECT * FROM %s WHERE `url` LIKE %s LIMIT %d, %d',
+					'SELECT * FROM %i WHERE `url` LIKE %s LIMIT %d, %d',
 					$table_name,
 					'%' . $wpdb->esc_like( $search ) . '%',
 					$offset,
@@ -1000,10 +1000,10 @@ class Class_critical_css_for_wp {
 				ARRAY_A
 			);
 		} else {
-			$total_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %s', $table_name ) );
+			$total_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table_name ) );
 			$result      = $wpdb->get_results(
 				$wpdb->prepare(
-					'SELECT * FROM %s LIMIT %d, %d',
+					'SELECT * FROM %i LIMIT %d, %d',
 					$table_name,
 					$offset,
 					$length
@@ -1083,7 +1083,7 @@ class Class_critical_css_for_wp {
 
 			$result = $wpdb->get_results(
 				$wpdb->prepare(
-					'SELECT * FROM %s WHERE `url` LIKE %s AND `status`=%s LIMIT %d, %d',
+					'SELECT * FROM %i WHERE `url` LIKE %s AND `status`=%s LIMIT %d, %d',
 					$table_name,
 					'%' . $wpdb->esc_like( $search ) . '%',
 					'cached',
@@ -1093,10 +1093,10 @@ class Class_critical_css_for_wp {
 				ARRAY_A
 			);
 		} else {
-			$total_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %s Where `status`=%s', $table_name, 'cached' ) );
+			$total_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i Where `status`=%s', $table_name, 'cached' ) );
 			$result      = $wpdb->get_results(
 				$wpdb->prepare(
-					'SELECT * FROM %s Where `status`=%s LIMIT %d, %d',
+					'SELECT * FROM %i Where `status`=%s LIMIT %d, %d',
 					$table_name,
 					'cached',
 					$offset,
@@ -1165,7 +1165,7 @@ class Class_critical_css_for_wp {
 			$search      = sanitize_text_field( $_GET['search']['value'] );
 			$total_count = $wpdb->get_var(
 				$wpdb->prepare(
-					'SELECT COUNT(*) FROM %s WHERE `url` LIKE %s AND `status`=%s',
+					'SELECT COUNT(*) FROM %i WHERE `url` LIKE %s AND `status`=%s',
 					$table_name,
 					'%' . $wpdb->esc_like( $search ) . '%',
 					'failed'
@@ -1174,7 +1174,7 @@ class Class_critical_css_for_wp {
 
 			$result = $wpdb->get_results(
 				$wpdb->prepare(
-					'SELECT * FROM %s WHERE `url` LIKE %s AND `status`=%s LIMIT %d, %d',
+					'SELECT * FROM %i WHERE `url` LIKE %s AND `status`=%s LIMIT %d, %d',
 					$table_name,
 					'%' . $wpdb->esc_like( $search ) . '%',
 					'failed',
@@ -1184,10 +1184,10 @@ class Class_critical_css_for_wp {
 				ARRAY_A
 			);
 		} else {
-			$total_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %s  Where `status`=%s', $table_name, 'failed' ) );
+			$total_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i  Where `status`=%s', $table_name, 'failed' ) );
 			$result      = $wpdb->get_results(
 				$wpdb->prepare(
-					'SELECT * FROM %s Where `status`=%s LIMIT %d, %d',
+					'SELECT * FROM %i Where `status`=%s LIMIT %d, %d',
 					$table_name,
 					'failed',
 					$offset,
@@ -1254,7 +1254,7 @@ class Class_critical_css_for_wp {
 			$search      = sanitize_text_field( $_GET['search']['value'] );
 			$total_count = $wpdb->get_var(
 				$wpdb->prepare(
-					'SELECT COUNT(*) FROM %s WHERE `url` LIKE %s AND `status`=%s',
+					'SELECT COUNT(*) FROM %i WHERE `url` LIKE %s AND `status`=%s',
 					$table_name,
 					'%' . $wpdb->esc_like( $search ) . '%',
 					'queue'
@@ -1263,7 +1263,7 @@ class Class_critical_css_for_wp {
 
 			$result = $wpdb->get_results(
 				$wpdb->prepare(
-					'SELECT * FROM %s WHERE `url` LIKE %s AND `status`=%s LIMIT %d, %d',
+					'SELECT * FROM %i WHERE `url` LIKE %s AND `status`=%s LIMIT %d, %d',
 					$table_name,
 					'%' . $wpdb->esc_like( $search ) . '%',
 					'queue',
@@ -1273,10 +1273,10 @@ class Class_critical_css_for_wp {
 				ARRAY_A
 			);
 		} else {
-			$total_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %s Where `status`=%s', $table_name, 'queue' ) );
+			$total_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i Where `status`=%s', $table_name, 'queue' ) );
 			$result      = $wpdb->get_results(
 				$wpdb->prepare(
-					'SELECT * FROM  %s Where `status`=%s LIMIT %d, %d',
+					'SELECT * FROM %i Where `status`=%s LIMIT %d, %d',
 					$table_name,
 					'queue',
 					$offset,
