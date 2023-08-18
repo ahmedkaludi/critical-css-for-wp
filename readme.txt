@@ -2,8 +2,8 @@
 Contributors: magazine3
 Tags: Critical, Critical CSS, Core Web Vital, Cache, SEO
 Requires at least: 3.0
-Tested up to: 6.2
-Stable tag: 1.0.8
+Tested up to: 6.3
+Stable tag: 1.0.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -49,6 +49,17 @@ You may now contribute to this Critical CSS For WP plugin on Github: [View repos
 
 
 == Changelog ==
+
+= 1.0.9 (18 August 2023) = 
+* Added : Create support links & other links for users to reach #11
+* Compatibility : Updated code according to WP Standard #32
+* Compatibility : Added compatibility with 10web Booster #31
+* Compatibility : Tested with WordPress 6.3 and update readme.txt #29
+* Fixed : Improvement in Critical CSS generation. #14
+* Fixed : Confirmation popup should display after sending message in support form of plugin #23
+* Fixed : Issue with send message button in Support section #28
+* Fixed : Warning showing in error log #30
+* Improved : add github links and other stuff in the readme.txt #4
 
 = 1.0.8 (26 May 2023) = 
 * Fixed : Critical css not loading on frontend using FlexMLS_IDX plugin #18
