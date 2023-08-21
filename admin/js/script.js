@@ -57,6 +57,8 @@ jQuery( document ).ready(function($) {
 		var message     = $("#ccfwp_query_message").val();  
 		var email       = $("#ccfwp_query_email").val();  
 		var premium_cus = $("#ccfwp_query_premium_cus").val(); 
+		$(this).text('Sending...');
+		$(this).attr('disabled',true);
 		
 		if($.trim(message) !='' && premium_cus && $.trim(email) !='' && ccfwpIsEmail(email) == true){
 			
@@ -67,19 +69,26 @@ jQuery( document ).ready(function($) {
 						data:{action:"ccfwp_send_query_message", premium_cus:premium_cus,message:message,email:email, ccfwp_security_nonce:ccfwp_localize_data.ccfwp_security_nonce},
 						success:function(response){                       
 						  if(response['status'] =='t'){
-							$(".saswp-query-success").show();
-							$(".saswp-query-error").hide();
+							$(".ccfwp-query-success").show();
+							$(".ccfwp-query-error").hide();
+							$(".ccfwp-send-query").text('Send Message');
+							$(".ccfwp-send-query").attr('disabled',false);
 						  }else{                                  
-							$(".saswp-query-success").hide();  
-							$(".saswp-query-error").show();
+							$(".ccfwp-query-success").hide();  
+							$(".ccfwp-query-error").show();
+							$(".ccfwp-send-query").text('Send Message');
+							$(".ccfwp-send-query").attr('disabled',false);
 						  }
 						},
 						error: function(response){                    
 							console.log(response);
+							$(".ccfwp-send-query").text('Send Message');
+							$(".ccfwp-send-query").attr('disabled',false);
 						}
 						});   
 		}else{
-			
+			$(".ccfwp-send-query").text('Send Message');
+			$(".ccfwp-send-query").attr('disabled',false);
 			if($.trim(message) =='' && premium_cus =='' && $.trim(email) ==''){
 				alert('Please enter the message, email and select customer type');
 			}else{

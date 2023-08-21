@@ -1,13 +1,9 @@
 <?php
-
-function ccfwp_t_string($string){
-    return esc_html__( $string , 'criticalcssforwp');   
-}
 /**
  * Internal helper function to sanitize a string from user input or from the db
  *
  * @since 1.9.94
- * @copied from wordpress 4.7.0 core to make compatible sanitize_textarea_field with WordPress v4.6.3
+ * @copied from WordPress 4.7.0 core to make compatible sanitize_textarea_field with WordPress v4.6.3
  *
  * @param string $str           String to sanitize.
  * @param bool   $keep_newlines Optional. Whether to keep newlines. Default: false.
@@ -31,7 +27,7 @@ function ccfwp_sanitize_textarea_field( $str ) {
 		// newline stripping stage could lead to a functional tag.
 		$filtered = str_replace( "<\n", "&lt;\n", $filtered );
 	}
-	
+
 	$filtered = trim( $filtered );
 
 	$found = false;
@@ -48,24 +44,31 @@ function ccfwp_sanitize_textarea_field( $str ) {
 	return $filtered;
 }
 
-function ccwp_check_js_defer()
-{
-    if(defined('WP_ROCKET_VERSION'))
-    {
-        $ccwp_wprocket_options=get_option('wp_rocket_settings',null);
+function ccwp_check_js_defer() {
+	if ( defined( 'WP_ROCKET_VERSION' ) ) {
+		$ccwp_wprocket_options = get_option( 'wp_rocket_settings', null );
 
-        if(isset($ccwp_wprocket_options['defer_all_js']) && $ccwp_wprocket_options['defer_all_js']==1)
-        {
-            return true;   
-        }
-    }
-    return false;
+		if ( isset( $ccwp_wprocket_options['defer_all_js'] ) && $ccwp_wprocket_options['defer_all_js'] == 1 ) {
+			return true;
+		}
+	}
+	return false;
 }
 
 function ccwp_complete_html_after_dom_loaded( $content ) {
-    if(function_exists('is_feed')&& is_feed()){ return $content; }
-    	$content = apply_filters('ccwp_complete_html_after_dom_loaded', $content);
-    return $content;
+	if ( function_exists( 'is_feed' ) && is_feed() ) {
+		return $content; }
+		$content = apply_filters( 'ccwp_complete_html_after_dom_loaded', $content );
+	return $content;
 }
 
-add_action('wp', function(){ ob_start('ccwp_complete_html_after_dom_loaded'); }, 999);
+add_action(
+	'wp',
+	function() {
+		ob_start( 'ccwp_complete_html_after_dom_loaded' );
+	},
+	999
+);
+function ccfwp_t_string( $string ) {
+	return esc_html__( $string, 'criticalcssforwp' );
+}
