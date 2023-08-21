@@ -176,8 +176,9 @@ class Class_critical_css_for_wp {
 						'status'     => 'queue',
 						'created_at' => date( 'Y-m-d h:i:sa' ),
 					),
+					array( 'url'=> $permalink ),
 					array( '%s', '%s' ),
-					array( 'url', $permalink )
+					array( '%s')
 				);
 				$user_dirname = $this->cachepath();
 				$user_dirname = trailingslashit( $user_dirname );
@@ -239,8 +240,10 @@ class Class_critical_css_for_wp {
 						'status'     => 'queue',
 						'created_at' => date( 'Y-m-d h:i:sa' ),
 					),
+					array( 'url'=> $permalink ),
 					array( '%s', '%s' ),
-					array( 'url', $permalink )
+					array( '%s')
+					
 				);
 				$user_dirname = $this->cachepath();
 				$user_dirname = trailingslashit( $user_dirname );
@@ -272,7 +275,7 @@ class Class_critical_css_for_wp {
 			$limit = ( get_option( 'ccfwp_scan_urls' ) > 0 ) ? intval( get_option( 'ccfwp_scan_urls' ) ) : 30;
 			$posts = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT `ID` FROM $wpdb->posts WHERE post_status='publish' AND ID >= %d
+					"SELECT `ID` FROM $wpdb->posts WHERE post_status='publish' AND ID > %d
 					AND post_type IN(%s) LIMIT %d",
 					$start,
 					implode( "', '", $post_types ),
@@ -370,7 +373,7 @@ class Class_critical_css_for_wp {
 			$terms = $wpdb->get_results(
 				$wpdb->prepare(
 					'SELECT `term_id`, `taxonomy` FROM %i
-					WHERE  taxonomy IN(%s) AND term_id>= %d LIMIT %d',
+					WHERE  taxonomy IN(%s) AND term_id> %d LIMIT %d',
 					$wpdb->term_taxonomy,
 					implode( "', '", $taxonomy_types ),
 					$start,
@@ -381,10 +384,10 @@ class Class_critical_css_for_wp {
 
 		if ( ! empty( $terms ) ) {
 			foreach ( $terms as $term ) {
-				$term = get_term( $term['term_id'] );
-				if ( ! is_wp_error( $term ) ) {
-					$this->insert_update_terms_url( $term );
-				}   $start = $term;
+				$term_obj = get_term( $term['term_id'] );
+				if ( ! is_wp_error( $term_obj ) ) {
+					$this->insert_update_terms_url( $term_obj );
+				}   $start = $term['term_id'];
 			}
 		}
 			update_option( 'ccfwp_current_term', $start );
@@ -1015,13 +1018,12 @@ class Class_critical_css_for_wp {
 		$formated_result = array();
 
 		if ( ! empty( $result ) ) {
-
+			$size="";
 			foreach ( $result as $value ) {
 
 				if ( $value['status'] == 'cached' ) {
 					$user_dirname = $this->cachepath();
 					$size         = @filesize( $user_dirname . '/' . md5( trailingslashit( $value['url'] ) ) . '.css' );
-					$cp_settings  = implode( ',', critical_css_defaults() );
 					if ( ! $size ) {
 						$size = '<abbr title="' . ccfwp_t_string( 'File is not in cached directory. Please recheck in advance option' ) . '">' . ccfwp_t_string( 'Deleted' ) . '</abbr>';
 					}
@@ -1109,12 +1111,12 @@ class Class_critical_css_for_wp {
 		$formated_result = array();
 
 		if ( ! empty( $result ) ) {
-
+			$size  ="";
 			foreach ( $result as $value ) {
 
 				if ( $value['status'] == 'cached' ) {
 					$user_dirname = $this->cachepath();
-					$size         = filesize( $user_dirname . '/' . md5( $value['url'] ) . '.css' );
+					$size         = @filesize( $user_dirname . '/' . md5( $value['url'] ) . '.css' );
 				}
 
 				$formated_result[] = array(
