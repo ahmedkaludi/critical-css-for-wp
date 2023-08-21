@@ -50,7 +50,7 @@ You may now contribute to this Critical CSS For WP plugin on Github: [View repos
 
 == Changelog ==
 
-= 1.0.9 (18 August 2023) = 
+= 1.0.9 (21 August 2023) = 
 * Added : Create support links & other links for users to reach #11
 * Compatibility : Updated code according to WP Standard #32
 * Compatibility : Added compatibility with 10web Booster #31
