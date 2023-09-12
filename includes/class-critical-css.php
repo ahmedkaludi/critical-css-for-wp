@@ -278,7 +278,7 @@ class Class_critical_css_for_wp {
 					"SELECT `ID` FROM $wpdb->posts WHERE post_status='publish' AND ID > %d
 					AND post_type IN(%s) LIMIT %d",
 					$start,
-					implode( "', '", $post_types ),
+					implode('\', \'', $post_types),
 					$limit
 				),
 				ARRAY_A
@@ -375,7 +375,7 @@ class Class_critical_css_for_wp {
 					'SELECT `term_id`, `taxonomy` FROM %i
 					WHERE  taxonomy IN(%s) AND term_id> %d LIMIT %d',
 					$wpdb->term_taxonomy,
-					implode( "', '", $taxonomy_types ),
+					implode('\', \'', $taxonomy_types),
 					$start,
 					$limit
 				),
