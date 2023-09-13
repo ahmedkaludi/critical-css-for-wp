@@ -270,15 +270,14 @@ class Class_critical_css_for_wp {
 				}
 			}
 		}
-
+		    $imploded_types = implode("', '", $post_types);
 			$start = get_option( 'ccfwp_current_post' ) ? get_option( 'ccfwp_current_post' ) : 0;
 			$limit = ( get_option( 'ccfwp_scan_urls' ) > 0 ) ? intval( get_option( 'ccfwp_scan_urls' ) ) : 30;
 			$posts = $wpdb->get_results(
 				$wpdb->prepare(
 					"SELECT `ID` FROM $wpdb->posts WHERE post_status='publish' AND ID > %d
-					AND post_type IN(%s) LIMIT %d",
+					AND post_type IN('".stripslashes(esc_sql($imploded_types))."') LIMIT %d",
 					$start,
-					implode( "', '", $post_types ),
 					$limit
 				),
 				ARRAY_A
@@ -367,15 +366,14 @@ class Class_critical_css_for_wp {
 				}
 			}
 		}
-
+			$imploded_types = implode('\', \'', $taxonomy_types);
 			$start = get_option( 'ccfwp_current_term' ) ? get_option( 'ccfwp_current_term' ) : 0;
 			$limit = ( get_option( 'ccfwp_scan_urls' ) > 0 ) ? intval( get_option( 'ccfwp_scan_urls' ) ) : 30;
 			$terms = $wpdb->get_results(
 				$wpdb->prepare(
-					'SELECT `term_id`, `taxonomy` FROM %i
-					WHERE  taxonomy IN(%s) AND term_id> %d LIMIT %d',
+					"SELECT `term_id`, `taxonomy` FROM %i
+					WHERE  taxonomy IN('".stripslashes(esc_sql($imploded_types))."') AND term_id> %d LIMIT %d",
 					$wpdb->term_taxonomy,
-					implode( "', '", $taxonomy_types ),
 					$start,
 					$limit
 				),

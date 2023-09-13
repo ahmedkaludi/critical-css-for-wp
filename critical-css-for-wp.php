@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Reduce Unused CSS Solution with Critical CSS For WP
  * Description: Critical CSS For WP intends to provide great experience to the web page visitors by improving the performance of the web page. Here we'd remove the unused CSS which helps to paint fast and render the above fold content, before downloading the complete css files.
- * Version: 1.0.9
+ * Version: 1.0.10
  * Author: Magazine3
  * Author URI: https://magazine3.company/
  * Donate link: https://www.paypal.me/Kaludi/25
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CRITICAL_CSS_FOR_WP_VERSION', '1.0.9' );
+define( 'CRITICAL_CSS_FOR_WP_VERSION', '1.0.10' );
 define( 'CRITICAL_CSS_FOR_WP_PLUGIN_URI', plugin_dir_url( __FILE__ ) );
 define( 'CRITICAL_CSS_FOR_WP_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 
