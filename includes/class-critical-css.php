@@ -25,7 +25,7 @@ class Class_critical_css_for_wp {
 		if ( function_exists( 'is_checkout' ) && is_checkout() ) {
 			return;
 		}
-		if ( function_exists( 'elementor_load_plugin_textdomain' ) && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
+		if ( function_exists( 'elementor_load_plugin_textdomain' ) && isset(\Elementor\Plugin::$instance->preview) && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
 			return;
 		}
 		if ( class_exists( 'FlexMLS_IDX' ) ) {
@@ -667,7 +667,7 @@ class Class_critical_css_for_wp {
 		if ( function_exists( 'is_checkout' ) && is_checkout() || ( function_exists( 'is_feed' ) && is_feed() ) ) {
 			return;
 		}
-		if ( function_exists( 'elementor_load_plugin_textdomain' ) && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
+		if ( function_exists( 'elementor_load_plugin_textdomain' ) && isset(\Elementor\Plugin::$instance->preview) && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
 			return;
 		}
 
