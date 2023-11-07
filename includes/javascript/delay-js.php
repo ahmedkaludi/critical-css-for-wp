@@ -50,7 +50,7 @@ function ccwp_delay_js_main() {
 		return;
 	}
 
-	if ( function_exists( 'elementor_load_plugin_textdomain' ) && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
+	if ( function_exists( 'elementor_load_plugin_textdomain' ) && isset(\Elementor\Plugin::$instance->preview) && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
 		return;
 	}
 
