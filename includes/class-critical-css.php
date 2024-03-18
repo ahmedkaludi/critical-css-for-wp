@@ -674,89 +674,78 @@ class Class_critical_css_for_wp {
 		add_filter( 'ccwp_complete_html_after_dom_loaded', array( $this, 'ccwp_delay_css_html' ), 1, 1 );
 	}
 
-	public function ccwp_delay_css_html( $html ) {
-
-		$return_html = $jetpack_boost = false;
-		$settings    = critical_css_defaults();
-		$url_arg     = '';
-
-		if ( class_exists( 'FlexMLS_IDX' ) && isset( $_SESSION['ccwp_current_uri'] ) ) {
-			$url_arg = esc_url( home_url( $_SESSION['ccwp_current_uri'] ) );
+	public function ccwp_delay_css_html($html) {
+		$jetpack_boost = false;
+		$settings = critical_css_defaults();
+		$url_arg = '';
+	
+		if (class_exists('FlexMLS_IDX') && isset($_SESSION['ccwp_current_uri'])) {
+			$url_arg = esc_url(home_url($_SESSION['ccwp_current_uri']));
 		}
-
-		if ( ! $this->check_critical_css( $url_arg ) ) {
-			 $return_html = true;
-		}
-
-		if ( preg_match( '/<style id="jetpack-boost-critical-css">/s', $html ) ) {
-			$return_html   = false;
-			$jetpack_boost = true;
-		}
-
-		if ( ( isset( $settings['ccfwp_defer_css'] ) && $settings['ccfwp_defer_css'] == 'off' ) ) {
-			$return_html = true;
-		}
-		if ( $return_html == true ) {
+	
+		if (!$this->check_critical_css($url_arg) || preg_match('/<style id="jetpack-boost-critical-css">/s', $html) || (isset($settings['ccfwp_defer_css']) && $settings['ccfwp_defer_css'] == 'off')) {
 			return $html;
 		}
-		$html_no_comments = preg_replace( '/<!--(.|\s)*?-->/', '', $html );
-		preg_match_all( '/<link\s?([^>]+)?>/is', $html_no_comments, $matches );
-
-		if ( ! isset( $matches[0] ) ) {
+	
+		$html_no_comments = preg_replace('/<!--(.|\s)*?-->/', '', $html);
+	
+		preg_match_all('/<link\s?([^>]+)?>/is', $html_no_comments, $matches);
+	
+		if (!isset($matches[0])) {
 			return $html;
 		}
-
-		foreach ( $matches[0] as $i => $tag ) {
-			$atts_array = ! empty( $matches[1][ $i ] ) ? $this->ccwp_get_atts_array( $matches[1][ $i ] ) : array();
-			if ( isset( $atts_array['rel'] ) && stripos( $atts_array['rel'], 'stylesheet' ) === false ) {
+	
+		foreach ($matches[0] as $i => $tag) {
+			$atts_array = !empty($matches[1][$i]) ? $this->ccwp_get_atts_array($matches[1][$i]) : array();
+			
+			if (isset($atts_array['rel']) && stripos($atts_array['rel'], 'stylesheet') === false) {
 				continue;
 			}
-			$delay_flag       = false;
-			$excluded_scripts = array(
-				'ccwp-delayed-styles',
-			);
-
-			if ( ! empty( $excluded_scripts ) ) {
-				foreach ( $excluded_scripts as $excluded_script ) {
-					if ( strpos( $tag, $excluded_script ) !== false ) {
+	
+			$delay_flag = false;
+			$excluded_scripts = array('ccwp-delayed-styles');
+	
+			if (!empty($excluded_scripts)) {
+				foreach ($excluded_scripts as $excluded_script) {
+					if (strpos($tag, $excluded_script) !== false) {
 						continue 2;
 					}
 				}
 			}
-
+	
 			$delay_flag = true;
-			if ( ! empty( $atts_array['rel'] ) ) {
+			if (!empty($atts_array['rel'])) {
 				$atts_array['data-ccwp-rel'] = $atts_array['rel'];
 			}
-
-			$atts_array['rel']   = 'ccwpdelayedstyle';
+	
+			$atts_array['rel'] = 'ccwpdelayedstyle';
 			$atts_array['defer'] = 'defer';
-
-			if ( $delay_flag ) {
-				$delayed_atts_string = $this->ccwp_get_atts_string( $atts_array );
-				$delayed_tag         = sprintf( '<link %1$s', $delayed_atts_string ) . ( ! empty( $matches[3][ $i ] ) ? $matches[3][ $i ] : '' ) . '/>';
-				$html                = str_replace( $tag, $delayed_tag, $html );
-				continue;
+	
+			if ($delay_flag) {
+				$delayed_atts_string = $this->ccwp_get_atts_string($atts_array);
+				$delayed_tag = sprintf('<link %1$s', $delayed_atts_string) . (!empty($matches[3][$i]) ? $matches[3][$i] : '') . '/>';
+				$html = str_replace($tag, $delayed_tag, $html);
 			}
 		}
-
-		preg_match_all( '#(<style\s?([^>]+)?\/?>)(.*?)<\/style>#is', $html_no_comments, $matches1 );
-		if ( isset( $matches1[0] ) ) {
-			foreach ( $matches1[0] as $i => $tag ) {
-				$atts_array = ! empty( $matches1[2][ $i ] ) ? $this->ccwp_get_atts_array( $matches1[2][ $i ] ) : array();
-				if ( isset( $atts_array['id'] ) && $atts_array['id'] == 'critical-css-for-wp' ) {
-					continue; }
-				if ( isset( $atts_array['type'] ) ) {
+	
+		preg_match_all('#(<style\s?([^>]+)?\/?>)(.*?)<\/style>#is', $html_no_comments, $matches1);
+		if (isset($matches1[0])) {
+			foreach ($matches1[0] as $i => $tag) {
+				$atts_array = !empty($matches1[2][$i]) ? $this->ccwp_get_atts_array($matches1[2][$i]) : array();
+				if (isset($atts_array['id']) && $atts_array['id'] == 'critical-css-for-wp') {
+					continue;
+				}
+				if (isset($atts_array['type'])) {
 					$atts_array['data-ccwp-cc-type'] = $atts_array['type'];
 				}
-				$delayed_atts_string = $this->ccwp_get_atts_string( $atts_array );
-				$delayed_tag         = sprintf( '<style %1$s>', $delayed_atts_string ) . ( ! empty( $matches1[3][ $i ] ) ? $matches1[3][ $i ] : '' ) . '</style>';
-				$html                = str_replace( $tag, $delayed_tag, $html );
+				$delayed_atts_string = $this->ccwp_get_atts_string($atts_array);
+				$delayed_tag = sprintf('<style %1$s>', $delayed_atts_string) . (!empty($matches1[3][$i]) ? $matches1[3][$i] : '') . '</style>';
+				$html = str_replace($tag, $delayed_tag, $html);
 			}
 		}
-
-		if ( $jetpack_boost == true && preg_match( '/<style\s+id="jetpack-boost-critical-css"\s+type="ccwpdelayedstyle">/s', $html ) ) {
-			$html = preg_replace( '/<style\s+id="jetpack-boost-critical-css"\s+type="ccwpdelayedstyle">/s', '<style id="jetpack-boost-critical-css">', $html );
+	
+		if ($jetpack_boost == true && preg_match('/<style\s+id="jetpack-boost-critical-css"\s+type="ccwpdelayedstyle">/s', $html)) {
+			$html = preg_replace('/<style\s+id="jetpack-boost-critical-css"\s+type="ccwpdelayedstyle">/s', '<style id="jetpack-boost-critical-css">', $html);
 		}
 		return $html;
 	}
