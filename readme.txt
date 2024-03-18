@@ -2,8 +2,8 @@
 Contributors: magazine3
 Tags: Critical, Critical CSS, Core Web Vital, Cache, SEO
 Requires at least: 3.0
-Tested up to: 6.3
-Stable tag: 1.0.11
+Tested up to: 6.4
+Stable tag: 1.0.12
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -49,6 +49,10 @@ You may now contribute to this Critical CSS For WP plugin on Github: [View repos
 
 
 == Changelog ==
+
+= 1.0.12 (09 January 2024) = 
+* Tested : Test with wordpress 6.4 and update readme.txt #41
+* Fixed : Category URLs are also getting cached even if the checkbox is not selected in the settings #40
 
 = 1.0.11 (07 November 2023) = 
 * Fixed : Critical Error while activating #38

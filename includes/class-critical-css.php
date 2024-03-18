@@ -357,7 +357,7 @@ class Class_critical_css_for_wp {
 
 		$settings = critical_css_defaults();
 
-		$taxonomy_types = array( 'category' );
+		$taxonomy_types = array();
 
 		if ( ! empty( $settings['ccfwp_on_tax_type'] ) ) {
 			foreach ( $settings['ccfwp_on_tax_type'] as $key => $value ) {
