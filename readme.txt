@@ -50,6 +50,10 @@ You may now contribute to this Critical CSS For WP plugin on Github: [View repos
 
 == Changelog ==
 
+= 1.0.13 (18 March 2024) = 
+* Improved  : Improved CSS delay code
+* Added  : Added separate Changelog file
+
 = 1.0.12 (09 January 2024) = 
 * Tested : Test with wordpress 6.4 and update readme.txt #41
 * Fixed : Category URLs are also getting cached even if the checkbox is not selected in the settings #40
@@ -60,50 +64,4 @@ You may now contribute to this Critical CSS For WP plugin on Github: [View repos
 = 1.0.10 (13 September 2023) = 
 * Fixed : Post / Pages not adding to queue for generating #35
 
-= 1.0.9 (21 August 2023) = 
-* Added : Create support links & other links for users to reach #11
-* Compatibility : Updated code according to WP Standard #32
-* Compatibility : Added compatibility with 10web Booster #31
-* Compatibility : Tested with WordPress 6.3 and update readme.txt #29
-* Fixed : Improvement in Critical CSS generation. #14
-* Fixed : Confirmation popup should display after sending message in support form of plugin #23
-* Fixed : Issue with send message button in Support section #28
-* Fixed : Warning showing in error log #30
-* Improved : add github links and other stuff in the readme.txt #4
-
-= 1.0.8 (26 May 2023) = 
-* Fixed : Critical css not loading on frontend using FlexMLS_IDX plugin #18
-* Fixed : Critical CSS not generated in subdomain due to SSL issue #22
-* Fixed : Reduce Used CSS showing on PageSpeed
-* Improved : Fixed  assets links with double slash(//)
-
-
-= 1.0.7 (04 March 2023) = 
-* Fixed : Critical css is not generated while using file_get_contents #17
-* Fixed : Critical css not loading on frontend using FlexMLS_IDX plugin #18
-* Fixed : Delayed CSS loading only on scroll/click event #19
-* Fixed : Option to load critical CSS without Delay #20
-
-= 1.0.6 (10 February 2023) = 
-* jQuery is not defined and related js issues #15
-
-= 1.0.5 (02 February 2023) = 
-* Make plugin compatible with WP rocket and Elementor #12
-* Images and Google Ads not loading #8
-
-= 1.0.4 (17 January 2023) = 
-* Make plugin WP multisite compatible #9
-
-= 1.0.3 (10 January 2023) = 
-* Added compatibility for WP Rocket.
-* Improved Critical CSS generation.
-
-= 1.0.2 (19 December 2022) = 
-* Added the code to improve the performance of the web page.
-
-= 1.0.1 (15 November 2022) = 
-* Resolved the issue of Fatal error: Composer detected issues in your platform.
-
-= 1.0.0 (06 September 2022) =
-
-* Initial Releases.
+Full changelog available [ at changelog.txt](https://plugins.svn.wordpress.org/critical-css-for-wp/trunk/changelog.txt)
