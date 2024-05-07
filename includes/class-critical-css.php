@@ -637,7 +637,7 @@ class Class_critical_css_for_wp {
 		$url = trailingslashit( $url );
 		if ( file_exists( $user_dirname . md5( $url ) . '.css' ) ) {
 			$css      = '';
-			$response = wp_remote_get( $user_dirname . '/' . md5( $url ) . '.css' );
+			$response = file_get_contents( $user_dirname . '/' . md5( $url ) . '.css' ); // wp_remote_get() uses url of file, not DIR url of file that is why we need to use file_get_contents()
 			if ( is_array( $response ) && ! is_wp_error( $response ) ) {
 				$css = $response['body'];
 			}
