@@ -3,7 +3,7 @@ Contributors: magazine3
 Tags: Critical, Critical CSS, Core Web Vital, Cache, SEO
 Requires at least: 3.0
 Tested up to: 6.5
-Stable tag: 1.0.13
+Stable tag: 1.0.14
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -49,6 +49,10 @@ You may now contribute to this Critical CSS For WP plugin on Github: [View repos
 
 
 == Changelog ==
+
+= 1.0.14 (07 May 2024) = 
+* Improved  : Fixed Bugs in the code #45
+* Tested  : Test with WordPress 6.5 #48
 
 = 1.0.13 (18 March 2024) = 
 * Improved  : Improved CSS delay code
