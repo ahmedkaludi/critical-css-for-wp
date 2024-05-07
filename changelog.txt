@@ -1,3 +1,7 @@
+= 1.0.14 (07 May 2024) = 
+* Improved  : Fixed Bugs in the code #45
+* Tested  : Test with WordPress 6.5 #48
+
 = 1.0.13 (18 March 2024) = 
 * Improved  : Improved CSS delay code
 * Added  : Added separate Changelog file
