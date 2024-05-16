@@ -1,11 +1,11 @@
 === Reduce Unused CSS Solution with Critical CSS For WP ===
-Contributors: magazine3
-Tags: Critical, Critical CSS, Core Web Vital, Cache, SEO
-Requires at least: 3.0
-Tested up to: 6.5
-Stable tag: 1.0.14
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+* Contributors: magazine3
+* Tags: Critical, Critical CSS, Core Web Vital, Cache, SEO
+* Requires at least: 3.0
+* Tested up to: 6.5
+* Stable tag: 1.0.14
+* License: GPLv2 or later
+* License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 
 == Description ==
