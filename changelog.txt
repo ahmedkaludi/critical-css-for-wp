@@ -1,3 +1,6 @@
+= 1.0.15 (24 May 2024) = 
+* Fixed  :  Fix some issues in the code #45
+
 = 1.0.14 (07 May 2024) = 
 * Improved  : Fixed Bugs in the code #45
 * Tested  : Test with WordPress 6.5 #48
