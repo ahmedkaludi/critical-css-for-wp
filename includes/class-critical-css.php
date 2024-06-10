@@ -642,6 +642,8 @@ class Class_critical_css_for_wp {
 				$css = $response;
 			}
 			$css .= $custom_css;
+			$css  = $this->ccwp_clean_css($css);
+
 			echo "<style type='text/css' id='critical-css-for-wp'>$css</style>";
 		} else {
 			$wpdb->query(
@@ -1343,6 +1345,26 @@ class Class_critical_css_for_wp {
 			}
 		}
 		return false;
+	}
+	    
+    public function ccwp_clean_css($css) {
+    // Remove comments
+		$css = preg_replace('!/\*.*?\*/!s', '', $css);
+
+		// Remove whitespace around specific characters
+		$css = preg_replace('/\s*([{}|:;,])\s+/', '$1', $css);
+		$css = preg_replace('/\s\s+(.*)/', '$1', $css);
+
+		// Remove universal selector rules
+		$css = preg_replace('/\*\s*{[^}]*}/', '', $css);
+
+		// Remove empty rules
+		$css = preg_replace('/[^{}]+{\s*}/', '', $css);
+
+		// Optional: Remove any remaining newlines or excessive spaces
+		$css = preg_replace('/\s+/', ' ', $css);
+
+		return trim($css);
 	}
 
 }
