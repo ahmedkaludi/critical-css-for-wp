@@ -44,11 +44,11 @@ function ccfwp_admin_interface_render() {
 		<div class="ccfwp-comp-cont">
 	<h2 class="nav-tab-wrapper">
 		<?php
-			echo '<a href="' . esc_url( critical_css_admin_link( 'generatecss' ) ) . '" class="nav-tab ' . esc_attr( 'generatecss' == $tab ? 'nav-tab-active' : '' ) . '">' . ccfwp_t_string( 'Generate CSS' ) . '</a>';
+			echo '<a href="' . esc_url( critical_css_admin_link( 'generatecss' ) ) . '" class="nav-tab ' . esc_attr( 'generatecss' == $tab ? 'nav-tab-active' : '' ) . '">' . esc_html__( 'Generate CSS' , 'critical-css-for-wp') . '</a>';
 
-			echo '<a href="' . esc_url( critical_css_admin_link( 'advance' ) ) . '" class="nav-tab ' . esc_attr( 'advance' == $tab ? 'nav-tab-active' : '' ) . '">' . ccfwp_t_string( 'Advance' ) . '</a>';
+			echo '<a href="' . esc_url( critical_css_admin_link( 'advance' ) ) . '" class="nav-tab ' . esc_attr( 'advance' == $tab ? 'nav-tab-active' : '' ) . '">' . esc_html__( 'Advance' , 'critical-css-for-wp') . '</a>';
 
-			echo '<a href="' . esc_url( critical_css_admin_link( 'support' ) ) . '" class="nav-tab ' . esc_attr( 'support' == $tab ? 'nav-tab-active' : '' ) . '">' . ccfwp_t_string( 'Support' ) . '</a>';
+			echo '<a href="' . esc_url( critical_css_admin_link( 'support' ) ) . '" class="nav-tab ' . esc_attr( 'support' == $tab ? 'nav-tab-active' : '' ) . '">' . esc_html__( 'Support' , 'critical-css-for-wp') . '</a>';
 		?>
 		  </h2>
 		  <form action="options.php" method="post" enctype="multipart/form-data" class="ccfwp-settings-form">
@@ -68,7 +68,7 @@ function ccfwp_admin_interface_render() {
 			  echo '</div>';
 			?>
 					
-		  <?php submit_button( ccfwp_t_string( 'Save Settings' ) ); ?>          
+		  <?php submit_button( esc_html__( 'Save Settings' , 'critical-css-for-wp') ); ?>          
 		  </form>
 	</div>
 	<?php
@@ -109,7 +109,7 @@ function critical_css_admin_link( $tab = '' ) {
 }
 
 function critical_css_get_tab( $default = '', $available = array() ) {
-
+	//phpcs:ignore -- Reason: $_GET['tab'] is used to show the tab only it is not saved or processed.
 	$tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : $default;
 
 	if ( ! in_array( $tab, $available ) ) {
@@ -120,7 +120,7 @@ function critical_css_get_tab( $default = '', $available = array() ) {
 }
 
 
-function critical_css_generate_time( $total_count ) {
+function critical_css_generate_time( $total_count = 0 ) {
 
 	   $estimate_time = '';
 	if ( $total_count > 0 ) {
@@ -147,12 +147,12 @@ function critical_css_urlslist_callback() {
 
 	global $wpdb, $table_prefix;
 	$table_name = $table_prefix . 'critical_css_for_wp_urls';
-
-	$total_count  = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table_name ) );
-	$cached_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i Where `status`=%s', $table_name, 'cached' ) );
-	$inprogress   = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i Where `status`=%s', $table_name, 'inprocess' ) );
-	$failed_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i Where `status`=%s', $table_name, 'failed' ) );
-	$queue_count  = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i Where `status`=%s', $table_name, 'queue' ) );
+	$table_name_escaped = esc_sql( $table_name );
+	$total_count  = $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name_escaped}" ); //phpcs:ignore -- Reasone: $table_name_escaped is escaped
+	$cached_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_name_escaped} Where `status`=%s",  'cached' ) ); //phpcs:ignore -- Reasone: $table_name_escaped is escaped
+	$inprogress   = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_name_escaped} Where `status`=%s", 'inprocess' ) ); //phpcs:ignore -- Reasone: $table_name_escaped is escaped
+	$failed_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_name_escaped} Where `status`=%s",  'failed' ) ); //phpcs:ignore -- Reasone: $table_name_escaped is escaped
+	$queue_count  = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_name_escaped} Where `status`=%s", 'queue' ) ); //phpcs:ignore -- Reasone: $table_name_escaped is escaped
 	$inprogress   = 0;
 	$percentage   = 0;
 
@@ -166,25 +166,25 @@ function critical_css_urlslist_callback() {
 			<!-- process section -->
 			<div class="ccfwp-css-optimization-wrapper">
 			
-				<strong style="font-size:18px;"><?php echo ccfwp_t_string( 'CSS Optimisation Status' ); ?></strong>
-				<p><?php echo ccfwp_t_string( 'Optimisation is running in background. You can see latest result on page reload' ); ?></p>
+				<strong style="font-size:18px;"><?php echo esc_html__( 'CSS Optimisation Status' ,'critical-css-for-wp'); ?></strong>
+				<p><?php echo esc_html__( 'Optimisation is running in background. You can see latest result on page reload' ,'critical-css-for-wp'); ?></p>
 				
 				<div class="ccfwp_progress_bar">
 					<div class="ccfwp_progress_bar_body" style="width: <?php echo esc_attr( $percentage ); ?>%;"><?php echo esc_attr( $percentage ); ?>%</div>
 				</div>
 				
 				<div class="ccfwp_cached_status_bar">
-				<div style="margin-top:20px;"><strong><?php echo ccfwp_t_string( 'Total :' ); ?></strong> 
+				<div style="margin-top:20px;"><strong><?php echo esc_html__( 'Total :' ,'critical-css-for-wp'); ?></strong> 
 																 <?php
 																	echo esc_attr( $total_count ) . ' URLs';
 																	?>
 				 </div>
-				 <div><strong><?php echo ccfwp_t_string( 'In Progress :' ); ?></strong> 
+				 <div><strong><?php echo esc_html__( 'In Progress :' ,'critical-css-for-wp'); ?></strong> 
 										 <?php
 											echo esc_attr( $queue_count ) . ' URLs';
 											?>
 				 </div>
-				<div><strong><?php echo ccfwp_t_string( 'Critical CSS Optimized  :' ); ?></strong> 
+				<div><strong><?php echo esc_html__( 'Critical CSS Optimized  :' ,'critical-css-for-wp'); ?></strong> 
 										<?php
 										echo esc_attr( $cached_count ) . ' URLs';
 										?>
@@ -193,9 +193,9 @@ function critical_css_urlslist_callback() {
 				if ( critical_css_generate_time( $queue_count ) ) {
 					?>
 						<div>
-						<strong><?php echo ccfwp_t_string( 'Remaining Time :' ); ?></strong>
+						<strong><?php echo esc_html__( 'Remaining Time :'  ,'critical-css-for-wp'); ?></strong>
 						<?php
-						echo critical_css_generate_time( $queue_count );
+						echo esc_attr(critical_css_generate_time( $queue_count ));
 						?>
 						</div>                        
 						<?php
@@ -205,8 +205,8 @@ function critical_css_urlslist_callback() {
 					?>
 						   
 							<div>
-								<strong><?php echo ccfwp_t_string( 'Failed      :' ); ?></strong> <?php echo esc_attr( $failed_count ); ?>
-								<a href="#" class="ccfwp-resend-urls button button-secondary"><?php echo ccfwp_t_string( 'Resend' ); ?></a>
+								<strong><?php echo esc_html__( 'Failed      :' ,'critical-css-for-wp');?></strong> <?php echo esc_attr( $failed_count ); ?>
+								<a href="#" class="ccfwp-resend-urls button button-secondary"><?php echo esc_html__( 'Resend' ,'critical-css-for-wp'); ?></a>
 							</div>                                                        
 						<?php
 				}
@@ -217,28 +217,28 @@ function critical_css_urlslist_callback() {
 			<!-- DataTable section -->
 			<div class="ccfwp-table-url-wrapper">                         
 			 <div id="cwvpb-global-tabs" style="margin-top: 10px;">
-				<a data-id="cwvpb-general-container"><?php echo ccfwp_t_string( 'All' ); ?> (<?php echo esc_html( $total_count ); ?>)</a> |
-				<a data-id="cwvpb-queue-container"><?php echo ccfwp_t_string( 'In Queue' ); ?> (<?php echo esc_html( $queue_count ); ?>)</a> |
-				<a data-id="cwvpb-knowledge-container"><?php echo ccfwp_t_string( 'Completed' ); ?> (<?php echo esc_html( $cached_count ); ?>)</a> |
-				<a data-id="cwvpb-default-container" ><?php echo ccfwp_t_string( 'Failed' ); ?> (<?php echo esc_html( $failed_count ); ?>)</a>
+				<a data-id="cwvpb-general-container"><?php echo esc_html__( 'All' ,'critical-css-for-wp'); ?> (<?php echo esc_html( $total_count ); ?>)</a> |
+				<a data-id="cwvpb-queue-container"><?php echo esc_html__( 'In Queue' ,'critical-css-for-wp');?> (<?php echo esc_html( $queue_count ); ?>)</a> |
+				<a data-id="cwvpb-knowledge-container"><?php echo esc_html__( 'Completed' ,'critical-css-for-wp'); ?> (<?php echo esc_html( $cached_count ); ?>)</a> |
+				<a data-id="cwvpb-default-container" ><?php echo esc_html__( 'Failed' ,'critical-css-for-wp'); ?> (<?php echo esc_html( $failed_count ); ?>)</a>
 			 </div>
 														
 				<div class="cwvpb-global-container" id="cwvpb-general-container">
 				<table class="table ccfwp-table-class" id="table_page_cc_style_all" style="width:100%">
 				<thead>
 					<tr>
-						<th><?php echo ccfwp_t_string( 'URL' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Status' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Size' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Created Date' ); ?></th>
+						<th><?php echo esc_html__( 'URL' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Status' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Size' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Created Date' ,'critical-css-for-wp'); ?></th>
 					</tr>
 				</thead>
 				<tfoot>
 					<tr>
-						<th><?php echo ccfwp_t_string( 'URL' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Status' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Size' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Created Date' ); ?></th>
+						<th><?php echo esc_html__( 'URL' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Status' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Size' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Created Date' ,'critical-css-for-wp'); ?></th>
 					</tr>
 				</tfoot>
 				</table>
@@ -248,18 +248,18 @@ function critical_css_urlslist_callback() {
 				<table class="table ccfwp-table-class" id="table_page_cc_style_queue" style="width:100%">
 				<thead>
 					<tr>
-						<th><?php echo ccfwp_t_string( 'URL' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Status' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Size' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Created Date' ); ?></th>
+						<th><?php echo esc_html__( 'URL' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Status' ,'critical-css-for-wp');?></th>
+						<th><?php echo esc_html__( 'Size' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Created Date' ,'critical-css-for-wp'); ?></th>
 					</tr>
 				</thead>
 				<tfoot>
 					<tr>
-						<th><?php echo ccfwp_t_string( 'URL' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Status' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Size' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Created Date' ); ?></th>
+						<th><?php echo esc_html__( 'URL' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Status' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Size' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Created Date' ,'critical-css-for-wp'); ?></th>
 					</tr>
 				</tfoot>
 				</table>
@@ -269,18 +269,18 @@ function critical_css_urlslist_callback() {
 				<table class="table ccfwp-table-class" id="table_page_cc_style_completed" style="width:100%">
 			<thead>
 					<tr>
-						<th><?php echo ccfwp_t_string( 'URL' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Status' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Size' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Created Date' ); ?></th>
+						<th><?php echo esc_html__( 'URL' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Status' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Size' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Created Date','critical-css-for-wp'); ?></th>
 					</tr>
 				</thead>
 				<tfoot>
 					<tr>
-						<th><?php echo ccfwp_t_string( 'URL' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Status' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Size' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Created Date' ); ?></th>
+						<th><?php echo esc_html__( 'URL' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Status','critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Size' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Created Date' ,'critical-css-for-wp'); ?></th>
 					</tr>
 				</tfoot>
 				</table>
@@ -290,19 +290,19 @@ function critical_css_urlslist_callback() {
 				<table class="table ccfwp-table-class" id="table_page_cc_style_failed" style="width:100%">
 				<thead>
 					<tr>
-						<th><?php echo ccfwp_t_string( 'URL' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Status' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Failed Date' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Error' ); ?></th>
+						<th><?php echo esc_html__( 'URL' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Status' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Failed Date' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Error' ,'critical-css-for-wp'); ?></th>
 						
 					</tr>
 				</thead>
 				<tfoot>
 					<tr>
-						<th><?php echo ccfwp_t_string( 'URL' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Status' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Failed Date' ); ?></th>
-						<th><?php echo ccfwp_t_string( 'Error' ); ?></th>                        
+						<th><?php echo esc_html__( 'URL' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Status' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Failed Date' ,'critical-css-for-wp'); ?></th>
+						<th><?php echo esc_html__( 'Error' ,'critical-css-for-wp'); ?></th>                        
 					</tr>
 				</tfoot>
 				</table>
@@ -311,10 +311,10 @@ function critical_css_urlslist_callback() {
 			</div>
 
 			 <div class="ccfwp-advance-urls-container">
-				<span class="ccfwp-advance-toggle"><?php echo ccfwp_t_string( 'Advance Settings' ); ?> <span class="dashicons dashicons-admin-generic"></span></span>
+				<span class="ccfwp-advance-toggle"><?php echo esc_html__( 'Advance Settings','critical-css-for-wp'); ?> <span class="dashicons dashicons-admin-generic"></span></span>
 				<div class="ccfwp-advance-btn-div cwvpb-display-none">
-					<a class="button button-primary ccfwp-recheck-url-cache"><?php echo ccfwp_t_string( 'Recheck' ); ?></a>
-					<a class="button button-primary ccfwp-reset-url-cache"><?php echo ccfwp_t_string( 'Reset Cache' ); ?></a>
+					<a class="button button-primary ccfwp-recheck-url-cache"><?php echo esc_html__( 'Recheck' ,'critical-css-for-wp'); ?></a>
+					<a class="button button-primary ccfwp-reset-url-cache"><?php echo esc_html__( 'Reset Cache' ,'critical-css-for-wp'); ?></a>
 				</div>
 			 </div>       
 			
@@ -327,7 +327,7 @@ function critical_css_urlslist_callback() {
 function critical_css_support_settings_callback() {
 	?>
 		<div class="ccfwp_support_div">
-			<strong><?php echo ccfwp_t_string( 'If you have any query, please write the query in below box or email us at' ); ?> <a href="mailto:team@magazine3.in">team@magazine3.in</a>. <?php echo ccfwp_t_string( 'We will reply to your email address shortly' ); ?></strong>
+			<strong><?php echo esc_html__( 'If you have any query, please write the query in below box or email us at' ,'critical-css-for-wp'); ?> <a href="mailto:team@magazine3.in">team@magazine3.in</a>. <?php echo esc_html__( 'We will reply to your email address shortly' ,'critical-css-for-wp'); ?></strong>
 		
 			<ul>
 				<li>
@@ -335,18 +335,18 @@ function critical_css_support_settings_callback() {
 				</li>
 				<li>                    
 					<div><textarea rows="5" cols="60" id="ccfwp_query_message" name="ccfwp_query_message" placeholder="Write your query"></textarea></div>
-					<span class="ccfwp-query-success ccfwp_hide"><strong><?php echo ccfwp_t_string( 'Message sent successfully, Please wait we will get back to you shortly' ); ?></strong></span>
-					<span class="ccfwp-query-error ccfwp_hide"><strong><?php echo ccfwp_t_string( 'Message not sent. please check your network connection' ); ?></strong></span>
+					<span class="ccfwp-query-success ccfwp_hide"><strong><?php echo esc_html__( 'Message sent successfully, Please wait we will get back to you shortly' ,'critical-css-for-wp'); ?></strong></span>
+					<span class="ccfwp-query-error ccfwp_hide"><strong><?php echo esc_html__( 'Message not sent. please check your network connection' ,'critical-css-for-wp'); ?></strong></span>
 				</li>
 				<li>
-					<strong><?php echo ccfwp_t_string( 'Are you a premium customer ?' ); ?></strong>  
+					<strong><?php echo esc_html__( 'Are you a premium customer ?' ,'critical-css-for-wp'); ?></strong>  
 					<select id="ccfwp_query_premium_cus" name="ccfwp_query_premium_cus">                       
-						<option value=""><?php echo ccfwp_t_string( 'Select' ); ?></option>
-						<option value="yes"><?php echo ccfwp_t_string( 'Yes' ); ?></option>
-						<option value="no"><?php echo ccfwp_t_string( 'No' ); ?></option>
+						<option value=""><?php echo esc_html__( 'Select' ,'critical-css-for-wp'); ?></option>
+						<option value="yes"><?php echo esc_html__( 'Yes' ,'critical-css-for-wp'); ?></option>
+						<option value="no"><?php echo esc_html__( 'No' ,'critical-css-for-wp'); ?></option>
 					</select>                      
 				</li>
-				<li><button class="button ccfwp-send-query"><?php echo ccfwp_t_string( 'Send Message' ); ?></button></li>
+				<li><button class="button ccfwp-send-query"><?php echo esc_html__( 'Send Message' ,'critical-css-for-wp'); ?></button></li>
 			</ul>            
 					
 		</div>
@@ -372,22 +372,22 @@ function critical_css_advance_settings_callback() {
 	echo '<div class="ccfwp-section-container">';
 	if ( $post_types ) {
 			echo '<div class="ccfwp-section-content">';
-			echo '<h2> ' . ccfwp_t_string( 'Generate Critical Css For' ) . '</h2>';
+			echo '<h2> ' . esc_html__( 'Generate Critical Css For','critical-css-for-wp') . '</h2>';
 			echo '<ul>';
 			echo '<li>';
-			echo '<input class="" type="checkbox" name="ccfwp_settings[ccfwp_on_home]" value="1" ' . ( isset( $settings['ccfwp_on_home'] ) ? 'checked' : '' ) . ' /> ' . esc_html( 'Home' );
+			echo '<input class="" type="checkbox" name="ccfwp_settings[ccfwp_on_home]" value="1" ' . ( isset( $settings['ccfwp_on_home'] ) ? 'checked' : '' ) . ' /> ' . esc_html__( 'Home' ,'critical-css-for-wp');
 			echo '</li>';
 
 		foreach ( $post_types as $key => $value ) {
 			echo '<li>';
-			echo '<input class="" type="checkbox" name="ccfwp_settings[ccfwp_on_cp_type][' . esc_attr( $key ) . ']" value="1" ' . ( isset( $settings['ccfwp_on_cp_type'][ $key ] ) ? 'checked' : '' ) . ' /> ' . ucwords( esc_html( $value ) );
+			echo '<input class="" type="checkbox" name="ccfwp_settings[ccfwp_on_cp_type][' . esc_attr( $key ) . ']" value="1" ' . ( isset( $settings['ccfwp_on_cp_type'][ $key ] ) ? 'checked' : '' ) . ' /> ' .  esc_html( ucwords($value) ) ;
 			echo '</li>';
 		}
 
 		if ( $taxonomies ) {
 			foreach ( $taxonomies as $key => $value ) {
 				echo '<li>';
-				echo '<input class="" type="checkbox" name="ccfwp_settings[ccfwp_on_tax_type][' . esc_attr( $key ) . ']" value="1" ' . ( isset( $settings['ccfwp_on_tax_type'][ $key ] ) ? 'checked' : '' ) . ' /> ' . ucwords( esc_html( $value ) );
+				echo '<input class="" type="checkbox" name="ccfwp_settings[ccfwp_on_tax_type][' . esc_attr( $key ) . ']" value="1" ' . ( isset( $settings['ccfwp_on_tax_type'][ $key ] ) ? 'checked' : '' ) . ' /> ' . esc_html( ucwords( $value ) );
 				echo '</li>';
 			}
 		}
@@ -397,45 +397,45 @@ function critical_css_advance_settings_callback() {
 	}
 	echo '<div class="ccfwp-section-content">';
 
-	echo '<div class="ccfwp-heading-title">' . ccfwp_t_string( 'Pages to scan' );
+	echo '<div class="ccfwp-heading-title">' . esc_html__( 'Pages to scan' ,'critical-css-for-wp');
 	echo '<div class="ccfwp-tooltip-box"><span class="dashicons dashicons-info"></span>
-    <span class="ccfwp-tooltip-text">' . ccfwp_t_string( 'By default plugin will scan 30 urls and add that to processing queue. You can increase this value to quickly add pages to queue.In case your website seems slow you can decrease this value.We recommed not to increase this value above 1000.' ) . '</span>
+    <span class="ccfwp-tooltip-text">' . esc_html__( 'By default plugin will scan 30 urls and add that to processing queue. You can increase this value to quickly add pages to queue.In case your website seems slow you can decrease this value.We recommed not to increase this value above 1000.' ,'critical-css-for-wp') . '</span>
   </div></div>';
-	// echo '<p><strong>'.ccfwp_t_string('By default plugin will scan 30 urls and add that to processing queue. You can increase this value to quickly add pages to queue.In case your website seems slow you can decrease this value.We recommed not to increase this value above 1000.').'</strong><p>';
+	
 	$ccfwp_scan_urls = ( isset( $settings['ccfwp_scan_urls'] ) ) ? $settings['ccfwp_scan_urls'] : 30;
 	echo '<input type="text" value="' . esc_attr( $ccfwp_scan_urls ) . '" name="ccfwp_settings[ccfwp_scan_urls]">';
 
-	echo '<div class="ccfwp-heading-title">' . ccfwp_t_string( 'Pages to generate critical css' );
+	echo '<div class="ccfwp-heading-title">' . esc_html__( 'Pages to generate critical css' ,'critical-css-for-wp');
 	echo '<div class="ccfwp-tooltip-box"><span class="dashicons dashicons-info"></span>
-    <span class="ccfwp-tooltip-text">' . ccfwp_t_string( 'By default plugin will generate critical css for 4 urls in every 30 seconds. You can increase this value to  quickly generate critical css.In case your website seems slow you can decrease this value.We recommed not to increase this value above 12.' ) . '</span>
+    <span class="ccfwp-tooltip-text">' . esc_html__( 'By default plugin will generate critical css for 4 urls in every 30 seconds. You can increase this value to  quickly generate critical css.In case your website seems slow you can decrease this value.We recommed not to increase this value above 12.' ,'critical-css-for-wp') . '</span>
   </div></div>';
-	// echo '<p><strong>'.ccfwp_t_string('By default plugin will generate critical css for 4 urls in every 30 seconds. You can increase this value to  quickly generate critical css.In case your website seems slow you can decrease this value.We recommed not to increase this value above 12.').'</strong><p>';
+	
 	$ccfwp_generate_urls = ( isset( $settings['ccfwp_generate_urls'] ) ) ? $settings['ccfwp_generate_urls'] : 4;
 	echo '<input type="text" value="' . esc_attr( $ccfwp_generate_urls ) . '" name="ccfwp_settings[ccfwp_generate_urls]">';
 
-	echo '<div class="ccfwp-heading-title">' . ccfwp_t_string( 'CSS Defer' );
+	echo '<div class="ccfwp-heading-title">' . esc_html__( 'CSS Defer','critical-css-for-wp');
 	echo '<div class="ccfwp-tooltip-box"><span class="dashicons dashicons-info"></span>
-    <span class="ccfwp-tooltip-text">' . ccfwp_t_string( 'By default plugin our plugin will add critical css and defer css loading. You can disable the deferring  of css if you have any issue.' ) . '</span>
+    <span class="ccfwp-tooltip-text">' . esc_html__( 'By default plugin our plugin will add critical css and defer css loading. You can disable the deferring  of css if you have any issue.' ,'critical-css-for-wp') . '</span>
   </div></div>';
-	// echo '<p><strong>'.ccfwp_t_string('By default plugin our plugin will add critical css and defer css loading. You can disable the deferring  of css if you have any issue.').'</strong><p>';
+	
 	echo '<select name="ccfwp_settings[ccfwp_defer_css]">';
 	$ccwp_defer_on  = ( isset( $settings['ccfwp_defer_css'] ) && $settings['ccfwp_defer_css'] == 'on' ) ? 'selected' : '';
 	$ccwp_defer_off = ( isset( $settings['ccfwp_defer_css'] ) && $settings['ccfwp_defer_css'] == 'off' ) ? 'selected' : '';
-	echo '<option value="on" ' . esc_attr( $ccwp_defer_on ) . '>' . esc_html( 'Enable' ) . ' </option>';
-	echo '<option value="off" ' . esc_attr( $ccwp_defer_off ) . '>' . esc_html( 'Disable' ) . '</option></select>';
+	echo '<option value="on" ' . esc_attr( $ccwp_defer_on ) . '>' . esc_html__( 'Enable' ,'critical-css-for-wp') . ' </option>';
+	echo '<option value="off" ' . esc_attr( $ccwp_defer_off ) . '>' . esc_html__( 'Disable' ,'critical-css-for-wp') . '</option></select>';
 
-	echo '<div class="ccfwp-heading-title">' . ccfwp_t_string( 'CSS Defer Delay' );
+	echo '<div class="ccfwp-heading-title">' . esc_html__( 'CSS Defer Delay' ,'critical-css-for-wp');
 	echo '<div class="ccfwp-tooltip-box"><span class="dashicons dashicons-info"></span>
-    <span class="ccfwp-tooltip-text">' . ccfwp_t_string( 'Amount of time all css is deferred to load. You can add any value for delay which seems good for your website.This value is in milliseconds(ms). [1000ms = 1sec] ' ) . '</span>
+    <span class="ccfwp-tooltip-text">' . esc_html__( 'Amount of time all css is deferred to load. You can add any value for delay which seems good for your website.This value is in milliseconds(ms). [1000ms = 1sec] ','critical-css-for-wp') . '</span>
   </div></div>';
 	echo '<input type="number" value="' . esc_attr( intval( $settings['ccfwp_defer_time'] ) ) . '" name="ccfwp_settings[ccfwp_defer_time]"> ms';
 
-	echo '<div class="ccfwp-heading-title">' . ccfwp_t_string( 'Cache Alt path' );
+	echo '<div class="ccfwp-heading-title">' . esc_html__( 'Cache Alt path' ,'critical-css-for-wp');
 	echo '<div class="ccfwp-tooltip-box"><span class="dashicons dashicons-info"></span>
-    <span class="ccfwp-tooltip-text">' . ccfwp_t_string( 'Check this options if you critical css is getting overwritten or deleted ' ) . '</span>
+    <span class="ccfwp-tooltip-text">' . esc_html__( 'Check this options if you critical css is getting overwritten or deleted ' ,'critical-css-for-wp'). '</span>
   </div></div>';
 	$alt_check = ( isset( $settings['ccfwp_alt_cachepath'] ) && $settings['ccfwp_alt_cachepath'] == 1 ) ? 'checked' : '';
-	echo '<p><input type="checkbox" value="1" name="ccfwp_settings[ccfwp_alt_cachepath]" ' . $alt_check . '> Alternative cache path</p>';
+	echo '<p><input type="checkbox" value="1" name="ccfwp_settings[ccfwp_alt_cachepath]" ' . esc_attr($alt_check) . '> Alternative cache path</p>';
 
 	echo '</div>';
 	?>

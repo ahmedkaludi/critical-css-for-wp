@@ -6,7 +6,7 @@
  * Author: Magazine3
  * Author URI: https://magazine3.company/
  * Donate link: https://www.paypal.me/Kaludi/25
- * Text Domain:  criticalcssforwp
+ * Text Domain:  critical-css-for-wp
  * Domain Path: /languages
  * License: GPL2
  */
@@ -31,7 +31,7 @@ define( 'CRITICAL_CSS_FOR_WP_CSS_DIR_ALT', WP_CONTENT_DIR . '/ccwp-cache/css/' )
 
 require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR . 'includes/common.php';
 require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR . 'admin/settings.php';
-require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR . 'includes/class-critical-css.php';
+require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR . 'includes/class-critical-css-for-wp.php';
 
 
 add_action( 'admin_enqueue_scripts', 'ccfwp_admin_enqueue' );
@@ -43,7 +43,7 @@ function ccfwp_admin_enqueue( $check ) {
 		return;
 	}
 	wp_enqueue_script( 'ccfwp-datatable-script', CRITICAL_CSS_FOR_WP_PLUGIN_URI . '/admin/js/jquery.dataTables.min.js', array( 'jquery' ), CRITICAL_CSS_FOR_WP_VERSION, true );
-	wp_enqueue_style( 'ccfwp-datatable-style', CRITICAL_CSS_FOR_WP_PLUGIN_URI . '/admin/js/jquery.dataTables.min.css', CRITICAL_CSS_FOR_WP_VERSION );
+	wp_enqueue_style( 'ccfwp-datatable-style', CRITICAL_CSS_FOR_WP_PLUGIN_URI . '/admin/js/jquery.dataTables.min.css', array() ,CRITICAL_CSS_FOR_WP_VERSION );
 
 	$data = array(
 		'ccfwp_security_nonce' => wp_create_nonce( 'ccfwp_ajax_check_nonce' ),
@@ -64,6 +64,7 @@ function ccfwp_on_activate( $network_wide ) {
 	global $wpdb;
 
 	if ( is_multisite() && $network_wide ) {
+		//phpcs:ignore -- Reason: This is a multisite plugin activation.
 		$blog_ids = $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs" );
 		foreach ( $blog_ids as $blog_id ) {
 			switch_to_blog( $blog_id );
@@ -86,13 +87,13 @@ function ccfwp_on_install() {
 	if ( $wpdb->has_cap( 'collation' ) && ! empty( $wpdb->collate ) ) {
 		$charset_collate .= " COLLATE {$wpdb->collate}";
 	}
-
+	//phpcs:ignore -- Reason: No need to escape query
 	$found_engine = $wpdb->get_var( $wpdb->prepare( 'SELECT ENGINE FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` = %s AND `TABLE_NAME` = %s;', array( DB_NAME, $wpdb->prefix . 'posts' ) ) );
 
 	if ( strtolower( $found_engine ) == 'innodb' ) {
 		$engine = ' ENGINE=InnoDB';
 	}
-
+	//phpcs:ignore -- Reason:  No need to escape query
 	$found_tables = $wpdb->get_col( "SHOW TABLES LIKE '{$wpdb->prefix}critical_css%';" );
 
 	if ( ! in_array( "{$wpdb->prefix}critical_css_for_wp_urls", $found_tables ) ) {

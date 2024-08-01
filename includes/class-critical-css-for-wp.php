@@ -5,7 +5,7 @@
  * @since 1.0
  **/
 
-class Class_critical_css_for_wp {
+class Critical_Css_For_Wp {
 
 
 	public function cachepath() {
@@ -141,22 +141,23 @@ class Class_critical_css_for_wp {
 
 		global $wpdb, $table_prefix;
 			   $table_name = $table_prefix . 'critical_css_for_wp_urls';
+			   $table_name_escaped = esc_sql( $table_name );
 
 		$permalink = get_permalink( $post_id );
 		if ( ! empty( $permalink ) ) {
 
 			$permalink = $this->append_slash_permalink( $permalink );
-
-			$pid = $wpdb->get_var(
+			
+			$pid = $wpdb->get_var( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
-					'SELECT `url` FROM %i WHERE `url`=%s limit 1',
-					$table_name,
+					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+					"SELECT `url` FROM {$table_name_escaped} WHERE `url`=%s limit 1",
 					$permalink
 				)
 			);
 
 			if ( is_null( $pid ) ) {
-				$wpdb->insert(
+				$wpdb->insert( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 					$table_name,
 					array(
 						'url_id'     => $post_id,
@@ -164,17 +165,17 @@ class Class_critical_css_for_wp {
 						'type_name'  => get_post_type( $post_id ),
 						'url'        => $permalink,
 						'status'     => 'queue',
-						'created_at' => date( 'Y-m-d h:i:sa' ),
+						'created_at' => gmdate( 'Y-m-d h:i:sa' ),
 					),
 					array( '%d', '%s', '%s', '%s', '%s', '%s' )
 				);
 
 			} else {
-				$wpdb->update(
+				$wpdb->update( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 					$table_name,
 					array(
 						'status'     => 'queue',
-						'created_at' => date( 'Y-m-d h:i:sa' ),
+						'created_at' => gmdate( 'Y-m-d h:i:sa' ),
 					),
 					array( 'url'=> $permalink ),
 					array( '%s', '%s' ),
@@ -183,8 +184,8 @@ class Class_critical_css_for_wp {
 				$user_dirname = $this->cachepath();
 				$user_dirname = trailingslashit( $user_dirname );
 				$new_file     = $user_dirname . '/' . md5( $permalink ) . '.css';
-				if ( file_exists( $new_file ) ) {
-					@unlink( $new_file );
+				if ( ccwp_file_exists( $new_file ) ) {
+					wp_delete_file( $new_file );
 				}
 			}
 		}
@@ -205,22 +206,23 @@ class Class_critical_css_for_wp {
 		}
 		global  $wpdb, $table_prefix;
 				$table_name = $table_prefix . 'critical_css_for_wp_urls';
+				$table_name_escaped = esc_sql( $table_name );
 				$permalink  = get_term_link( $term );
 
 		if ( ! empty( $permalink ) ) {
 
 			$permalink = $this->append_slash_permalink( $permalink );
 
-			$pid = $wpdb->get_var(
+			$pid = $wpdb->get_var( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
-					'SELECT `url` FROM %i WHERE `url`=%s limit 1',
-					$table_name,
+					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+					"SELECT `url` FROM {$table_name_escaped} WHERE `url`=%s limit 1",
 					$permalink
 				)
 			);
 
 			if ( is_null( $pid ) ) {
-				$wpdb->insert(
+				$wpdb->insert( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 					$table_name,
 					array(
 						'url_id'     => $term->term_id,
@@ -228,17 +230,17 @@ class Class_critical_css_for_wp {
 						'type_name'  => $term->taxonomy,
 						'url'        => $permalink,
 						'status'     => 'queue',
-						'created_at' => date( 'Y-m-d h:i:sa' ),
+						'created_at' => gmdate( 'Y-m-d h:i:sa' ),
 					),
 					array( '%d', '%s', '%s', '%s', '%s', '%s' )
 				);
 
 			} else {
-				$wpdb->update(
+				$wpdb->update( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 					$table_name,
 					array(
 						'status'     => 'queue',
-						'created_at' => date( 'Y-m-d h:i:sa' ),
+						'created_at' => gmdate( 'Y-m-d h:i:sa' ),
 					),
 					array( 'url'=> $permalink ),
 					array( '%s', '%s' ),
@@ -248,8 +250,8 @@ class Class_critical_css_for_wp {
 				$user_dirname = $this->cachepath();
 				$user_dirname = trailingslashit( $user_dirname );
 				$new_file     = $user_dirname . '/' . md5( $user_dirname ) . '.css';
-				if ( file_exists( $new_file ) ) {
-					@unlink( $new_file );
+				if ( ccwp_file_exists( $new_file ) ) {
+					wp_delete_file( $new_file );
 				}
 			}
 		}
@@ -270,13 +272,16 @@ class Class_critical_css_for_wp {
 				}
 			}
 		}
-		    $imploded_types = implode("', '", $post_types);
+		    
+			$post_types = array_map('esc_sql', $post_types);
+			$imploded_types = "'" . implode("','", $post_types) . "'";
 			$start = get_option( 'ccfwp_current_post' ) ? get_option( 'ccfwp_current_post' ) : 0;
 			$limit = ( get_option( 'ccfwp_scan_urls' ) > 0 ) ? intval( get_option( 'ccfwp_scan_urls' ) ) : 30;
-			$posts = $wpdb->get_results(
+			$posts = $wpdb->get_results( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
+					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
 					"SELECT `ID` FROM $wpdb->posts WHERE post_status='publish' AND ID > %d
-					AND post_type IN('".stripslashes(esc_sql($imploded_types))."') LIMIT %d",
+					AND post_type IN($imploded_types) LIMIT %d", //phpcs:ignore -- Reason: $imploded is escaped above.
 					$start,
 					$limit
 				),
@@ -297,6 +302,7 @@ class Class_critical_css_for_wp {
 
 		global $wpdb, $table_prefix;
 		$table_name = $table_prefix . 'critical_css_for_wp_urls';
+		$table_name_escaped = esc_sql( $table_name );
 
 		$settings = critical_css_defaults();
 		$urls_to  = array();
@@ -311,17 +317,17 @@ class Class_critical_css_for_wp {
 
 			foreach ( $urls_to as $key => $value ) {
 
-				$pid = $wpdb->get_var(
+				$pid = $wpdb->get_var( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 					$wpdb->prepare(
-						'SELECT `url` FROM %i WHERE `url`=%s limit 1',
-						$table_name,
+						//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+						"SELECT `url` FROM {$table_name_escaped} WHERE `url`=%s limit 1",
 						$value
 					)
 				);
 				$id  = ( $key++ ) + 999999999;
 				if ( is_null( $pid ) ) {
 
-					$wpdb->insert(
+					$wpdb->insert( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 						$table_name,
 						array(
 							'url_id'     => $id,
@@ -329,16 +335,16 @@ class Class_critical_css_for_wp {
 							'type_name'  => 'others',
 							'url'        => $value,
 							'status'     => 'queue',
-							'created_at' => date( 'Y-m-d' ),
+							'created_at' => gmdate( 'Y-m-d' ),
 						),
 						array( '%d', '%s', '%s', '%s', '%s', '%s' )
 					);
 
 				} else {
-					$wpdb->query(
+					$wpdb->query( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 						$wpdb->prepare(
-							'UPDATE %i SET `url` = %s WHERE `url_id` = %d',
-							$table_name,
+							//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+							"UPDATE {$table_name_escaped} SET `url` = %s WHERE `url_id` = %d",
 							$value,
 							$id
 						)
@@ -352,8 +358,9 @@ class Class_critical_css_for_wp {
 
 	public function save_terms_urls() {
 
-		global $wpdb, $table_prefix;
-		$table_name = $table_prefix . 'critical_css_for_wp_urls';
+		global $wpdb;
+		$table_name = $wpdb->term_taxonomy;
+		$table_name_escaped = esc_sql( $table_name );
 
 		$settings = critical_css_defaults();
 
@@ -366,14 +373,16 @@ class Class_critical_css_for_wp {
 				}
 			}
 		}
-			$imploded_types = implode('\', \'', $taxonomy_types);
+			$taxonomy_types_escaped = array_map('esc_sql', $taxonomy_types);
+			$imploded_types_escaped = "'" . implode("','", $taxonomy_types_escaped) . "'";
+			
 			$start = get_option( 'ccfwp_current_term' ) ? get_option( 'ccfwp_current_term' ) : 0;
 			$limit = ( get_option( 'ccfwp_scan_urls' ) > 0 ) ? intval( get_option( 'ccfwp_scan_urls' ) ) : 30;
-			$terms = $wpdb->get_results(
+			$terms = $wpdb->get_results( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
-					"SELECT `term_id`, `taxonomy` FROM %i
-					WHERE  taxonomy IN('".stripslashes(esc_sql($imploded_types))."') AND term_id> %d LIMIT %d",
-					$wpdb->term_taxonomy,
+					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+					"SELECT `term_id`, `taxonomy` FROM {$table_name_escaped}
+					WHERE  taxonomy IN({$imploded_types_escaped}) AND term_id> %d LIMIT %d", //phpcs:ignore -- Reason: $imploded_types_escaped is escaped above.
 					$start,
 					$limit
 				),
@@ -501,19 +510,12 @@ class Class_critical_css_for_wp {
 				$critical_css = str_replace( "url('wp-content/", "url('" . get_site_url() . '/wp-content/', $critical_css );
 				$critical_css = str_replace( 'url("wp-content/', 'url("' . get_site_url() . '/wp-content/', $critical_css );
 				$new_file     = $user_dirname . '/' . md5( $targetUrl ) . '.css';
-				$ifp          = @fopen( $new_file, 'w+' );
-			if ( ! $ifp ) {
-				return array(
-					'status'  => false,
-					'message' => sprintf( __( 'Could not write file %s' ), $new_file ),
-				);
-			}
-				$result = @fwrite( $ifp, $critical_css );
-				fclose( $ifp );
+
+				$result = ccwp_file_put_contents( $new_file, $critical_css );
 			if ( $result ) {
 				return array(
 					'status'  => true,
-					'message' => 'Css creted sussfully',
+					'message' => 'CSS created sucessfully',
 				);
 			} else {
 				return array(
@@ -533,13 +535,14 @@ class Class_critical_css_for_wp {
 
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'critical_css_for_wp_urls';
+		$table_name_escaped = esc_sql( $table_name );
 		$settings   = critical_css_defaults();
 		$limit      = ( intval( $settings['ccfwp_generate_urls'] ) > 0 ) ? intval( $settings['ccfwp_generate_urls'] ) : 4;
 
-		$result = $wpdb->get_results(
+		$result = $wpdb->get_results( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 			$wpdb->prepare(
-				'SELECT * FROM %i WHERE `status` IN  (%s) LIMIT %d',
-				$table_name,
+				//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+				"SELECT * FROM {$table_name_escaped} WHERE `status` IN  (%s) LIMIT %d",
 				'queue',
 				$limit
 			),
@@ -583,14 +586,15 @@ class Class_critical_css_for_wp {
 
 		global $wpdb, $table_prefix;
 		$table_name = $table_prefix . 'critical_css_for_wp_urls';
+		$table_name_escaped = esc_sql( $table_name );
 
-		$result = $wpdb->query(
+		$result = $wpdb->query( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 			$wpdb->prepare(
-				'UPDATE %i SET `status` = %s,  `cached_name` = %s,  `updated_at` = %s,  `failed_error` = %s WHERE `url` = %s',
-				$table_name,
+				//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+				"UPDATE {$table_name_escaped} SET `status` = %s,  `cached_name` = %s,  `updated_at` = %s,  `failed_error` = %s WHERE `url` = %s",
 				$status,
 				$cached_name,
-				date( 'Y-m-d h:i:sa' ),
+				gmdate( 'Y-m-d h:i:sa' ),
 				$failed_error,
 				$url
 			)
@@ -625,6 +629,7 @@ class Class_critical_css_for_wp {
 		$settings     = critical_css_defaults();
 		global $wp, $wpdb, $table_prefix;
 			   $table_name = $table_prefix . 'critical_css_for_wp_urls';
+			   $table_name_escaped = esc_sql( $table_name );
 
 		$url = home_url( $wp->request );
 		if ( class_exists( 'FlexMLS_IDX' ) && isset( $_SESSION['ccwp_current_uri'] ) ) {
@@ -635,21 +640,21 @@ class Class_critical_css_for_wp {
 			$custom_css = '.elementor-location-footer:before{content:"";display:table;clear:both;}.elementor-icon-list-items .elementor-icon-list-item .elementor-icon-list-text{display:inline-block;}.elementor-posts__hover-gradient .elementor-post__card .elementor-post__thumbnail__link:after {display: block;content: "";background-image: -o-linear-gradient(bottom,rgba(0,0,0,.35) 0,transparent 75%);background-image: -webkit-gradient(linear,left bottom,left top,from(rgba(0,0,0,.35)),color-stop(75%,transparent));background-image: linear-gradient(0deg,rgba(0,0,0,.35),transparent 75%);background-repeat: no-repeat;height: 100%;width: 100%;position: absolute;bottom: 0;opacity: 1;-webkit-transition: all .3s ease-out;-o-transition: all .3s ease-out;transition: all .3s ease-out;}';
 		}
 		$url = trailingslashit( $url );
-		if ( file_exists( $user_dirname . md5( $url ) . '.css' ) ) {
+		if ( ccwp_file_exists( $user_dirname . md5( $url ) . '.css' ) ) {
 			$css      = '';
-			$response = file_get_contents( $user_dirname . md5( $url ) . '.css' ); // wp_remote_get() uses url of file, not DIR url of file that is why we need to use file_get_contents()
+			$response = ccwp_file_get_contents( $user_dirname . md5( $url ) . '.css' ); 
 			if ( $response ) {
 				$css = $response;
 			}
 			$css .= $custom_css;
 			$css  = $this->ccwp_clean_css($css);
 
-			echo "<style type='text/css' id='critical-css-for-wp'>$css</style>";
+			echo "<style type='text/css' id='critical-css-for-wp'>".esc_html($css)."</style>";
 		} else {
-			$wpdb->query(
+			$wpdb->query( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
-					'UPDATE %i SET `status` = %s,  `cached_name` = %s WHERE `url` = %s',
-					$table_name,
+					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+					"UPDATE {$table_name_escaped} SET `status` = %s,  `cached_name` = %s WHERE `url` = %s",
 					'queue',
 					'',
 					$url
@@ -759,7 +764,7 @@ class Class_critical_css_for_wp {
 			$url = home_url( $wp->request );
 		}
 		$url = trailingslashit( $url );
-		return file_exists( $user_dirname . md5( $url ) . '.css' ) ? true : false;
+		return ccwp_file_exists( $user_dirname . md5( $url ) . '.css' ) ? true : false;
 	}
 
 	function ccwp_get_atts_string( $atts_array ) {
@@ -806,15 +811,16 @@ class Class_critical_css_for_wp {
 
 		global $wpdb, $table_prefix;
 		$table_name = $table_prefix . 'critical_css_for_wp_urls';
+		$table_name_escaped = esc_sql( $table_name );
 
 		$url_id = ! empty( $_POST['url_id'] ) ? intval( $_POST['url_id'] ) : null;
 
 		if ( $url_id ) {
 
-			$result = $wpdb->query(
+			$result = $wpdb->query( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
-					'UPDATE %i SET `status` = %s, `cached_name` = %s, `failed_error` = %s WHERE `id` = %d',
-					$table_name,
+					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+					"UPDATE {$table_name_escaped} SET `status` = %s, `cached_name` = %s, `failed_error` = %s WHERE `id` = %d",
 					'queue',
 					'',
 					'',
@@ -848,11 +854,12 @@ class Class_critical_css_for_wp {
 		$offset = $page * $limit;
 		global $wpdb, $table_prefix;
 		$table_name = $table_prefix . 'critical_css_for_wp_urls';
+		$table_name_escaped = esc_sql( $table_name );
 
-		$result = $wpdb->get_results(
+		$result = $wpdb->get_results( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 			$wpdb->prepare(
-				'SELECT * FROM %i WHERE `status` = %s LIMIT %d, %d',
-				$table_name,
+				//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+				"SELECT * FROM {$table_name_escaped} WHERE `status` = %s LIMIT %d, %d",
 				'cached',
 				$offset,
 				$limit
@@ -864,11 +871,11 @@ class Class_critical_css_for_wp {
 			$user_dirname = $this->cachepath();
 			foreach ( $result as $value ) {
 
-				if ( ! file_exists( $user_dirname . $value['cached_name'] . '.css' ) ) {
-					$updated = $wpdb->query(
+				if ( ! ccwp_file_exists( $user_dirname . $value['cached_name'] . '.css' ) ) {
+					$updated = $wpdb->query( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 						$wpdb->prepare(
-							'UPDATE %i SET `status` = %s,  `cached_name` = %s WHERE `url` = %s',
-							$table_name,
+							//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+							"UPDATE {$table_name_escaped} SET `status` = %s,  `cached_name` = %s WHERE `url` = %s",
 							'queue',
 							'',
 							$value['url']
@@ -907,11 +914,12 @@ class Class_critical_css_for_wp {
 
 		global $wpdb, $table_prefix;
 		$table_name = $table_prefix . 'critical_css_for_wp_urls';
+		$table_name_escaped = esc_sql( $table_name );
 
-		$result = $wpdb->query(
+		$result = $wpdb->query( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 			$wpdb->prepare(
-				'UPDATE %i SET `status` = %s, `cached_name` = %s, `failed_error` = %s WHERE `status` = %s',
-				$table_name,
+				//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+				"UPDATE {$table_name_escaped} SET `status` = %s, `cached_name` = %s, `failed_error` = %s WHERE `status` = %s",
 				'queue',
 				'',
 				'',
@@ -938,7 +946,9 @@ class Class_critical_css_for_wp {
 
 		global $wpdb;
 		$table  = $wpdb->prefix . 'critical_css_for_wp_urls';
-		$result = $wpdb->query( "TRUNCATE TABLE {$table}" );
+		$table_escaped = esc_sql( $table );
+		//phpcs:ignore -- Reason: $table_escaped is escaped above.
+		$result = $wpdb->query( "TRUNCATE TABLE {$table_escaped }" );
 		update_option( 'ccfwp_current_post', 0 );
 		update_option( 'ccfwp_current_term', 0 );
 		$dir = $this->cachepath();
@@ -970,21 +980,22 @@ class Class_critical_css_for_wp {
 
 		global $wpdb, $table_prefix;
 		$table_name = $table_prefix . 'critical_css_for_wp_urls';
+		$table_name_escaped = esc_sql( $table_name );
 
 		if ( ! empty( $_GET['search']['value'] ) ) {
 			$search      = sanitize_text_field( $_GET['search']['value'] );
-			$total_count = $wpdb->get_var(
+			$total_count = $wpdb->get_var( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
-					'SELECT COUNT(*) FROM %i WHERE `url` LIKE %s ',
-					$table_name,
+					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+					"SELECT COUNT(*) FROM {$table_name_escaped} WHERE `url` LIKE %s ",
 					'%' . $wpdb->esc_like( $search ) . '%'
 				),
 			);
 
-			$result = $wpdb->get_results(
+			$result = $wpdb->get_results( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
-					'SELECT * FROM %i WHERE `url` LIKE %s LIMIT %d, %d',
-					$table_name,
+					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+					"SELECT * FROM {$table_name_escaped} WHERE `url` LIKE %s LIMIT %d, %d",
 					'%' . $wpdb->esc_like( $search ) . '%',
 					$offset,
 					$length
@@ -992,11 +1003,12 @@ class Class_critical_css_for_wp {
 				ARRAY_A
 			);
 		} else {
-			$total_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table_name ) );
-			$result      = $wpdb->get_results(
+			//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+			$total_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name_escaped}");
+			$result      = $wpdb->get_results( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
-					'SELECT * FROM %i LIMIT %d, %d',
-					$table_name,
+					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+					"SELECT * FROM {$table_name_escaped} LIMIT %d, %d",
 					$offset,
 					$length
 				),
@@ -1012,9 +1024,9 @@ class Class_critical_css_for_wp {
 
 				if ( $value['status'] == 'cached' ) {
 					$user_dirname = $this->cachepath();
-					$size         = @filesize( $user_dirname . '/' . md5( trailingslashit( $value['url'] ) ) . '.css' );
+					$size         = ccwp_file_exists($user_dirname . '/' . md5( trailingslashit( $value['url'] )). '.css' )?filesize( $user_dirname . '/' . md5( trailingslashit( $value['url'] ) ) . '.css' ):'';
 					if ( ! $size ) {
-						$size = '<abbr title="' . ccfwp_t_string( 'File is not in cached directory. Please recheck in advance option' ) . '">' . ccfwp_t_string( 'Deleted' ) . '</abbr>';
+						$size = '<abbr title="' . esc_attr__( 'File is not in cached directory. Please recheck in advance option' ,'critical-css-for-wp') . '">' . esc_html( 'Deleted' ,'critical-css-for-wp') . '</abbr>';
 					}
 				}
 
@@ -1060,22 +1072,23 @@ class Class_critical_css_for_wp {
 
 		global $wpdb, $table_prefix;
 		$table_name = $table_prefix . 'critical_css_for_wp_urls';
+		$table_name_escaped = esc_sql( $table_name );
 
 		if ( ! empty( $_GET['search']['value'] ) ) {
 			$search      = sanitize_text_field( $_GET['search']['value'] );
-			$total_count = $wpdb->get_var(
-				$wpdb->prepare(
-					'SELECT COUNT(*) FROM  %i WHERE `url` LIKE %s AND `status`=%s',
-					$table_name,
+			$total_count = $wpdb->get_var( //phpcs:ignore -- Reason: Using custom query on non-core tables.
+				$wpdb->prepare( 
+					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+					"SELECT COUNT(*) FROM  {$table_name_escaped} WHERE `url` LIKE %s AND `status`=%s",
 					'%' . $wpdb->esc_like( $search ) . '%',
 					'cached'
 				),
 			);
 
-			$result = $wpdb->get_results(
+			$result = $wpdb->get_results( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
-					'SELECT * FROM %i WHERE `url` LIKE %s AND `status`=%s LIMIT %d, %d',
-					$table_name,
+					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+					"SELECT * FROM {$table_name_escaped} WHERE `url` LIKE %s AND `status`=%s LIMIT %d, %d",
 					'%' . $wpdb->esc_like( $search ) . '%',
 					'cached',
 					$offset,
@@ -1084,11 +1097,12 @@ class Class_critical_css_for_wp {
 				ARRAY_A
 			);
 		} else {
-			$total_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i Where `status`=%s', $table_name, 'cached' ) );
-			$result      = $wpdb->get_results(
+			//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+			$total_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_name_escaped} Where `status`=%s", 'cached' ) );
+			$result      = $wpdb->get_results( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
-					'SELECT * FROM %i Where `status`=%s LIMIT %d, %d',
-					$table_name,
+					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+					"SELECT * FROM {$table_name_escaped} Where `status`=%s LIMIT %d, %d",
 					'cached',
 					$offset,
 					$length
@@ -1105,8 +1119,12 @@ class Class_critical_css_for_wp {
 
 				if ( $value['status'] == 'cached' ) {
 					$user_dirname = $this->cachepath();
-					$size         = @filesize( $user_dirname . '/' . md5( $value['url'] ) . '.css' );
+					if(ccwp_file_exists($user_dirname . '/' . md5( $value['url'] ) . '.css' )){
+						$size         = filesize( $user_dirname . '/' . md5( $value['url'] ) . '.css' );
+					}else{
+						$size = '<abbr title="' . esc_attr__( 'File is not in cached directory. Please recheck in advance option' ,'critical-css-for-wp') . '">' . esc_html__( 'Deleted' ,'critical-css-for-wp') . '</abbr>';
 				}
+			}
 
 				$formated_result[] = array(
 					'<abbr title="' . esc_attr( $value['cached_name'] ) . '">' . esc_url( $value['url'] ) . '</abbr>',
@@ -1151,22 +1169,23 @@ class Class_critical_css_for_wp {
 
 		global $wpdb, $table_prefix;
 		$table_name = $table_prefix . 'critical_css_for_wp_urls';
+		$table_name_escaped = esc_sql( $table_name );
 
 		if ( isset( $_GET['search']['value'] ) && $_GET['search']['value'] ) {
 			$search      = sanitize_text_field( $_GET['search']['value'] );
-			$total_count = $wpdb->get_var(
+			$total_count = $wpdb->get_var( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
-					'SELECT COUNT(*) FROM %i WHERE `url` LIKE %s AND `status`=%s',
-					$table_name,
+					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+					"SELECT COUNT(*) FROM {$table_name_escaped} WHERE `url` LIKE %s AND `status`=%s",
 					'%' . $wpdb->esc_like( $search ) . '%',
 					'failed'
 				),
 			);
 
-			$result = $wpdb->get_results(
+			$result = $wpdb->get_results( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
-					'SELECT * FROM %i WHERE `url` LIKE %s AND `status`=%s LIMIT %d, %d',
-					$table_name,
+					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+					"SELECT * FROM {$table_name_escaped} WHERE `url` LIKE %s AND `status`=%s LIMIT %d, %d",
 					'%' . $wpdb->esc_like( $search ) . '%',
 					'failed',
 					$offset,
@@ -1175,11 +1194,12 @@ class Class_critical_css_for_wp {
 				ARRAY_A
 			);
 		} else {
-			$total_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i  Where `status`=%s', $table_name, 'failed' ) );
-			$result      = $wpdb->get_results(
+			//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+			$total_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_name_escaped} Where `status`=%s", 'failed' ) );
+			$result      = $wpdb->get_results( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
-					'SELECT * FROM %i Where `status`=%s LIMIT %d, %d',
-					$table_name,
+					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+					"SELECT * FROM {$table_name_escaped} Where `status`=%s LIMIT %d, %d",
 					'failed',
 					$offset,
 					$length
@@ -1196,14 +1216,14 @@ class Class_critical_css_for_wp {
 
 				if ( $value['status'] == 'cached' ) {
 					$user_dirname = $this->cachepath();
-					$size         = filesize( $user_dirname . '/' . md5( $value['url'] ) . '.css' );
+					$size         =ccwp_file_exists($user_dirname . '/' . md5( $value['url'] ) . '.css')?filesize( $user_dirname . '/' . md5( $value['url'] ) . '.css' ):'';
 				}
 
 				$formated_result[] = array(
 					'<div>' . esc_url( $value['url'] ) . ' <a href="#" data-section="failed" data-id="' . esc_attr( $value['id'] ) . '" class="cwvpb-resend-single-url dashicons dashicons-controls-repeat"></a></div>',
 					'<span class="cwvpb-status-t">' . esc_html( $value['status'] ) . '</span>',
 					esc_html( $value['updated_at'] ),
-					'<div><a data-id="id-' . esc_attr( $value['id'] ) . '" href="#" class="cwb-copy-urls-error button button-secondary">' . ccfwp_t_string( 'Copy Error' ) . '</a><input id="id-' . esc_attr( $value['id'] ) . '" class="cwb-copy-urls-text" type="hidden" value="' . esc_attr( $value['failed_error'] ) . '"></div>',
+					'<div><a data-id="id-' . esc_attr( $value['id'] ) . '" href="#" class="cwb-copy-urls-error button button-secondary">' . esc_html__( 'Copy Error' ,'critical-css-for-wp') . '</a><input id="id-' . esc_attr( $value['id'] ) . '" class="cwb-copy-urls-text" type="hidden" value="' . esc_attr( $value['failed_error'] ) . '"></div>',
 				);
 			}
 		}
@@ -1240,22 +1260,23 @@ class Class_critical_css_for_wp {
 
 		global $wpdb, $table_prefix;
 		$table_name = $table_prefix . 'critical_css_for_wp_urls';
+		$table_name_escaped = esc_sql( $table_name );
 
 		if ( isset( $_GET['search']['value'] ) && $_GET['search']['value'] ) {
 			$search      = sanitize_text_field( $_GET['search']['value'] );
-			$total_count = $wpdb->get_var(
+			$total_count = $wpdb->get_var( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
-					'SELECT COUNT(*) FROM %i WHERE `url` LIKE %s AND `status`=%s',
-					$table_name,
+					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+					"SELECT COUNT(*) FROM {$table_name_escaped} WHERE `url` LIKE %s AND `status`=%s",
 					'%' . $wpdb->esc_like( $search ) . '%',
 					'queue'
 				),
 			);
 
-			$result = $wpdb->get_results(
+			$result = $wpdb->get_results( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
-					'SELECT * FROM %i WHERE `url` LIKE %s AND `status`=%s LIMIT %d, %d',
-					$table_name,
+					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+					"SELECT * FROM {$table_name_escaped} WHERE `url` LIKE %s AND `status`=%s LIMIT %d, %d",
 					'%' . $wpdb->esc_like( $search ) . '%',
 					'queue',
 					$offset,
@@ -1264,11 +1285,12 @@ class Class_critical_css_for_wp {
 				ARRAY_A
 			);
 		} else {
-			$total_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i Where `status`=%s', $table_name, 'queue' ) );
-			$result      = $wpdb->get_results(
+			//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+			$total_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_name_escaped} Where `status`=%s", 'queue' ) );
+			$result      = $wpdb->get_results( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
-					'SELECT * FROM %i Where `status`=%s LIMIT %d, %d',
-					$table_name,
+					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
+					"SELECT * FROM {$table_name_escaped} Where `status`=%s LIMIT %d, %d",
 					'queue',
 					$offset,
 					$length
@@ -1285,7 +1307,7 @@ class Class_critical_css_for_wp {
 				$size = '';
 				if ( $value['status'] == 'cached' ) {
 					$user_dirname = $this->cachepath();
-					$size         = filesize( $user_dirname . '/' . md5( $value['url'] ) . '.css' );
+					$size         = ccwp_file_exists($user_dirname . '/' . md5( $value['url'] ) . '.css')?filesize( $user_dirname . '/' . md5( $value['url'] ) . '.css' ):'';
 				}
 
 				$formated_result[] = array(
@@ -1369,5 +1391,5 @@ class Class_critical_css_for_wp {
 
 }
 
-$ccfwpgeneralcriticalCss = new Class_critical_css_for_wp();
+$ccfwpgeneralcriticalCss = new Critical_Css_For_Wp();
 $ccfwpgeneralcriticalCss->critical_hooks();

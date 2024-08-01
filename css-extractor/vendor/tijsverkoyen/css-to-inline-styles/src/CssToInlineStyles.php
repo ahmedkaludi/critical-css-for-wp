@@ -113,12 +113,19 @@ class CssToInlineStyles
     {
         $document = new \DOMDocument('1.0', 'UTF-8');
         $internalErrors = libxml_use_internal_errors(true);
-        $document->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+        
+        // Convert HTML entities to numeric entities
+        $html = htmlentities($html, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    
+        // Load the HTML into the DOMDocument
+        $document->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    
         libxml_use_internal_errors($internalErrors);
         $document->formatOutput = true;
-
+    
         return $document;
     }
+    
 
     /**
      * @param \DOMDocument $document

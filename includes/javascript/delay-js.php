@@ -166,7 +166,7 @@ function ccwp_delay_js_load() {
 	}
 
 	$ccfwp_defer_time = intval( $settings['ccfwp_defer_time'] );
-		$js_content   = '<script type="text/javascript" id="ccwp-delayed-scripts" data-two-no-delay="true">
+		echo '<script type="text/javascript" id="ccwp-delayed-scripts" data-two-no-delay="true">
 			let ccwpDOMLoaded=!1;
 			let ccwp_loaded = false;
 			let resources_length=0;
@@ -320,6 +320,4 @@ function ccwp_delay_js_load() {
                 return link;
             }
 			</script>';
-
-	echo $js_content;
 }

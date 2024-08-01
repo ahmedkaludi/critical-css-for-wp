@@ -69,6 +69,88 @@ add_action(
 	},
 	999
 );
-function ccfwp_t_string( $string ) {
-	return esc_html__( $string, 'criticalcssforwp' );
+/**
+ * Get the contents of a file using the WP Filesystem API
+ *
+ * @param string $file_path The path to the file
+ *
+ * @return string|bool The contents of the file or false on failure
+ */
+
+function ccwp_file_get_contents($file_path) {
+    global $wp_filesystem;
+
+    if (!function_exists('WP_Filesystem')) {
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+    }
+
+    if (!WP_Filesystem()) {
+        return false; 
+    }
+
+    // Check if file exists
+    if (!$wp_filesystem->exists($file_path)) {
+        return false; 
+    }
+
+
+    return $wp_filesystem->get_contents($file_path);
+}
+/*
+ * Write the contents to a file using the WP Filesystem API
+ *
+ * @param string $file_path The path to the file
+ * @param string $content The content to write to the file
+ * @param int $mode Optional. The file permissions as octal number. Default: FS_CHMOD_FILE
+ * @param bool $append Optional. Whether to append the content to the file. Default: false
+ *
+ * @return bool True on success, false on failure
+ */
+function ccwp_file_put_contents($file_path, $content, $mode = 0644 , $append = false) {
+    global $wp_filesystem;
+
+    // Ensure WP Filesystem is loaded
+    if (!function_exists('WP_Filesystem')) {
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+    }
+
+    if (!WP_Filesystem()) {
+        return false; 
+    }
+
+
+    if ($append && $wp_filesystem->exists($file_path)) {
+
+        $existing_content = $wp_filesystem->get_contents($file_path);
+        if ($existing_content === false) {
+            return false; 
+        }
+
+        $content = $existing_content . $content;
+    }
+
+    // Write the content to the file
+    return $wp_filesystem->put_contents($file_path, $content, $mode);
+}
+/*
+ * Check if a file exists using the WP Filesystem API
+ *
+ * @param string $file_path The path to the file
+ *
+ * @return bool True if the file exists, false otherwise
+ */
+function ccwp_file_exists($file_path) {
+    global $wp_filesystem;
+
+
+    if (!function_exists('WP_Filesystem')) {
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+    }
+
+    if (!WP_Filesystem()) {
+        return false; 
+    }
+
+
+    return $wp_filesystem->exists($file_path);
 }

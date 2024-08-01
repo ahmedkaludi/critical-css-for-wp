@@ -7,7 +7,7 @@ Stable tag: 1.0.15
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-
+Critical CSS For WP removes the unused CSS which helps to paint fast and render the above fold content, before downloading the complete css files.
 == Description ==
 
 Critical CSS For WP removes the unused CSS which helps to paint fast and render the above fold content, before downloading the complete css files. We intends to provide great experience to the web page visitors by improving the performance of the web page.
