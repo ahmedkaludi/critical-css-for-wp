@@ -76,23 +76,37 @@ class Critical_Css_For_Wp {
 
 		add_filter( 'cron_schedules', array( $this, 'isa_add_every_one_hour_crtlcss' ) );
 		if ( ! wp_next_scheduled( 'isa_add_every_one_hour_crtlcss' ) ) {
-			wp_schedule_event( time(), 'every_one_hour', 'isa_add_every_one_hour_crtlcss' );
+			if($this->ccfwp_is_wpcron_active()){
+				wp_schedule_event( time(), 'every_one_hour', 'isa_add_every_one_hour_crtlcss' );
+			}
+			
 		}
 		add_action( 'isa_add_every_one_hour_crtlcss', array( $this, 'every_one_minutes_event_func_crtlcss' ) );
-		if ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON == true ) {
-			add_action( 'current_screen', array( $this, 'ccfwp_custom_critical_css_generate' ) );
-		}
+		add_action( 'current_screen', array( $this, 'ccfwp_custom_critical_css_generate' ) );
 	}
 	public function ccwp_flexmls_fix() {
 		$_SESSION['ccwp_current_uri'] = isset($_SERVER['REQUEST_URI'])?$_SERVER['REQUEST_URI']:'';
 	}
 	public function ccfwp_custom_critical_css_generate() {
-		if ( is_admin() ) {
-			$current_screen = get_current_screen();
-			if ( isset( $current_screen->id ) && $current_screen->id == 'toplevel_page_critical-css-for-wp' ) {
-				$this->every_one_minutes_event_func_crtlcss();
+		$settings = critical_css_defaults();
+		$ccfwp_generate_css = isset($settings['ccfwp_generate_css'])?$settings['ccfwp_generate_css']:'off';
+			if ( is_admin() && !$this->ccfwp_is_wpcron_active() && $ccfwp_generate_css == 'on') {
+				$ccwp_last_cron_update = get_option( 'ccwp_last_altcron_update' , 0 );
+				if( $ccwp_last_cron_update < strtotime( '-1 minute' ) ) {
+					$this->every_one_minutes_event_func_crtlcss();
+					update_option( 'ccwp_last_altcron_update', time() );
+				}
 			}
+	}
+
+	private function ccfwp_is_wpcron_active(){
+		if(!defined( 'DISABLE_WP_CRON' )){
+			return true;
 		}
+		if ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON == false ) {
+			return true;
+		}
+		return false;
 	}
 	public function on_term_create( $term_id, $tt_id, $taxonomy ) {
 

@@ -424,6 +424,20 @@ function critical_css_advance_settings_callback() {
 	echo '<option value="on" ' . esc_attr( $ccwp_defer_on ) . '>' . esc_html__( 'Enable' ,'critical-css-for-wp') . ' </option>';
 	echo '<option value="off" ' . esc_attr( $ccwp_defer_off ) . '>' . esc_html__( 'Disable' ,'critical-css-for-wp') . '</option></select>';
 
+	echo '<div class="ccfwp-heading-title">' . esc_html__( 'Generate CSS on Plugin Page reload','critical-css-for-wp');
+	echo '<div class="ccfwp-tooltip-box"><span class="dashicons dashicons-info"></span>
+    <span class="ccfwp-tooltip-text">' . esc_html__( 'This option will only work when WP cron is disabled. Critical CSS will be generated plugin page is visited. There will be a gap of 1 minutes between two consecutive requests' ,'critical-css-for-wp') . '</span>
+  </div></div>';
+	
+	echo '<select name="ccfwp_settings[ccfwp_generate_css]">';
+	$ccwp_generate_on  = ( isset( $settings['ccfwp_generate_css'] ) && $settings['ccfwp_generate_css'] == 'on' ) ? 'selected' : '';
+	$ccwp_generate_off = ( isset( $settings['ccfwp_generate_css'] ) && $settings['ccfwp_generate_css'] == 'off' ) ? 'selected' : '';
+	if(!$ccwp_generate_on){
+		$ccwp_generate_off = 'selected';
+	}
+	echo '<option value="on" ' . esc_attr( $ccwp_generate_on ) . '>' . esc_html__( 'Enable' ,'critical-css-for-wp') . ' </option>';
+	echo '<option value="off" ' . esc_attr( $ccwp_generate_off ) . '>' . esc_html__( 'Disable' ,'critical-css-for-wp') . '</option></select>';
+
 	echo '<div class="ccfwp-heading-title">' . esc_html__( 'CSS Defer Delay' ,'critical-css-for-wp');
 	echo '<div class="ccfwp-tooltip-box"><span class="dashicons dashicons-info"></span>
     <span class="ccfwp-tooltip-text">' . esc_html__( 'Amount of time all css is deferred to load. You can add any value for delay which seems good for your website.This value is in milliseconds(ms). [1000ms = 1sec] ','critical-css-for-wp') . '</span>
@@ -455,6 +469,7 @@ function critical_css_defaults() {
 		'ccfwp_generate_urls' => 4,
 		'ccfwp_defer_time'    => 300,
 		'ccfwp_alt_cachepath' => 0,
+		'ccfwp_generate_css'  => 'off',
 	);
 	$settings = get_option( 'ccfwp_settings', $defaults );
 	return $settings;
