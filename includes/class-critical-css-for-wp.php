@@ -676,7 +676,7 @@ class Critical_Css_For_Wp {
 	public function print_style_cc() {
 
 		$user_dirname = $this->cachepath();
-		$settings     = critical_css_defaults();
+		$settings     = ccfwp_defaults();
 		global $wp, $wpdb, $table_prefix;
 				$table_name         = $table_prefix . 'critical_css_for_wp_urls';
 				$table_name_escaped = esc_sql( $table_name );
@@ -733,7 +733,7 @@ class Critical_Css_For_Wp {
 
 	public function ccwp_delay_css_html( $html ) {
 		$jetpack_boost = false;
-		$settings      = critical_css_defaults();
+		$settings      = ccfwp_defaults();
 		$url_arg       = '';
 
 		if ( class_exists( 'FlexMLS_IDX' ) && isset( $_SESSION['ccwp_current_uri'] ) ) {
