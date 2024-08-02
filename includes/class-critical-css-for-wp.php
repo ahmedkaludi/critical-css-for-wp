@@ -3,13 +3,13 @@
  * Critical CSS functionality
  *
  * @since 1.0
- **/
-
+ * @package critical-css-for-wp
+ */
 class Critical_Css_For_Wp {
 
 
 	public function cachepath() {
-		$cp_settings = critical_css_defaults();
+		$cp_settings = ccfwp_defaults();
 		if ( defined( CRITICAL_CSS_FOR_WP_CSS_DIR ) || isset( $cp_settings['ccfwp_alt_cachepath'] ) ) {
 			if ( $cp_settings['ccfwp_alt_cachepath'] == 1 ) {
 				return CRITICAL_CSS_FOR_WP_CSS_DIR_ALT;
@@ -25,7 +25,7 @@ class Critical_Css_For_Wp {
 		if ( function_exists( 'is_checkout' ) && is_checkout() ) {
 			return;
 		}
-		if ( function_exists( 'elementor_load_plugin_textdomain' ) && isset(\Elementor\Plugin::$instance->preview) && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
+		if ( function_exists( 'elementor_load_plugin_textdomain' ) && isset( \Elementor\Plugin::$instance->preview ) && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
 			return;
 		}
 		if ( class_exists( 'FlexMLS_IDX' ) ) {
@@ -35,7 +35,7 @@ class Critical_Css_For_Wp {
 		add_action( 'wp', array( $this, 'delay_css_loadings' ), 999 );
 		add_action(
 			'create_term',
-			function( $term_id, $tt_id, $taxonomy ) {
+			function ( $term_id, $tt_id, $taxonomy ) {
 				$this->on_term_create( $term_id, $tt_id, $taxonomy );
 			},
 			10,
@@ -44,7 +44,7 @@ class Critical_Css_For_Wp {
 
 		add_action(
 			'save_post',
-			function( $post_ID, $post, $update ) {
+			function ( $post_ID, $post, $update ) {
 				$this->on_post_change( $post_ID, $post );
 			},
 			10,
@@ -52,7 +52,7 @@ class Critical_Css_For_Wp {
 		);
 		add_action(
 			'wp_insert_post',
-			function( $post_ID, $post, $update ) {
+			function ( $post_ID, $post, $update ) {
 				$this->on_post_change( $post_ID, $post );
 			},
 			10,
@@ -76,31 +76,30 @@ class Critical_Css_For_Wp {
 
 		add_filter( 'cron_schedules', array( $this, 'isa_add_every_one_hour_crtlcss' ) );
 		if ( ! wp_next_scheduled( 'isa_add_every_one_hour_crtlcss' ) ) {
-			if($this->ccfwp_is_wpcron_active()){
+			if ( $this->ccfwp_is_wpcron_active() ) {
 				wp_schedule_event( time(), 'every_one_hour', 'isa_add_every_one_hour_crtlcss' );
 			}
-			
 		}
 		add_action( 'isa_add_every_one_hour_crtlcss', array( $this, 'every_one_minutes_event_func_crtlcss' ) );
 		add_action( 'current_screen', array( $this, 'ccfwp_custom_critical_css_generate' ) );
 	}
 	public function ccwp_flexmls_fix() {
-		$_SESSION['ccwp_current_uri'] = isset($_SERVER['REQUEST_URI'])?$_SERVER['REQUEST_URI']:'';
+		$_SESSION['ccwp_current_uri'] = isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '';
 	}
 	public function ccfwp_custom_critical_css_generate() {
-		$settings = critical_css_defaults();
-		$ccfwp_generate_css = isset($settings['ccfwp_generate_css'])?$settings['ccfwp_generate_css']:'off';
-			if ( is_admin() && !$this->ccfwp_is_wpcron_active() && $ccfwp_generate_css == 'on') {
-				$ccwp_last_cron_update = get_option( 'ccwp_last_altcron_update' , 0 );
-				if( $ccwp_last_cron_update < strtotime( '-1 minute' ) ) {
-					$this->every_one_minutes_event_func_crtlcss();
-					update_option( 'ccwp_last_altcron_update', time() );
-				}
+		$settings           = ccfwp_defaults();
+		$ccfwp_generate_css = isset( $settings['ccfwp_generate_css'] ) ? $settings['ccfwp_generate_css'] : 'off';
+		if ( is_admin() && ! $this->ccfwp_is_wpcron_active() && $ccfwp_generate_css == 'on' ) {
+			$ccwp_last_cron_update = get_option( 'ccwp_last_altcron_update', 0 );
+			if ( $ccwp_last_cron_update < strtotime( '-1 minute' ) ) {
+				$this->every_one_minutes_event_func_crtlcss();
+				update_option( 'ccwp_last_altcron_update', time() );
 			}
+		}
 	}
 
-	private function ccfwp_is_wpcron_active(){
-		if(!defined( 'DISABLE_WP_CRON' )){
+	private function ccfwp_is_wpcron_active() {
+		if ( ! defined( 'DISABLE_WP_CRON' ) ) {
 			return true;
 		}
 		if ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON == false ) {
@@ -110,7 +109,7 @@ class Critical_Css_For_Wp {
 	}
 	public function on_term_create( $term_id, $tt_id, $taxonomy ) {
 
-		$settings   = critical_css_defaults();
+		$settings   = ccfwp_defaults();
 		$post_types = array();
 		if ( ! empty( $settings['ccfwp_on_tax_type'] ) ) {
 			foreach ( $settings['ccfwp_on_tax_type'] as $key => $value ) {
@@ -126,12 +125,11 @@ class Critical_Css_For_Wp {
 				$this->insert_update_terms_url( $term );
 			}
 		}
-
 	}
 
 	public function on_post_change( $post_id, $post ) {
 
-		$settings   = critical_css_defaults();
+		$settings   = ccfwp_defaults();
 		$post_types = array( 'post' );
 		if ( ! empty( $settings['ccfwp_on_cp_type'] ) ) {
 			foreach ( $settings['ccfwp_on_cp_type'] as $key => $value ) {
@@ -148,20 +146,23 @@ class Critical_Css_For_Wp {
 				$this->insert_update_posts_url( $post_id );
 			}
 		}
-
 	}
-
+	/**
+	 * Insert or update post url using post id
+	 * @param int $post_id post id.
+	 * @return void
+	 */
 	public function insert_update_posts_url( $post_id ) {
 
 		global $wpdb, $table_prefix;
-			   $table_name = $table_prefix . 'critical_css_for_wp_urls';
-			   $table_name_escaped = esc_sql( $table_name );
+				$table_name         = $table_prefix . 'critical_css_for_wp_urls';
+				$table_name_escaped = esc_sql( $table_name );
 
 		$permalink = get_permalink( $post_id );
 		if ( ! empty( $permalink ) ) {
 
 			$permalink = $this->append_slash_permalink( $permalink );
-			
+
 			$pid = $wpdb->get_var( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
 					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
@@ -191,9 +192,9 @@ class Critical_Css_For_Wp {
 						'status'     => 'queue',
 						'created_at' => gmdate( 'Y-m-d h:i:sa' ),
 					),
-					array( 'url'=> $permalink ),
+					array( 'url' => $permalink ),
 					array( '%s', '%s' ),
-					array( '%s')
+					array( '%s' )
 				);
 				$user_dirname = $this->cachepath();
 				$user_dirname = trailingslashit( $user_dirname );
@@ -203,25 +204,32 @@ class Critical_Css_For_Wp {
 				}
 			}
 		}
-
 	}
-
+	/**
+	 * Add cron schedule
+	 * @param mixed $schedules
+	 * @return mixed
+	 */
 	public function isa_add_every_one_hour_crtlcss( $schedules ) {
 		$schedules['every_one_hour'] = array(
 			'interval' => 30 * 1,
-			'display'  => __( 'Every 30 Seconds', 'criticalcssforwp' ),
+			'display'  => __( 'Every 30 Seconds', 'critical-css-for-wp' ),
 		);
 		return $schedules;
 	}
-
+	/**
+	 * Insert or update term url using term object
+	 * @param mixed $term
+	 * @return void
+	 */
 	public function insert_update_terms_url( $term ) {
 		if ( ! is_object( $term ) ) {
 			return;
 		}
 		global  $wpdb, $table_prefix;
-				$table_name = $table_prefix . 'critical_css_for_wp_urls';
+				$table_name         = $table_prefix . 'critical_css_for_wp_urls';
 				$table_name_escaped = esc_sql( $table_name );
-				$permalink  = get_term_link( $term );
+				$permalink          = get_term_link( $term );
 
 		if ( ! empty( $permalink ) ) {
 
@@ -256,10 +264,9 @@ class Critical_Css_For_Wp {
 						'status'     => 'queue',
 						'created_at' => gmdate( 'Y-m-d h:i:sa' ),
 					),
-					array( 'url'=> $permalink ),
+					array( 'url' => $permalink ),
 					array( '%s', '%s' ),
-					array( '%s')
-					
+					array( '%s' )
 				);
 				$user_dirname = $this->cachepath();
 				$user_dirname = trailingslashit( $user_dirname );
@@ -269,13 +276,16 @@ class Critical_Css_For_Wp {
 				}
 			}
 		}
-
 	}
 
+	/**
+	 * Save posts url in database for generating critical css
+	 * @return void
+	 */
 	public function save_posts_url() {
 
 			global $wpdb, $table_prefix;
-			$settings = critical_css_defaults();
+			$settings = ccfwp_defaults();
 
 			$post_types = array();
 
@@ -286,11 +296,11 @@ class Critical_Css_For_Wp {
 				}
 			}
 		}
-		    
-			$post_types = array_map('esc_sql', $post_types);
-			$imploded_types = "'" . implode("','", $post_types) . "'";
-			$start = get_option( 'ccfwp_current_post' ) ? get_option( 'ccfwp_current_post' ) : 0;
-			$limit = ( get_option( 'ccfwp_scan_urls' ) > 0 ) ? intval( get_option( 'ccfwp_scan_urls' ) ) : 30;
+
+			$post_types     = array_map( 'esc_sql', $post_types );
+			$imploded_types = "'" . implode( "','", $post_types ) . "'";
+			$start          = get_option( 'ccfwp_current_post' ) ? get_option( 'ccfwp_current_post' ) : 0;
+			$limit          = ( get_option( 'ccfwp_scan_urls' ) > 0 ) ? intval( get_option( 'ccfwp_scan_urls' ) ) : 30;
 			$posts = $wpdb->get_results( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
 					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
@@ -309,16 +319,19 @@ class Critical_Css_For_Wp {
 			}
 		}
 			update_option( 'ccfwp_current_post', $start );
-
 	}
 
+	/**
+	 * Save other urls in database for generating critical css
+	 * @return void
+	 */
 	public function save_others_urls() {
 
 		global $wpdb, $table_prefix;
-		$table_name = $table_prefix . 'critical_css_for_wp_urls';
+		$table_name         = $table_prefix . 'critical_css_for_wp_urls';
 		$table_name_escaped = esc_sql( $table_name );
 
-		$settings = critical_css_defaults();
+		$settings = ccfwp_defaults();
 		$urls_to  = array();
 		if ( isset( $settings['ccfwp_on_home'] ) && $settings['ccfwp_on_home'] == 1 ) {
 			$urls_to[] = get_home_url(); // always purge home page if any other page is modified.
@@ -338,7 +351,7 @@ class Critical_Css_For_Wp {
 						$value
 					)
 				);
-				$id  = ( $key++ ) + 999999999;
+				$id = ( $key++ ) + 999999999;
 				if ( is_null( $pid ) ) {
 
 					$wpdb->insert( //phpcs:ignore -- Reason: Using custom query on non-core tables.
@@ -367,16 +380,19 @@ class Critical_Css_For_Wp {
 				}
 			}
 		}
-
 	}
 
+	/**
+	 * Save terms urls in database for generating critical css
+	 * @return void
+	 */
 	public function save_terms_urls() {
 
 		global $wpdb;
-		$table_name = $wpdb->term_taxonomy;
+		$table_name         = $wpdb->term_taxonomy;
 		$table_name_escaped = esc_sql( $table_name );
 
-		$settings = critical_css_defaults();
+		$settings = ccfwp_defaults();
 
 		$taxonomy_types = array();
 
@@ -387,9 +403,9 @@ class Critical_Css_For_Wp {
 				}
 			}
 		}
-			$taxonomy_types_escaped = array_map('esc_sql', $taxonomy_types);
-			$imploded_types_escaped = "'" . implode("','", $taxonomy_types_escaped) . "'";
-			
+			$taxonomy_types_escaped = array_map( 'esc_sql', $taxonomy_types );
+			$imploded_types_escaped = "'" . implode( "','", $taxonomy_types_escaped ) . "'";
+
 			$start = get_option( 'ccfwp_current_term' ) ? get_option( 'ccfwp_current_term' ) : 0;
 			$limit = ( get_option( 'ccfwp_scan_urls' ) > 0 ) ? intval( get_option( 'ccfwp_scan_urls' ) ) : 30;
 			$terms = $wpdb->get_results( //phpcs:ignore -- Reason: Using custom query on non-core tables.
@@ -412,14 +428,18 @@ class Critical_Css_For_Wp {
 			}
 		}
 			update_option( 'ccfwp_current_term', $start );
-
 	}
 
+	/**
+	 * Generate critical css for the page and
+	 * save it in the cache directory
+	 * @return void
+	 */
 	public function ccfwp_save_critical_css_in_dir_php( $current_url ) {
 
-		$targetUrl    = $current_url;
+		$target_url    = $current_url;
 		$user_dirname = $this->cachepath();
-		$response     = wp_remote_get( $targetUrl, array( 'sslverify' => false ) );
+		$response     = wp_remote_get( $target_url, array( 'sslverify' => false ) );
 		$content      = wp_remote_retrieve_body( $response );
 		$regex1       = '/<link(.*?)href="(.*?)"(.*?)>/';
 		preg_match_all( $regex1, $content, $matches1, PREG_SET_ORDER );
@@ -473,7 +493,7 @@ class Critical_Css_For_Wp {
 				$mock->appendChild( $mock->importNode( $child, true ) );
 			}
 
-			$rawHtml = $mock->saveHTML();
+			$raw_html = $mock->saveHTML();
 
 			require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR . 'css-extractor/vendor/autoload.php';
 
@@ -482,9 +502,9 @@ class Critical_Css_For_Wp {
 			$page_specific     = new \PageSpecificCss\PageSpecificCss();
 			$page_specific_css = preg_replace( '/@media[^{]*+{([^{}]++|{[^{}]*+})*+}/', '', $rowcss );
 			$page_specific->addBaseRules( $page_specific_css );
-			$page_specific->addHtmlToStore( $rawHtml );
-			$extractedCss        = $page_specific->buildExtractedRuleSet();
-			$extracted_css_arr[] = $extractedCss;
+			$page_specific->addHtmlToStore( $raw_html );
+			$extracted_css        = $page_specific->buildExtractedRuleSet();
+			$extracted_css_arr[] = $extracted_css;
 
 		}
 
@@ -505,11 +525,11 @@ class Critical_Css_For_Wp {
 						if ( $value[0] ) {
 							$page_specific = new \PageSpecificCss\PageSpecificCss();
 							$page_specific->addBaseRules( $value[0] );
-							$page_specific->addHtmlToStore( $rawHtml );
-							$extractedCss = $page_specific->buildExtractedRuleSet();
-							if ( $extractedCss ) {
-								$extractedCss        = $explod[0] . '{' . $extractedCss . '}';
-								$extracted_css_arr[] = $extractedCss;
+							$page_specific->addHtmlToStore( $raw_html );
+							$extracted_css = $page_specific->buildExtractedRuleSet();
+							if ( $extracted_css ) {
+								$extracted_css        = $explod[0] . '{' . $extracted_css . '}';
+								$extracted_css_arr[] = $extracted_css;
 							}
 						}
 					}
@@ -520,38 +540,37 @@ class Critical_Css_For_Wp {
 		if ( ! empty( $extracted_css_arr ) && is_array( $extracted_css_arr ) ) {
 
 				$critical_css = implode( '', $extracted_css_arr );
-				$targetUrl    = trailingslashit( $targetUrl );
+				$target_url    = trailingslashit( $target_url );
 				$critical_css = str_replace( "url('wp-content/", "url('" . get_site_url() . '/wp-content/', $critical_css );
 				$critical_css = str_replace( 'url("wp-content/', 'url("' . get_site_url() . '/wp-content/', $critical_css );
-				$new_file     = $user_dirname . '/' . md5( $targetUrl ) . '.css';
+				$new_file     = $user_dirname . '/' . md5( $target_url ) . '.css';
 
 				$result = ccwp_file_put_contents( $new_file, $critical_css );
 			if ( $result ) {
 				return array(
 					'status'  => true,
-					'message' => 'CSS created sucessfully',
+					'message' => esc_html__( 'CSS created sucessfully', 'critical-css-for-wp' ),
 				);
 			} else {
 				return array(
 					'status'  => false,
-					'message' => 'Could not write into css file',
+					'message' => esc_html__( 'Could not write into css file', 'critical-css-for-wp' ),
 				);
 			}
 		} else {
 			return array(
 				'status'  => false,
-				'message' => 'critical css does not generated from server',
+				'message' => esc_html__( 'Critical css does not generated from server', 'critical-css-for-wp' ),
 			);
 		}
-
 	}
 	public function generate_css_on_interval() {
 
 		global $wpdb;
-		$table_name = $wpdb->prefix . 'critical_css_for_wp_urls';
+		$table_name         = $wpdb->prefix . 'critical_css_for_wp_urls';
 		$table_name_escaped = esc_sql( $table_name );
-		$settings   = critical_css_defaults();
-		$limit      = ( intval( $settings['ccfwp_generate_urls'] ) > 0 ) ? intval( $settings['ccfwp_generate_urls'] ) : 4;
+		$settings           = ccfwp_defaults();
+		$limit              = ( intval( $settings['ccfwp_generate_urls'] ) > 0 ) ? intval( $settings['ccfwp_generate_urls'] ) : 4;
 
 		$result = $wpdb->get_results( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 			$wpdb->prepare(
@@ -593,13 +612,12 @@ class Critical_Css_For_Wp {
 				}
 			}
 		}
-
 	}
 
 	public function change_caching_status( $url, $status, $cached_name = null, $failed_error = null ) {
 
 		global $wpdb, $table_prefix;
-		$table_name = $table_prefix . 'critical_css_for_wp_urls';
+		$table_name         = $table_prefix . 'critical_css_for_wp_urls';
 		$table_name_escaped = esc_sql( $table_name );
 
 		$result = $wpdb->query( //phpcs:ignore -- Reason: Using custom query on non-core tables.
@@ -613,7 +631,6 @@ class Critical_Css_For_Wp {
 				$url
 			)
 		);
-
 	}
 
 	public function every_one_minutes_event_func_crtlcss() {
@@ -621,7 +638,6 @@ class Critical_Css_For_Wp {
 		$this->save_terms_urls();
 		$this->save_others_urls();
 		$this->generate_css_on_interval();
-
 	}
 
 	public function append_slash_permalink( $permalink ) {
@@ -642,8 +658,8 @@ class Critical_Css_For_Wp {
 		$user_dirname = $this->cachepath();
 		$settings     = critical_css_defaults();
 		global $wp, $wpdb, $table_prefix;
-			   $table_name = $table_prefix . 'critical_css_for_wp_urls';
-			   $table_name_escaped = esc_sql( $table_name );
+				$table_name         = $table_prefix . 'critical_css_for_wp_urls';
+				$table_name_escaped = esc_sql( $table_name );
 
 		$url = home_url( $wp->request );
 		if ( class_exists( 'FlexMLS_IDX' ) && isset( $_SESSION['ccwp_current_uri'] ) ) {
@@ -656,14 +672,14 @@ class Critical_Css_For_Wp {
 		$url = trailingslashit( $url );
 		if ( ccwp_file_exists( $user_dirname . md5( $url ) . '.css' ) ) {
 			$css      = '';
-			$response = ccwp_file_get_contents( $user_dirname . md5( $url ) . '.css' ); 
+			$response = ccwp_file_get_contents( $user_dirname . md5( $url ) . '.css' );
 			if ( $response ) {
 				$css = $response;
 			}
 			$css .= $custom_css;
-			$css  = $this->ccwp_clean_css($css);
+			$css  = $this->ccfwp_clean_css( $css );
 
-			echo "<style type='text/css' id='critical-css-for-wp'>".esc_html($css)."</style>";
+			echo "<style type='text/css' id='critical-css-for-wp'>" . esc_html( $css ) . '</style>';
 		} else {
 			$wpdb->query( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
@@ -688,85 +704,85 @@ class Critical_Css_For_Wp {
 		if ( function_exists( 'is_checkout' ) && is_checkout() || ( function_exists( 'is_feed' ) && is_feed() ) ) {
 			return;
 		}
-		if ( function_exists( 'elementor_load_plugin_textdomain' ) && isset(\Elementor\Plugin::$instance->preview) && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
+		if ( function_exists( 'elementor_load_plugin_textdomain' ) && isset( \Elementor\Plugin::$instance->preview ) && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
 			return;
 		}
 
 		add_filter( 'ccwp_complete_html_after_dom_loaded', array( $this, 'ccwp_delay_css_html' ), 1, 1 );
 	}
 
-	public function ccwp_delay_css_html($html) {
+	public function ccwp_delay_css_html( $html ) {
 		$jetpack_boost = false;
-		$settings = critical_css_defaults();
-		$url_arg = '';
-	
-		if (class_exists('FlexMLS_IDX') && isset($_SESSION['ccwp_current_uri'])) {
-			$url_arg = esc_url(home_url($_SESSION['ccwp_current_uri']));
+		$settings      = critical_css_defaults();
+		$url_arg       = '';
+
+		if ( class_exists( 'FlexMLS_IDX' ) && isset( $_SESSION['ccwp_current_uri'] ) ) {
+			$url_arg = esc_url( home_url( $_SESSION['ccwp_current_uri'] ) );
 		}
-	
-		if (!$this->check_critical_css($url_arg) || preg_match('/<style id="jetpack-boost-critical-css">/s', $html) || (isset($settings['ccfwp_defer_css']) && $settings['ccfwp_defer_css'] == 'off')) {
+
+		if ( ! $this->check_critical_css( $url_arg ) || preg_match( '/<style id="jetpack-boost-critical-css">/s', $html ) || ( isset( $settings['ccfwp_defer_css'] ) && $settings['ccfwp_defer_css'] == 'off' ) ) {
 			return $html;
 		}
-	
-		$html_no_comments = preg_replace('/<!--(.|\s)*?-->/', '', $html);
-	
-		preg_match_all('/<link\s?([^>]+)?>/is', $html_no_comments, $matches);
-	
-		if (!isset($matches[0])) {
+
+		$html_no_comments = preg_replace( '/<!--(.|\s)*?-->/', '', $html );
+
+		preg_match_all( '/<link\s?([^>]+)?>/is', $html_no_comments, $matches );
+
+		if ( ! isset( $matches[0] ) ) {
 			return $html;
 		}
-	
-		foreach ($matches[0] as $i => $tag) {
-			$atts_array = !empty($matches[1][$i]) ? $this->ccwp_get_atts_array($matches[1][$i]) : array();
-			
-			if (isset($atts_array['rel']) && stripos($atts_array['rel'], 'stylesheet') === false) {
+
+		foreach ( $matches[0] as $i => $tag ) {
+			$atts_array = ! empty( $matches[1][ $i ] ) ? $this->ccwp_get_atts_array( $matches[1][ $i ] ) : array();
+
+			if ( isset( $atts_array['rel'] ) && stripos( $atts_array['rel'], 'stylesheet' ) === false ) {
 				continue;
 			}
-	
-			$delay_flag = false;
-			$excluded_scripts = array('ccwp-delayed-styles');
-	
-			if (!empty($excluded_scripts)) {
-				foreach ($excluded_scripts as $excluded_script) {
-					if (strpos($tag, $excluded_script) !== false) {
+
+			$delay_flag       = false;
+			$excluded_scripts = array( 'ccwp-delayed-styles' );
+
+			if ( ! empty( $excluded_scripts ) ) {
+				foreach ( $excluded_scripts as $excluded_script ) {
+					if ( strpos( $tag, $excluded_script ) !== false ) {
 						continue 2;
 					}
 				}
 			}
-	
+
 			$delay_flag = true;
-			if (!empty($atts_array['rel'])) {
+			if ( ! empty( $atts_array['rel'] ) ) {
 				$atts_array['data-ccwp-rel'] = $atts_array['rel'];
 			}
-	
-			$atts_array['rel'] = 'ccwpdelayedstyle';
+
+			$atts_array['rel']   = 'ccwpdelayedstyle';
 			$atts_array['defer'] = 'defer';
-	
-			if ($delay_flag) {
-				$delayed_atts_string = $this->ccwp_get_atts_string($atts_array);
-				$delayed_tag = sprintf('<link %1$s', $delayed_atts_string) . (!empty($matches[3][$i]) ? $matches[3][$i] : '') . '/>';
-				$html = str_replace($tag, $delayed_tag, $html);
+
+			if ( $delay_flag ) {
+				$delayed_atts_string = $this->ccwp_get_atts_string( $atts_array );
+				$delayed_tag         = sprintf( '<link %1$s', $delayed_atts_string ) . ( ! empty( $matches[3][ $i ] ) ? $matches[3][ $i ] : '' ) . '/>';
+				$html                = str_replace( $tag, $delayed_tag, $html );
 			}
 		}
-	
-		preg_match_all('#(<style\s?([^>]+)?\/?>)(.*?)<\/style>#is', $html_no_comments, $matches1);
-		if (isset($matches1[0])) {
-			foreach ($matches1[0] as $i => $tag) {
-				$atts_array = !empty($matches1[2][$i]) ? $this->ccwp_get_atts_array($matches1[2][$i]) : array();
-				if (isset($atts_array['id']) && $atts_array['id'] == 'critical-css-for-wp') {
+
+		preg_match_all( '#(<style\s?([^>]+)?\/?>)(.*?)<\/style>#is', $html_no_comments, $matches1 );
+		if ( isset( $matches1[0] ) ) {
+			foreach ( $matches1[0] as $i => $tag ) {
+				$atts_array = ! empty( $matches1[2][ $i ] ) ? $this->ccwp_get_atts_array( $matches1[2][ $i ] ) : array();
+				if ( isset( $atts_array['id'] ) && $atts_array['id'] == 'critical-css-for-wp' ) {
 					continue;
 				}
-				if (isset($atts_array['type'])) {
+				if ( isset( $atts_array['type'] ) ) {
 					$atts_array['data-ccwp-cc-type'] = $atts_array['type'];
 				}
-				$delayed_atts_string = $this->ccwp_get_atts_string($atts_array);
-				$delayed_tag = sprintf('<style %1$s>', $delayed_atts_string) . (!empty($matches1[3][$i]) ? $matches1[3][$i] : '') . '</style>';
-				$html = str_replace($tag, $delayed_tag, $html);
+				$delayed_atts_string = $this->ccwp_get_atts_string( $atts_array );
+				$delayed_tag         = sprintf( '<style %1$s>', $delayed_atts_string ) . ( ! empty( $matches1[3][ $i ] ) ? $matches1[3][ $i ] : '' ) . '</style>';
+				$html                = str_replace( $tag, $delayed_tag, $html );
 			}
 		}
-	
-		if ($jetpack_boost == true && preg_match('/<style\s+id="jetpack-boost-critical-css"\s+type="ccwpdelayedstyle">/s', $html)) {
-			$html = preg_replace('/<style\s+id="jetpack-boost-critical-css"\s+type="ccwpdelayedstyle">/s', '<style id="jetpack-boost-critical-css">', $html);
+
+		if ( $jetpack_boost == true && preg_match( '/<style\s+id="jetpack-boost-critical-css"\s+type="ccwpdelayedstyle">/s', $html ) ) {
+			$html = preg_replace( '/<style\s+id="jetpack-boost-critical-css"\s+type="ccwpdelayedstyle">/s', '<style id="jetpack-boost-critical-css">', $html );
 		}
 		return $html;
 	}
@@ -785,7 +801,7 @@ class Critical_Css_For_Wp {
 
 		if ( ! empty( $atts_array ) ) {
 			$assigned_atts_array = array_map(
-				function( $name, $value ) {
+				function ( $name, $value ) {
 					if ( $value === '' ) {
 						return $name;
 					}
@@ -804,7 +820,7 @@ class Critical_Css_For_Wp {
 
 		if ( ! empty( $atts_string ) ) {
 			$atts_array = array_map(
-				function( array $attribute ) {
+				function ( array $attribute ) {
 					return $attribute['value'];
 				},
 				wp_kses_hair( $atts_string, wp_allowed_protocols() )
@@ -824,7 +840,7 @@ class Critical_Css_For_Wp {
 		}
 
 		global $wpdb, $table_prefix;
-		$table_name = $table_prefix . 'critical_css_for_wp_urls';
+		$table_name         = $table_prefix . 'critical_css_for_wp_urls';
 		$table_name_escaped = esc_sql( $table_name );
 
 		$url_id = ! empty( $_POST['url_id'] ) ? intval( $_POST['url_id'] ) : null;
@@ -867,7 +883,7 @@ class Critical_Css_For_Wp {
 		$page   = ! empty( $_POST['page'] ) ? intval( $_POST['page'] ) : 0;
 		$offset = $page * $limit;
 		global $wpdb, $table_prefix;
-		$table_name = $table_prefix . 'critical_css_for_wp_urls';
+		$table_name         = $table_prefix . 'critical_css_for_wp_urls';
 		$table_name_escaped = esc_sql( $table_name );
 
 		$result = $wpdb->get_results( //phpcs:ignore -- Reason: Using custom query on non-core tables.
@@ -914,7 +930,6 @@ class Critical_Css_For_Wp {
 			);
 			die;
 		}
-
 	}
 
 	public function ccfwp_resend_urls_for_cache() {
@@ -927,7 +942,7 @@ class Critical_Css_For_Wp {
 		}
 
 		global $wpdb, $table_prefix;
-		$table_name = $table_prefix . 'critical_css_for_wp_urls';
+		$table_name         = $table_prefix . 'critical_css_for_wp_urls';
 		$table_name_escaped = esc_sql( $table_name );
 
 		$result = $wpdb->query( //phpcs:ignore -- Reason: Using custom query on non-core tables.
@@ -959,7 +974,7 @@ class Critical_Css_For_Wp {
 		}
 
 		global $wpdb;
-		$table  = $wpdb->prefix . 'critical_css_for_wp_urls';
+		$table         = $wpdb->prefix . 'critical_css_for_wp_urls';
 		$table_escaped = esc_sql( $table );
 		//phpcs:ignore -- Reason: $table_escaped is escaped above.
 		$result = $wpdb->query( "TRUNCATE TABLE {$table_escaped }" );
@@ -972,7 +987,6 @@ class Critical_Css_For_Wp {
 
 		echo wp_json_encode( array( 'status' => true ) );
 		die;
-
 	}
 
 	public function ccfwp_showdetails_data() {
@@ -993,7 +1007,7 @@ class Critical_Css_For_Wp {
 		$draw   = isset( $_GET['draw'] ) ? intval( $_GET['draw'] ) : 0;
 
 		global $wpdb, $table_prefix;
-		$table_name = $table_prefix . 'critical_css_for_wp_urls';
+		$table_name         = $table_prefix . 'critical_css_for_wp_urls';
 		$table_name_escaped = esc_sql( $table_name );
 
 		if ( ! empty( $_GET['search']['value'] ) ) {
@@ -1033,14 +1047,14 @@ class Critical_Css_For_Wp {
 		$formated_result = array();
 
 		if ( ! empty( $result ) ) {
-			$size="";
+			$size = '';
 			foreach ( $result as $value ) {
 
 				if ( $value['status'] == 'cached' ) {
 					$user_dirname = $this->cachepath();
-					$size         = ccwp_file_exists($user_dirname . '/' . md5( trailingslashit( $value['url'] )). '.css' )?filesize( $user_dirname . '/' . md5( trailingslashit( $value['url'] ) ) . '.css' ):'';
+					$size         = ccwp_file_exists( $user_dirname . '/' . md5( trailingslashit( $value['url'] ) ) . '.css' ) ? filesize( $user_dirname . '/' . md5( trailingslashit( $value['url'] ) ) . '.css' ) : '';
 					if ( ! $size ) {
-						$size = '<abbr title="' . esc_attr__( 'File is not in cached directory. Please recheck in advance option' ,'critical-css-for-wp') . '">' . esc_html( 'Deleted' ,'critical-css-for-wp') . '</abbr>';
+						$size = '<abbr title="' . esc_attr__( 'File is not in cached directory. Please recheck in advance option', 'critical-css-for-wp' ) . '">' . esc_html__( 'Deleted', 'critical-css-for-wp' ) . '</abbr>';
 					}
 				}
 
@@ -1053,16 +1067,15 @@ class Critical_Css_For_Wp {
 			}
 		}
 
-		$retuernData = array(
+		$return_data = array(
 			'draw'            => $draw,
 			'recordsTotal'    => $total_count,
 			'recordsFiltered' => $total_count,
 			'data'            => $formated_result,
 		);
 
-		echo wp_json_encode( $retuernData );
+		echo wp_json_encode( $return_data );
 		die;
-
 	}
 
 	public function ccfwp_showdetails_data_completed() {
@@ -1085,13 +1098,13 @@ class Critical_Css_For_Wp {
 		$draw   = isset( $_GET['draw'] ) ? intval( $_GET['draw'] ) : 0;
 
 		global $wpdb, $table_prefix;
-		$table_name = $table_prefix . 'critical_css_for_wp_urls';
+		$table_name         = $table_prefix . 'critical_css_for_wp_urls';
 		$table_name_escaped = esc_sql( $table_name );
 
 		if ( ! empty( $_GET['search']['value'] ) ) {
 			$search      = sanitize_text_field( $_GET['search']['value'] );
 			$total_count = $wpdb->get_var( //phpcs:ignore -- Reason: Using custom query on non-core tables.
-				$wpdb->prepare( 
+				$wpdb->prepare(
 					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
 					"SELECT COUNT(*) FROM  {$table_name_escaped} WHERE `url` LIKE %s AND `status`=%s",
 					'%' . $wpdb->esc_like( $search ) . '%',
@@ -1128,17 +1141,17 @@ class Critical_Css_For_Wp {
 		$formated_result = array();
 
 		if ( ! empty( $result ) ) {
-			$size  ="";
+			$size = '';
 			foreach ( $result as $value ) {
 
 				if ( $value['status'] == 'cached' ) {
 					$user_dirname = $this->cachepath();
-					if(ccwp_file_exists($user_dirname . '/' . md5( $value['url'] ) . '.css' )){
-						$size         = filesize( $user_dirname . '/' . md5( $value['url'] ) . '.css' );
-					}else{
-						$size = '<abbr title="' . esc_attr__( 'File is not in cached directory. Please recheck in advance option' ,'critical-css-for-wp') . '">' . esc_html__( 'Deleted' ,'critical-css-for-wp') . '</abbr>';
+					if ( ccwp_file_exists( $user_dirname . '/' . md5( $value['url'] ) . '.css' ) ) {
+						$size = filesize( $user_dirname . '/' . md5( $value['url'] ) . '.css' );
+					} else {
+						$size = '<abbr title="' . esc_attr__( 'File is not in cached directory. Please recheck in advance option', 'critical-css-for-wp' ) . '">' . esc_html__( 'Deleted', 'critical-css-for-wp' ) . '</abbr>';
+					}
 				}
-			}
 
 				$formated_result[] = array(
 					'<abbr title="' . esc_attr( $value['cached_name'] ) . '">' . esc_url( $value['url'] ) . '</abbr>',
@@ -1149,16 +1162,15 @@ class Critical_Css_For_Wp {
 			}
 		}
 
-		$retuernData = array(
+		$return_data = array(
 			'draw'            => $draw,
 			'recordsTotal'    => $total_count,
 			'recordsFiltered' => $total_count,
 			'data'            => $formated_result,
 		);
 
-		echo wp_json_encode( $retuernData );
+		echo wp_json_encode( $return_data );
 		die;
-
 	}
 
 
@@ -1182,7 +1194,7 @@ class Critical_Css_For_Wp {
 		$draw   = isset( $_GET['draw'] ) ? intval( $_GET['draw'] ) : 0;
 
 		global $wpdb, $table_prefix;
-		$table_name = $table_prefix . 'critical_css_for_wp_urls';
+		$table_name         = $table_prefix . 'critical_css_for_wp_urls';
 		$table_name_escaped = esc_sql( $table_name );
 
 		if ( isset( $_GET['search']['value'] ) && $_GET['search']['value'] ) {
@@ -1230,28 +1242,27 @@ class Critical_Css_For_Wp {
 
 				if ( $value['status'] == 'cached' ) {
 					$user_dirname = $this->cachepath();
-					$size         =ccwp_file_exists($user_dirname . '/' . md5( $value['url'] ) . '.css')?filesize( $user_dirname . '/' . md5( $value['url'] ) . '.css' ):'';
+					$size         = ccwp_file_exists( $user_dirname . '/' . md5( $value['url'] ) . '.css' ) ? filesize( $user_dirname . '/' . md5( $value['url'] ) . '.css' ) : '';
 				}
 
 				$formated_result[] = array(
 					'<div>' . esc_url( $value['url'] ) . ' <a href="#" data-section="failed" data-id="' . esc_attr( $value['id'] ) . '" class="cwvpb-resend-single-url dashicons dashicons-controls-repeat"></a></div>',
 					'<span class="cwvpb-status-t">' . esc_html( $value['status'] ) . '</span>',
 					esc_html( $value['updated_at'] ),
-					'<div><a data-id="id-' . esc_attr( $value['id'] ) . '" href="#" class="cwb-copy-urls-error button button-secondary">' . esc_html__( 'Copy Error' ,'critical-css-for-wp') . '</a><input id="id-' . esc_attr( $value['id'] ) . '" class="cwb-copy-urls-text" type="hidden" value="' . esc_attr( $value['failed_error'] ) . '"></div>',
+					'<div><a data-id="id-' . esc_attr( $value['id'] ) . '" href="#" class="cwb-copy-urls-error button button-secondary">' . esc_html__( 'Copy Error', 'critical-css-for-wp' ) . '</a><input id="id-' . esc_attr( $value['id'] ) . '" class="cwb-copy-urls-text" type="hidden" value="' . esc_attr( $value['failed_error'] ) . '"></div>',
 				);
 			}
 		}
 
-		$retuernData = array(
+		$return_data = array(
 			'draw'            => $draw,
 			'recordsTotal'    => $total_count,
 			'recordsFiltered' => $total_count,
 			'data'            => $formated_result,
 		);
 
-		echo wp_json_encode( $retuernData );
+		echo wp_json_encode( $return_data );
 		die;
-
 	}
 	public function ccfwp_showdetails_data_queue() {
 
@@ -1273,11 +1284,11 @@ class Critical_Css_For_Wp {
 		$draw   = isset( $_GET['draw'] ) ? intval( $_GET['draw'] ) : 0;
 
 		global $wpdb, $table_prefix;
-		$table_name = $table_prefix . 'critical_css_for_wp_urls';
+		$table_name         = $table_prefix . 'critical_css_for_wp_urls';
 		$table_name_escaped = esc_sql( $table_name );
 
-		if ( isset( $_GET['search']['value'] ) && $_GET['search']['value'] ) {
-			$search      = sanitize_text_field( $_GET['search']['value'] );
+		if ( isset( $_GET['search']['value'] ) && wp_unslash( $_GET['search']['value'] ) ) {
+			$search      = sanitize_text_field( wp_unslash( $_GET['search']['value'] ) );
 			$total_count = $wpdb->get_var( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
 					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
@@ -1319,9 +1330,9 @@ class Critical_Css_For_Wp {
 
 			foreach ( $result as $value ) {
 				$size = '';
-				if ( $value['status'] == 'cached' ) {
+				if ( 'cached' == $value['status'] ) {
 					$user_dirname = $this->cachepath();
-					$size         = ccwp_file_exists($user_dirname . '/' . md5( $value['url'] ) . '.css')?filesize( $user_dirname . '/' . md5( $value['url'] ) . '.css' ):'';
+					$size         = ccwp_file_exists( $user_dirname . '/' . md5( $value['url'] ) . '.css' ) ? filesize( $user_dirname . '/' . md5( $value['url'] ) . '.css' ) : '';
 				}
 
 				$formated_result[] = array(
@@ -1333,17 +1344,19 @@ class Critical_Css_For_Wp {
 			}
 		}
 
-		$retuernData = array(
+		$return_data = array(
 			'draw'            => $draw,
 			'recordsTotal'    => $total_count,
 			'recordsFiltered' => $total_count,
 			'data'            => $formated_result,
 		);
 
-		echo wp_json_encode( $retuernData );
+		echo wp_json_encode( $return_data );
 		die;
-
 	}
+	/**
+	 * Add admin notices
+	 */
 	public function ccfwp_add_admin_notices() {
 
 		$user = wp_get_current_user();
@@ -1353,57 +1366,70 @@ class Critical_Css_For_Wp {
 				  <p>' . esc_html( 'Critical CSS For WP needs ' ) . '<strong>' . esc_html( '"allow_url_fopen"' ) . '</strong>' . esc_html( ' option to be enabled in PHP configuration to work.' ) . ' </p>
 				 </div>';
 			}
-			if ( $this->ccwp_wprocket_criticalcss() ) {
+			if ( $this->ccfwp_wprocket_criticalcss() ) {
 				echo '<div class="notice notice-warning is-dismissible">
 					  <p>' . esc_html( 'For' ) . ' <strong>' . esc_html( 'Critical CSS For WP ' ) . '</strong>' . esc_html( ' to function properly ' ) . esc_html( 'disable ' ) . '<strong>' . esc_html( 'Remove Unused CSS option' ) . '</strong> ' . esc_html( 'in' ) . ' <strong>' . esc_html( 'WP Rocket' ) . '</strong> </p>
 					 </div>';
 			}
 		}
-
 	}
-
-	public function ccwp_check_js_defer() {
+	/**
+	 * Check if WP Rocket is enabled for JS Defer
+	 *
+	 * @return bool
+	 */
+	public function ccfwp_check_js_defer() {
 		if ( defined( 'WP_ROCKET_VERSION' ) ) {
 			$ccwp_wprocket_options = get_option( 'wp_rocket_settings', null );
 
-			if ( isset( $ccwp_wprocket_options['defer_all_js'] ) && $ccwp_wprocket_options['defer_all_js'] == 1 ) {
+			if ( isset( $ccwp_wprocket_options['defer_all_js'] ) && 1 == $ccwp_wprocket_options['defer_all_js'] ) {
 				return true;
 			}
 		}
 		return false;
 	}
-	public function ccwp_wprocket_criticalcss() {
+
+	/**
+	 * Check if WP Rocket is enabled for Critical CSS
+	 *
+	 * @return bool
+	 */
+	public function ccfwp_wprocket_criticalcss() {
 		if ( defined( 'WP_ROCKET_VERSION' ) ) {
 			$ccwp_wprocket_options = get_option( 'wp_rocket_settings', null );
 
-			if ( ( isset( $ccwp_wprocket_options['critical_css'] ) && $ccwp_wprocket_options['critical_css'] == 1 ) || ( isset( $ccwp_wprocket_options['remove_unused_css'] ) && $ccwp_wprocket_options['remove_unused_css'] == 1 ) ) {
+			if ( ( isset( $ccwp_wprocket_options['critical_css'] ) && 1 == $ccwp_wprocket_options['critical_css'] ) || ( isset( $ccwp_wprocket_options['remove_unused_css'] ) && 1 == $ccwp_wprocket_options['remove_unused_css'] ) ) {
 				return true;
 			}
 		}
 		return false;
 	}
-	    
-    public function ccwp_clean_css($css) {
-    // Remove comments
-		$css = preg_replace('!/\*.*?\*/!s', '', $css);
 
-		// Remove whitespace around specific characters
-		$css = preg_replace('/\s*([{}|:;,])\s+/', '$1', $css);
-		$css = preg_replace('/\s\s+(.*)/', '$1', $css);
+	/**
+	 * Clean the geenrated Critical CSS
+	 *
+	 * @param string $css  The generated Critical CSS.
+	 * @return string
+	 */
+	public function ccfwp_clean_css( $css ) {
+		// Remove comments.
+		$css = preg_replace( '!/\*.*?\*/!s', '', $css );
 
-		// Remove universal selector rules
-		$css = preg_replace('/\*\s*{[^}]*}/', '', $css);
+		// Remove whitespace around specific characters.
+		$css = preg_replace( '/\s*([{}|:;,])\s+/', '$1', $css );
+		$css = preg_replace( '/\s\s+(.*)/', '$1', $css );
 
-		// Remove empty rules
-		$css = preg_replace('/[^{}]+{\s*}/', '', $css);
+		// Remove universal selector rules.
+		$css = preg_replace( '/\*\s*{[^}]*}/', '', $css );
 
-		// Optional: Remove any remaining newlines or excessive spaces
-		$css = preg_replace('/\s+/', ' ', $css);
+		// Remove empty rules.
+		$css = preg_replace( '/[^{}]+{\s*}/', '', $css );
 
-		return trim($css);
+		$css = preg_replace( '/\s+/', ' ', $css );
+
+		return trim( $css );
 	}
-
 }
 
-$ccfwpgeneralcriticalCss = new Critical_Css_For_Wp();
-$ccfwpgeneralcriticalCss->critical_hooks();
+$ccfwp_general_critical_css = new Critical_Css_For_Wp();
+$ccfwp_general_critical_css->critical_hooks();

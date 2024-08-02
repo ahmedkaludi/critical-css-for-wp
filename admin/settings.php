@@ -18,12 +18,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since   1.0
  * @refer   https://developer.wordpress.org/plugins/administration-menus/
  */
-function critical_css_add_menu_links() {
+function ccfwp_add_menu_links() {
 	// Main menu page.
-	add_menu_page( __( 'Critical CSS For WP', 'critical-css' ), __( 'Critical CSS For WP', 'critical-css' ), 'manage_options', 'critical-css-for-wp', 'ccfwp_admin_interface_render', 'dashicons-performance', 100 );
+	add_menu_page( __( 'Critical CSS For WP', 'critical-css-for-wp' ), __( 'Critical CSS For WP', 'critical-css-for-wp' ), 'manage_options', 'critical-css-for-wp', 'ccfwp_admin_interface_render', 'dashicons-performance', 100 );
 }
 
-add_action( 'admin_menu', 'critical_css_add_menu_links' );
+add_action( 'admin_menu', 'ccfwp_add_menu_links' );
 
 /**
  * Admin interface renderer
@@ -36,35 +36,35 @@ function ccfwp_admin_interface_render() {
 		return;
 	}
 
-	$tab = critical_css_get_tab( 'generatecss', array( 'generatecss', 'advance', 'support' ) );
+	$tab = ccfwp_get_tab( 'generatecss', array( 'generatecss', 'advance', 'support' ) );
 	?>
 	<div class="ccfwp-container" id="ccfwp-wrap">
 
-		<h1><?php echo esc_html__( 'Critical CSS For WP', 'criticalcssforwp' ); ?></h1>
+		<h1><?php echo esc_html__( 'Critical CSS For WP', 'critical-css-for-wp' ); ?></h1>
 		<div class="ccfwp-comp-cont">
 	<h2 class="nav-tab-wrapper">
 		<?php
-			echo '<a href="' . esc_url( critical_css_admin_link( 'generatecss' ) ) . '" class="nav-tab ' . esc_attr( 'generatecss' == $tab ? 'nav-tab-active' : '' ) . '">' . esc_html__( 'Generate CSS' , 'critical-css-for-wp') . '</a>';
+			echo '<a href="' . esc_url( ccfwp_admin_link( 'generatecss' ) ) . '" class="nav-tab ' . esc_attr( 'generatecss' == $tab ? 'nav-tab-active' : '' ) . '">' . esc_html__( 'Generate CSS' , 'critical-css-for-wp') . '</a>';
 
-			echo '<a href="' . esc_url( critical_css_admin_link( 'advance' ) ) . '" class="nav-tab ' . esc_attr( 'advance' == $tab ? 'nav-tab-active' : '' ) . '">' . esc_html__( 'Advance' , 'critical-css-for-wp') . '</a>';
+			echo '<a href="' . esc_url( ccfwp_admin_link( 'advance' ) ) . '" class="nav-tab ' . esc_attr( 'advance' == $tab ? 'nav-tab-active' : '' ) . '">' . esc_html__( 'Advance' , 'critical-css-for-wp') . '</a>';
 
-			echo '<a href="' . esc_url( critical_css_admin_link( 'support' ) ) . '" class="nav-tab ' . esc_attr( 'support' == $tab ? 'nav-tab-active' : '' ) . '">' . esc_html__( 'Support' , 'critical-css-for-wp') . '</a>';
+			echo '<a href="' . esc_url( ccfwp_admin_link( 'support' ) ) . '" class="nav-tab ' . esc_attr( 'support' == $tab ? 'nav-tab-active' : '' ) . '">' . esc_html__( 'Support' , 'critical-css-for-wp') . '</a>';
 		?>
 		  </h2>
 		  <form action="options.php" method="post" enctype="multipart/form-data" class="ccfwp-settings-form">
 		  <?php
 			// Output nonce, action, and option_page fields for a settings page.
-				settings_fields( 'critical_css_settings_group' );
+				settings_fields( 'ccfwp_settings_group' );
 			 echo "<div class='ccfwp-section-tab ccfwp-generatecss' " . ( $tab != 'generatecss' ? 'style="display:none;"' : '' ) . '>';
-				   critical_css_urlslist_callback();
+				   ccfwp_urlslist_callback();
 			  echo '</div>';
 
 			  echo "<div class='ccfwp-section-tab ccfwp-advance' " . ( $tab != 'advance' ? 'style="display:none;"' : '' ) . '>';
-				   critical_css_advance_settings_callback();
+				   ccfwp_advance_settings_callback();
 			  echo '</div>';
 
 			  echo "<div class='ccfwp-section-tab ccfwp-support' " . ( $tab != 'support' ? 'style="display:none;"' : '' ) . '>';
-				   critical_css_support_settings_callback();
+				   ccfwp_support_settings_callback();
 			  echo '</div>';
 			?>
 					
@@ -76,9 +76,9 @@ function ccfwp_admin_interface_render() {
 
 
 
-add_action( 'admin_enqueue_scripts', 'critical_css_settings_page_css' );
+add_action( 'admin_enqueue_scripts', 'ccfwp_settings_page_css' );
 
-function critical_css_settings_page_css( $hook ) {
+function ccfwp_settings_page_css( $hook ) {
 	global $current_screen;
 	$pagenow = false;
 
@@ -87,14 +87,14 @@ function critical_css_settings_page_css( $hook ) {
 	}
 
 	if ( is_admin() && $pagenow == true ) {
-
-		wp_register_style( 'crtitcal-css-settings-style', untrailingslashit( CRITICAL_CSS_FOR_WP_PLUGIN_URI ) . '/admin/crtitcal-css-settings.css', false, CRITICAL_CSS_FOR_WP_VERSION );
+		$min  = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		wp_register_style( 'crtitcal-css-settings-style', untrailingslashit( CRITICAL_CSS_FOR_WP_PLUGIN_URI ) . "/admin/css/crtitcal-css-settings{$min}.css", false, CRITICAL_CSS_FOR_WP_VERSION );
 		wp_enqueue_style( 'crtitcal-css-settings-style' );
 
 	}
 }
 
-function critical_css_admin_link( $tab = '' ) {
+function ccfwp_admin_link( $tab = '' ) {
 
 	$page = 'critical-css-for-wp';
 
@@ -108,7 +108,7 @@ function critical_css_admin_link( $tab = '' ) {
 
 }
 
-function critical_css_get_tab( $default = '', $available = array() ) {
+function ccfwp_get_tab( $default = '', $available = array() ) {
 	//phpcs:ignore -- Reason: $_GET['tab'] is used to show the tab only it is not saved or processed.
 	$tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : $default;
 
@@ -120,7 +120,7 @@ function critical_css_get_tab( $default = '', $available = array() ) {
 }
 
 
-function critical_css_generate_time( $total_count = 0 ) {
+function ccfwp_generate_time( $total_count = 0 ) {
 
 	   $estimate_time = '';
 	if ( $total_count > 0 ) {
@@ -143,7 +143,7 @@ function critical_css_generate_time( $total_count = 0 ) {
 	/**
 	 * Url list will be shows
 	 */
-function critical_css_urlslist_callback() {
+function ccfwp_urlslist_callback() {
 
 	global $wpdb, $table_prefix;
 	$table_name = $table_prefix . 'critical_css_for_wp_urls';
@@ -190,12 +190,12 @@ function critical_css_urlslist_callback() {
 										?>
 				</div>
 				<?php
-				if ( critical_css_generate_time( $queue_count ) ) {
+				if ( ccfwp_generate_time( $queue_count ) ) {
 					?>
 						<div>
 						<strong><?php echo esc_html__( 'Remaining Time :'  ,'critical-css-for-wp'); ?></strong>
 						<?php
-						echo esc_attr(critical_css_generate_time( $queue_count ));
+						echo esc_attr(ccfwp_generate_time( $queue_count ));
 						?>
 						</div>                        
 						<?php
@@ -324,7 +324,7 @@ function critical_css_urlslist_callback() {
 
 }
 
-function critical_css_support_settings_callback() {
+function ccfwp_support_settings_callback() {
 	?>
 		<div class="ccfwp_support_div">
 			<strong><?php echo esc_html__( 'If you have any query, please write the query in below box or email us at' ,'critical-css-for-wp'); ?> <a href="mailto:team@magazine3.in">team@magazine3.in</a>. <?php echo esc_html__( 'We will reply to your email address shortly' ,'critical-css-for-wp'); ?></strong>
@@ -352,9 +352,9 @@ function critical_css_support_settings_callback() {
 		</div>
 	<?php
 }
-function critical_css_advance_settings_callback() {
+function ccfwp_advance_settings_callback() {
 
-	$settings = critical_css_defaults();
+	$settings = ccfwp_defaults();
 
 	$taxonomies = get_taxonomies( array( 'public' => true ), 'names' );
 
@@ -460,7 +460,7 @@ function critical_css_advance_settings_callback() {
 }
 
 
-function critical_css_defaults() {
+function ccfwp_defaults() {
 	$defaults = array(
 		'ccfwp_on_home'       => 1,
 		'ccfwp_on_cp_type'    => array( 'post' => 1 ),
@@ -483,8 +483,35 @@ add_action( 'admin_init', 'ccfwp_settings_init' );
 
 function ccfwp_settings_init() {
 
-	register_setting( 'critical_css_settings_group', 'ccfwp_settings' );
+	register_setting( 'ccfwp_settings_group', 'ccfwp_settings','ccfwp_settings_validate' );
 
+}
+
+function ccfwp_settings_validate( $input ) {
+
+	$defaults = array(
+		'ccfwp_on_home'       => 1,
+		'ccfwp_on_cp_type'    => array( 'post' => 1 ),
+		'ccfwp_defer_css'     => 'on',
+		'ccfwp_scan_urls'     => 30,
+		'ccfwp_generate_urls' => 4,
+		'ccfwp_defer_time'    => 300,
+		'ccfwp_alt_cachepath' => 0,
+		'ccfwp_generate_css'  => 'off',
+	);
+
+	foreach ( $defaults as $key => $value ) {
+		if (  isset( $input[ $key ] ) ) {
+			if($key == 'ccfwp_on_cp_type'){
+				$input[ $key ] = array_map( 'sanitize_text_field', $input[ $key ]);
+			} else if($key == 'ccfwp_on_home' || $key == 'ccfwp_scan_urls' || $key == 'ccfwp_generate_urls' || $key == 'ccfwp_defer_time' || $key == 'ccfwp_alt_cachepath'){
+				$input[ $key ] = absint( $input[ $key ] );
+			} else {
+				$input[ $key ] = sanitize_text_field( $input[ $key ] );
+			}
+		}
+	}
+    return $input;
 }
 
 add_action( 'wp_ajax_ccfwp_send_query_message', 'ccfwp_send_query_message' );

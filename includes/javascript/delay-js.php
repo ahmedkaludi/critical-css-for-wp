@@ -56,7 +56,7 @@ function ccwp_delay_js_main() {
 
 	add_action( 'wp_footer', 'ccwp_delay_js_load', PHP_INT_MAX );
 
-	if ( ccwp_check_js_defer() ) {
+	if ( ccfwp_check_js_defer() ) {
 		add_filter( 'rocket_delay_js_exclusions', 'ccwp_add_rocket_delay_js_exclusions' );
 		return;
 	}
@@ -143,7 +143,7 @@ function ccwp_delay_js_html( $html ) {
 }
 
 function ccwp_delay_exclude_js() {
-	$settings             = critical_css_defaults();
+	$settings             = ccfwp_defaults();
 	$inputs['exclude_js'] = array();
 	$excluded_files       = array();
 	if ( $inputs['exclude_js'] ) {
@@ -160,7 +160,7 @@ function ccwp_delay_exclude_js() {
 }
 
 function ccwp_delay_js_load() {
-	$settings = critical_css_defaults();
+	$settings = ccfwp_defaults();
 	if ( ( isset( $settings['ccfwp_defer_css'] ) && $settings['ccfwp_defer_css'] == 'off' ) ) {
 		return;
 	}

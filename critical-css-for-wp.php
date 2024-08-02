@@ -9,7 +9,10 @@
  * Text Domain:  critical-css-for-wp
  * Domain Path: /languages
  * License: GPL2
+ *
+ * @package critical-css-for-wp
  */
+
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -35,31 +38,46 @@ require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR . 'includes/class-critical-css-for-w
 
 
 add_action( 'admin_enqueue_scripts', 'ccfwp_admin_enqueue' );
+
+/**
+ * Enqueue admin scripts
+ *
+ * @param string $check The page hook.
+ */
 function ccfwp_admin_enqueue( $check ) {
 	if ( ! is_admin() ) {
 		return;
 	}
-	if ( $check !== 'toplevel_page_critical-css-for-wp' ) {
+	if ( 'toplevel_page_critical-css-for-wp' !== $check ) {
 		return;
 	}
 	wp_enqueue_script( 'ccfwp-datatable-script', CRITICAL_CSS_FOR_WP_PLUGIN_URI . '/admin/js/jquery.dataTables.min.js', array( 'jquery' ), CRITICAL_CSS_FOR_WP_VERSION, true );
-	wp_enqueue_style( 'ccfwp-datatable-style', CRITICAL_CSS_FOR_WP_PLUGIN_URI . '/admin/js/jquery.dataTables.min.css', array() ,CRITICAL_CSS_FOR_WP_VERSION );
+	wp_enqueue_style( 'ccfwp-datatable-style', CRITICAL_CSS_FOR_WP_PLUGIN_URI . '/admin/css/jquery.dataTables.min.css', array(), CRITICAL_CSS_FOR_WP_VERSION );
 
 	$data = array(
 		'ccfwp_security_nonce' => wp_create_nonce( 'ccfwp_ajax_check_nonce' ),
 	);
-	wp_register_script( 'ccfwp-admin-js', CRITICAL_CSS_FOR_WP_PLUGIN_URI . '/admin/js/script.js', array( 'ccfwp-datatable-script' ), CRITICAL_CSS_FOR_WP_VERSION, true );
+	$min  = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+	wp_register_script( 'ccfwp-admin-js', CRITICAL_CSS_FOR_WP_PLUGIN_URI . "/admin/js/script{$min}.js", array( 'ccfwp-datatable-script' ), CRITICAL_CSS_FOR_WP_VERSION, true );
 	wp_localize_script( 'ccfwp-admin-js', 'ccfwp_localize_data', $data );
 	wp_enqueue_script( 'ccfwp-admin-js' );
 }
 
-add_action( 'init', 'load_js_data' );
-function load_js_data() {
+add_action( 'init', 'ccfwp_load_js_data' );
+
+/**
+ * Load js data
+ */
+function ccfwp_load_js_data() {
 	require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR . 'includes/javascript/delay-js.php';
 }
 
 register_activation_hook( __FILE__, 'ccfwp_on_activate' );
-
+/**
+ * On plugin activation
+ *
+ * @param bool $network_wide Network wide activation.
+ */
 function ccfwp_on_activate( $network_wide ) {
 	global $wpdb;
 
@@ -76,8 +94,13 @@ function ccfwp_on_activate( $network_wide ) {
 	}
 }
 
+/**
+ * On plugin install add tables
+ */
 function ccfwp_on_install() {
-	$charset_collate = $engine = '';
+	$charset_collate = '';
+	$engine          = '';
+
 	global $wpdb;
 	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
@@ -90,7 +113,7 @@ function ccfwp_on_install() {
 	//phpcs:ignore -- Reason: No need to escape query
 	$found_engine = $wpdb->get_var( $wpdb->prepare( 'SELECT ENGINE FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` = %s AND `TABLE_NAME` = %s;', array( DB_NAME, $wpdb->prefix . 'posts' ) ) );
 
-	if ( strtolower( $found_engine ) == 'innodb' ) {
+	if ( strtolower( $found_engine ) === 'innodb' ) {
 		$engine = ' ENGINE=InnoDB';
 	}
 	//phpcs:ignore -- Reason:  No need to escape query
@@ -115,9 +138,12 @@ function ccfwp_on_install() {
         ) " . $charset_collate . $engine . ';'
 		);
 	}
-
 }
-
+/**
+ * Add settings link
+ *
+ * @param array $links The plugin links.
+ */
 function ccfwp_plugin_settings_links( $links ) {
 	$custom_urls   = array();
 	$custom_urls[] = '<a href="' . admin_url( 'admin.php?page=critical-css-for-wp' ) . '">' . __( 'Dashboard' ) . '</a>';
@@ -125,5 +151,5 @@ function ccfwp_plugin_settings_links( $links ) {
 	$custom_urls[] = '<a href="' . admin_url( 'admin.php?page=critical-css-for-wp&tab=support' ) . '">' . __( 'Support' ) . '</a>';
 	return array_merge( $custom_urls, $links );
 }
-  $ccfwp_plugin = plugin_basename( __FILE__ );
-  add_filter( "plugin_action_links_$ccfwp_plugin", 'ccfwp_plugin_settings_links' );
+	$ccfwp_plugin = plugin_basename( __FILE__ );
+	add_filter( "plugin_action_links_$ccfwp_plugin", 'ccfwp_plugin_settings_links' );
