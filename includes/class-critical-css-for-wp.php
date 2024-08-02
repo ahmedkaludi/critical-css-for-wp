@@ -7,11 +7,14 @@
  */
 class Critical_Css_For_Wp {
 
-
+	/**
+	 * Set cache folder 
+	 * @return mixed
+	 */
 	public function cachepath() {
 		$cp_settings = ccfwp_defaults();
 		if ( defined( CRITICAL_CSS_FOR_WP_CSS_DIR ) || isset( $cp_settings['ccfwp_alt_cachepath'] ) ) {
-			if ( $cp_settings['ccfwp_alt_cachepath'] == 1 ) {
+			if ( 1  == $cp_settings['ccfwp_alt_cachepath'] ) {
 				return CRITICAL_CSS_FOR_WP_CSS_DIR_ALT;
 			}
 			return CRITICAL_CSS_FOR_WP_CSS_DIR;
@@ -20,6 +23,10 @@ class Critical_Css_For_Wp {
 		}
 	}
 
+	/**
+	 * Adding hooks for critical css
+	 * @return void
+	 */
 	public function critical_hooks() {
 
 		if ( function_exists( 'is_checkout' ) && is_checkout() ) {
@@ -83,9 +90,18 @@ class Critical_Css_For_Wp {
 		add_action( 'isa_add_every_one_hour_crtlcss', array( $this, 'every_one_minutes_event_func_crtlcss' ) );
 		add_action( 'current_screen', array( $this, 'ccfwp_custom_critical_css_generate' ) );
 	}
+	/**
+	 * Add session variable for flexmls fix
+	 * @return void
+	 */
+
 	public function ccwp_flexmls_fix() {
-		$_SESSION['ccwp_current_uri'] = isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '';
+		$_SESSION['ccwp_current_uri'] = isset($_SERVER['REQUEST_URI']) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
 	}
+	/**
+	 * generate critical css for the page
+	 * @return void
+	 */
 	public function ccfwp_custom_critical_css_generate() {
 		$settings           = ccfwp_defaults();
 		$ccfwp_generate_css = isset( $settings['ccfwp_generate_css'] ) ? $settings['ccfwp_generate_css'] : 'off';
@@ -98,6 +114,10 @@ class Critical_Css_For_Wp {
 		}
 	}
 
+	/**
+	 * Check if WP Cron is active
+	 * @return bool
+	 */
 	private function ccfwp_is_wpcron_active() {
 		if ( ! defined( 'DISABLE_WP_CRON' ) ) {
 			return true;
@@ -835,7 +855,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_POST['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_POST['ccfwp_security_nonce'], 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash ($_POST['ccfwp_security_nonce'] ), 'ccfwp_ajax_check_nonce' ) ) {
 			return;
 		}
 
@@ -843,7 +863,7 @@ class Critical_Css_For_Wp {
 		$table_name         = $table_prefix . 'critical_css_for_wp_urls';
 		$table_name_escaped = esc_sql( $table_name );
 
-		$url_id = ! empty( $_POST['url_id'] ) ? intval( $_POST['url_id'] ) : null;
+		$url_id = ! empty( $_POST['url_id'] ) ? intval( wp_unslash($_POST['url_id']) ) : null;
 
 		if ( $url_id ) {
 
@@ -875,12 +895,12 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_POST['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_POST['ccfwp_security_nonce'], 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash( $_POST['ccfwp_security_nonce'] ), 'ccfwp_ajax_check_nonce' ) ) {
 			return;
 		}
 
 		$limit  = 100;
-		$page   = ! empty( $_POST['page'] ) ? intval( $_POST['page'] ) : 0;
+		$page   = ! empty( $_POST['page'] ) ? intval( wp_unslash($_POST['page']) ) : 0;
 		$offset = $page * $limit;
 		global $wpdb, $table_prefix;
 		$table_name         = $table_prefix . 'critical_css_for_wp_urls';
@@ -937,7 +957,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_POST['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_POST['ccfwp_security_nonce'], 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash( $_POST['ccfwp_security_nonce'] ) , 'ccfwp_ajax_check_nonce' ) ) {
 			return;
 		}
 
@@ -969,7 +989,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_POST['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_POST['ccfwp_security_nonce'], 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash( $_POST['ccfwp_security_nonce'] ), 'ccfwp_ajax_check_nonce' ) ) {
 			return;
 		}
 
@@ -994,7 +1014,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_GET['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_GET['ccfwp_security_nonce'], 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash( $_GET['ccfwp_security_nonce'] ), 'ccfwp_ajax_check_nonce' ) ) {
 			return;
 		}
 		$page   = 1;
@@ -1083,7 +1103,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_GET['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_GET['ccfwp_security_nonce'], 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash ($_GET['ccfwp_security_nonce']), 'ccfwp_ajax_check_nonce' ) ) {
 			return;
 		}
 
@@ -1179,7 +1199,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_GET['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_GET['ccfwp_security_nonce'], 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash($_GET['ccfwp_security_nonce']), 'ccfwp_ajax_check_nonce' ) ) {
 			return;
 		}
 
@@ -1269,7 +1289,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_GET['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_GET['ccfwp_security_nonce'], 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash($_GET['ccfwp_security_nonce']), 'ccfwp_ajax_check_nonce' ) ) {
 			return;
 		}
 
@@ -1363,12 +1383,12 @@ class Critical_Css_For_Wp {
 		if ( in_array( 'administrator', (array) $user->roles ) ) {
 			if ( ! filter_var( ini_get( 'allow_url_fopen' ), FILTER_VALIDATE_BOOLEAN ) ) {
 				echo '<div class="notice notice-warning is-dismissible">
-				  <p>' . esc_html( 'Critical CSS For WP needs ' ) . '<strong>' . esc_html( '"allow_url_fopen"' ) . '</strong>' . esc_html( ' option to be enabled in PHP configuration to work.' ) . ' </p>
+				  <p>' . esc_html__( 'Critical CSS For WP needs ' ,'critical-css-for-wp') . '<strong>' . esc_html__( '"allow_url_fopen"' ,'critical-css-for-wp') . '</strong>' . esc_html__( ' option to be enabled in PHP configuration to work.' ,'critical-css-for-wp') . ' </p>
 				 </div>';
 			}
 			if ( $this->ccfwp_wprocket_criticalcss() ) {
 				echo '<div class="notice notice-warning is-dismissible">
-					  <p>' . esc_html( 'For' ) . ' <strong>' . esc_html( 'Critical CSS For WP ' ) . '</strong>' . esc_html( ' to function properly ' ) . esc_html( 'disable ' ) . '<strong>' . esc_html( 'Remove Unused CSS option' ) . '</strong> ' . esc_html( 'in' ) . ' <strong>' . esc_html( 'WP Rocket' ) . '</strong> </p>
+					  <p>' . esc_html__( 'For' ,'critical-css-for-wp') . ' <strong>' . esc_html__( 'Critical CSS For WP ' ,'critical-css-for-wp') . '</strong>' . esc_html__( ' to function properly ' ,'critical-css-for-wp') . esc_html__( 'disable ' ,'critical-css-for-wp') . '<strong>' . esc_html__( 'Remove Unused CSS option' ,'critical-css-for-wp') . '</strong> ' . esc_html__( 'in' ,'critical-css-for-wp') . ' <strong>' . esc_html__( 'WP Rocket' ,'critical-css-for-wp') . '</strong> </p>
 					 </div>';
 			}
 		}

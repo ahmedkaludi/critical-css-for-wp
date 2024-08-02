@@ -521,13 +521,13 @@ function ccfwp_send_query_message() {
 	if ( ! isset( $_POST['ccfwp_security_nonce'] ) ) {
 		return;
 	}
-	if ( ! wp_verify_nonce( $_POST['ccfwp_security_nonce'], 'ccfwp_ajax_check_nonce' ) ) {
+	if ( ! wp_verify_nonce( wp_unslash( $_POST['ccfwp_security_nonce'] ), 'ccfwp_ajax_check_nonce' ) ) {
 		return;
 	}
 	$customer_type = 'Are you a premium customer ? No';
-	$message       = isset( $_POST['message'] ) ? ccfwp_sanitize_textarea_field( $_POST['message'] ) : '';
+	$message       = isset( $_POST['message'] ) ? ccfwp_sanitize_textarea_field( wp_unslash($_POST['message']) ) : '';
 	$email         = sanitize_email( $_POST['email'] );
-	$premium_cus   = isset( $_POST['premium_cus'] ) ? ccfwp_sanitize_textarea_field( $_POST['premium_cus'] ) : '';
+	$premium_cus   = isset( $_POST['premium_cus'] ) ? ccfwp_sanitize_textarea_field( wp_unslash( $_POST['premium_cus']) ) : '';
 
 	if ( function_exists( 'wp_get_current_user' ) ) {
 
