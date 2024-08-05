@@ -82,8 +82,7 @@ function ccfwp_on_activate( $network_wide ) {
 	global $wpdb;
 
 	if ( is_multisite() && $network_wide ) {
-		//phpcs:ignore -- Reason: This is a multisite plugin activation.
-		$blog_ids = $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs" );
+		$blog_ids = get_sites();
 		foreach ( $blog_ids as $blog_id ) {
 			switch_to_blog( $blog_id );
 			ccfwp_on_install();

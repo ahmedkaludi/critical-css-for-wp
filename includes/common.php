@@ -14,6 +14,9 @@
  * @param string $str  String to sanitize.
  * @return string Sanitized string.
  */
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 function ccfwp_sanitize_textarea_field( $str ) {
 	if ( is_object( $str ) || is_array( $str ) ) {
 		return '';
@@ -167,4 +170,38 @@ function ccwp_file_exists( $file_path ) {
 	}
 
 	return $wp_filesystem->exists( $file_path );
+}
+
+/**
+ * Fetches the content from a URL using wp_remote_get.
+ *
+ * @param string $target_url The URL to fetch.
+ * @return string The response body 
+ */
+function ccfwp_fetch_remote_content( $target_url ) {
+    // Validate the URL
+    if ( ! esc_url_raw( $target_url ) ) {
+        return '';
+    }
+
+    // Fetch the remote content
+    $response = wp_remote_get( $target_url, array(
+        'sslverify' => false,
+        'timeout'   => 30, // Add a timeout for the request
+    ) );
+
+    // Check for errors
+    if ( is_wp_error( $response ) ) {
+        return '';
+    }
+
+    // Check for a valid response
+    $response_code = wp_remote_retrieve_response_code( $response );
+    if ( $response_code !== 200 ) {
+        return '';
+    }
+
+    // Retrieve and return the body of the response
+    $content = wp_remote_retrieve_body( $response );
+    return $content;
 }

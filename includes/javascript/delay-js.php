@@ -143,8 +143,8 @@ function ccwp_delay_js_html( $html ) {
 }
 
 function ccwp_delay_exclude_js() {
-	$settings             = ccfwp_defaults();
-	$inputs['exclude_js'] = array();
+
+	$inputs['exclude_js'] = apply_filters("ccwp_delay_exclude_js", array());
 	$excluded_files       = array();
 	if ( $inputs['exclude_js'] ) {
 		foreach ( $inputs['exclude_js'] as $i => $excluded_file ) {

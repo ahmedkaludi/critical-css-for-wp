@@ -331,10 +331,10 @@ function ccfwp_support_settings_callback() {
 		
 			<ul>
 				<li>
-					<input type="text" id="ccfwp_query_email" name="ccfwp_query_email" placeholder="email">
+					<input type="text" id="ccfwp_query_email" name="ccfwp_query_email" placeholder="<?php echo  esc_html__( 'email' ,'critical-css-for-wp');?>">
 				</li>
 				<li>                    
-					<div><textarea rows="5" cols="60" id="ccfwp_query_message" name="ccfwp_query_message" placeholder="Write your query"></textarea></div>
+					<div><textarea rows="5" cols="60" id="ccfwp_query_message" name="ccfwp_query_message" placeholder="<?php echo  esc_html__( 'Write your query' ,'critical-css-for-wp');?>"></textarea></div>
 					<span class="ccfwp-query-success ccfwp_hide"><strong><?php echo esc_html__( 'Message sent successfully, Please wait we will get back to you shortly' ,'critical-css-for-wp'); ?></strong></span>
 					<span class="ccfwp-query-error ccfwp_hide"><strong><?php echo esc_html__( 'Message not sent. please check your network connection' ,'critical-css-for-wp'); ?></strong></span>
 				</li>

@@ -5,6 +5,9 @@
  * @since 1.0
  * @package critical-css-for-wp
  */
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 class Critical_Css_For_Wp {
 
 	/**
@@ -453,14 +456,13 @@ class Critical_Css_For_Wp {
 	/**
 	 * Generate critical css for the page and
 	 * save it in the cache directory
-	 * @return void
+	 * @return array
 	 */
 	public function ccfwp_save_critical_css_in_dir_php( $current_url ) {
 
 		$target_url    = $current_url;
 		$user_dirname = $this->cachepath();
-		$response     = wp_remote_get( $target_url, array( 'sslverify' => false ) );
-		$content      = wp_remote_retrieve_body( $response );
+		$content     = ccfwp_fetch_remote_content( $target_url);
 		$regex1       = '/<link(.*?)href="(.*?)"(.*?)>/';
 		preg_match_all( $regex1, $content, $matches1, PREG_SET_ORDER );
 		$regex2 = "/<link(.*?)href='(.*?)'(.*?)>/";
@@ -475,8 +477,7 @@ class Critical_Css_For_Wp {
 			foreach ( $matches as $mat ) {
 				if ( ( strpos( $mat[2], '.css' ) !== false ) && ( strpos( $mat[1], 'preload' ) === false ) ) {
 					$all_css[]  = $mat[2];
-					$response2  = wp_remote_get( $mat[2], array( 'sslverify' => false ) );
-					$rowcssdata = wp_remote_retrieve_body( $response2 );
+					$rowcssdata = ccfwp_fetch_remote_content( $mat[2] );
 					$regexn     = '/@import\s*(url)?\s*\(?([^;]+?)\)?;/';
 
 					preg_match_all( $regexn, $rowcssdata, $matchen, PREG_SET_ORDER );
@@ -489,8 +490,7 @@ class Critical_Css_For_Wp {
 									$style = trim( end( $explod ), '"' );
 									if ( strpos( $style, '.css' ) !== false ) {
 										$pthemestyle = get_template_directory_uri() . '/' . $style;
-										$response3   = wp_remote_get( $pthemestyle, array( 'sslverify' => false ) );
-										$rowcss     .= wp_remote_retrieve_body( $response3 );
+										$rowcss     .= ccfwp_fetch_remote_content( $pthemestyle );
 									}
 								}
 							}
