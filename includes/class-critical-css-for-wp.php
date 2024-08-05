@@ -68,7 +68,7 @@ class Critical_Css_For_Wp {
 			10,
 			3
 		);
-		add_action( 'wp_enqueue_script', array( $this, 'ccfwp_add_styles' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'ccfwp_add_styles' ) );
 
 		add_action( 'wp_ajax_ccfwp_showdetails_data', array( $this, 'ccfwp_showdetails_data' ) );
 
@@ -463,6 +463,7 @@ class Critical_Css_For_Wp {
 		$target_url    = $current_url;
 		$user_dirname = $this->cachepath();
 		$content     = ccfwp_fetch_remote_content( $target_url);
+		//error_log($content);
 		$regex1       = '/<link(.*?)href="(.*?)"(.*?)>/';
 		preg_match_all( $regex1, $content, $matches1, PREG_SET_ORDER );
 		$regex2 = "/<link(.*?)href='(.*?)'(.*?)>/";
@@ -518,7 +519,6 @@ class Critical_Css_For_Wp {
 			require_once CRITICAL_CSS_FOR_WP_PLUGIN_DIR . 'css-extractor/vendor/autoload.php';
 
 			$extracted_css_arr = array();
-
 			$page_specific     = new \PageSpecificCss\PageSpecificCss();
 			$page_specific_css = preg_replace( '/@media[^{]*+{([^{}]++|{[^{}]*+})*+}/', '', $rowcss );
 			$page_specific->addBaseRules( $page_specific_css );
@@ -674,12 +674,10 @@ class Critical_Css_For_Wp {
 	}
 
 	public function ccfwp_add_styles() {
-
 		$user_dirname = $this->cachepath();
 		global $wp, $wpdb, $table_prefix;
 		$table_name         = $table_prefix . 'critical_css_for_wp_urls';
 		$table_name_escaped = esc_sql( $table_name );
-		var_dump('vokdsjbvihsd00');die();
 		$url = home_url( $wp->request );
 		if ( class_exists( 'FlexMLS_IDX' ) && isset( $_SESSION['ccwp_current_uri'] ) ) {
 			$url = esc_url( home_url( $_SESSION['ccwp_current_uri'] ) );
