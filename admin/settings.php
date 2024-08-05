@@ -502,24 +502,24 @@ function ccfwp_settings_init() {
 
 }
 
-function ccfwp_settings_validate( $input ) {
+function ccfwp_settings_validate( $input = array() ) {
 	$default_options = ccfwp_options();
+	foreach ( $input as  $key => $value ) {
 
-	foreach ( $default_options as  $value ) {
-		$key = $value['name'];
-		$type = $value['type'];
-		if (  isset( $input[ $key ] ) ) {
+		if ( isset( $default_options[ $key ] ) ) {
+			$type = $default_options[ $key ]['type'];
 			if($type == 'array'){
 				$input[ sanitize_key($key) ] = array_map( 'sanitize_text_field', wp_unslash($input[ $key ]));
 			} else if($type == 'number'){
 				$input[ sanitize_key($key) ] = absint( $input[ $key ] );
-			} else if($type == 'string'){
+			}else{
 				$input[ sanitize_key($key) ] = sanitize_text_field( $input[ $key ] );
 			}
-		}else{
+		} else{
 			$input[ sanitize_key($key) ] = sanitize_text_field( $input[ $key ] );
 		}
 	}
+
     return $input;
 }
 
