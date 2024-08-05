@@ -127,7 +127,7 @@ function ccfwp_on_install() {
             `url_id` bigint( 20 ) unsigned NOT NULL,            
             `type` varchar(20),
             `type_name` varchar(50),
-            `url` varchar(300) NOT NULL,                 
+            `url` varchar(250) NOT NULL,                 
             `status` varchar(20) NOT NULL default 'queue',                                          
             `cached_name` varchar(100),
             `created_at` datetime NOT NULL,
@@ -146,9 +146,9 @@ function ccfwp_on_install() {
  */
 function ccfwp_plugin_settings_links( $links ) {
 	$custom_urls   = array();
-	$custom_urls[] = '<a href="' . admin_url( 'admin.php?page=critical-css-for-wp' ) . '">' . __( 'Dashboard' ) . '</a>';
-	$custom_urls[] = '<a href="' . admin_url( 'admin.php?page=critical-css-for-wp&tab=advance' ) . '">' . __( 'Settings' ) . '</a>';
-	$custom_urls[] = '<a href="' . admin_url( 'admin.php?page=critical-css-for-wp&tab=support' ) . '">' . __( 'Support' ) . '</a>';
+	$custom_urls[] = '<a href="' . esc_url(admin_url( 'admin.php?page=critical-css-for-wp' )) . '">' . esc_html__( 'Dashboard' ,'critical-css-for-wp') . '</a>';
+	$custom_urls[] = '<a href="' .  esc_url(admin_url( 'admin.php?page=critical-css-for-wp&tab=advance' )) . '">' . esc_html__( 'Settings' ,'critical-css-for-wp') . '</a>';
+	$custom_urls[] = '<a href="' .  esc_url(admin_url( 'admin.php?page=critical-css-for-wp&tab=support' )) . '">' . esc_html__( 'Support' , 'critical-css-for-wp') . '</a>';
 	return array_merge( $custom_urls, $links );
 }
 	$ccfwp_plugin = plugin_basename( __FILE__ );

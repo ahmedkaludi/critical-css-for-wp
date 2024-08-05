@@ -855,7 +855,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_POST['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( wp_unslash ($_POST['ccfwp_security_nonce'] ), 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( $_POST['ccfwp_security_nonce'] , 'ccfwp_ajax_check_nonce' ) ) {
 			return;
 		}
 
@@ -895,7 +895,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_POST['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( wp_unslash( $_POST['ccfwp_security_nonce'] ), 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce($_POST['ccfwp_security_nonce'] , 'ccfwp_ajax_check_nonce' ) ) {
 			return;
 		}
 
@@ -957,7 +957,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_POST['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( wp_unslash( $_POST['ccfwp_security_nonce'] ) , 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( $_POST['ccfwp_security_nonce']  , 'ccfwp_ajax_check_nonce' ) ) {
 			return;
 		}
 
@@ -989,7 +989,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_POST['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( wp_unslash( $_POST['ccfwp_security_nonce'] ), 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( $_POST['ccfwp_security_nonce'] , 'ccfwp_ajax_check_nonce' ) ) {
 			return;
 		}
 
@@ -1014,7 +1014,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_GET['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( wp_unslash( $_GET['ccfwp_security_nonce'] ), 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( $_GET['ccfwp_security_nonce'] , 'ccfwp_ajax_check_nonce' ) ) {
 			return;
 		}
 		$page   = 1;
@@ -1031,7 +1031,7 @@ class Critical_Css_For_Wp {
 		$table_name_escaped = esc_sql( $table_name );
 
 		if ( ! empty( $_GET['search']['value'] ) ) {
-			$search      = sanitize_text_field( $_GET['search']['value'] );
+			$search      = sanitize_text_field( wp_unslash($_GET['search']['value'] ));
 			$total_count = $wpdb->get_var( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
 					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
@@ -1103,7 +1103,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_GET['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( wp_unslash ($_GET['ccfwp_security_nonce']), 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( $_GET['ccfwp_security_nonce'] , 'ccfwp_ajax_check_nonce' ) ) {
 			return;
 		}
 
@@ -1122,7 +1122,7 @@ class Critical_Css_For_Wp {
 		$table_name_escaped = esc_sql( $table_name );
 
 		if ( ! empty( $_GET['search']['value'] ) ) {
-			$search      = sanitize_text_field( $_GET['search']['value'] );
+			$search      = sanitize_text_field( wp_unlash($_GET['search']['value'] ) );
 			$total_count = $wpdb->get_var( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
 					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
@@ -1199,7 +1199,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_GET['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( wp_unslash($_GET['ccfwp_security_nonce']), 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( $_GET['ccfwp_security_nonce'], 'ccfwp_ajax_check_nonce' ) ) {
 			return;
 		}
 
@@ -1218,7 +1218,7 @@ class Critical_Css_For_Wp {
 		$table_name_escaped = esc_sql( $table_name );
 
 		if ( isset( $_GET['search']['value'] ) && $_GET['search']['value'] ) {
-			$search      = sanitize_text_field( $_GET['search']['value'] );
+			$search      = sanitize_text_field( wp_unslash($_GET['search']['value'] ));
 			$total_count = $wpdb->get_var( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
 					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
@@ -1289,7 +1289,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_GET['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( wp_unslash($_GET['ccfwp_security_nonce']), 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( $_GET['ccfwp_security_nonce'], 'ccfwp_ajax_check_nonce' ) ) {
 			return;
 		}
 

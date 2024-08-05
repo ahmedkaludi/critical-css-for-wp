@@ -110,7 +110,7 @@ function ccfwp_admin_link( $tab = '' ) {
 
 function ccfwp_get_tab( $default = '', $available = array() ) {
 	//phpcs:ignore -- Reason: $_GET['tab'] is used to show the tab only it is not saved or processed.
-	$tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : $default;
+	$tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash($_GET['tab'] )) : $default;
 
 	if ( ! in_array( $tab, $available ) ) {
 		$tab = $default;
@@ -403,7 +403,7 @@ function ccfwp_advance_settings_callback() {
   </div></div>';
 	
 	$ccfwp_scan_urls = ( isset( $settings['ccfwp_scan_urls'] ) ) ? $settings['ccfwp_scan_urls'] : 30;
-	echo '<input type="text" value="' . esc_attr( $ccfwp_scan_urls ) . '" name="ccfwp_settings[ccfwp_scan_urls]">';
+	echo '<input type="number" class="ccfwp-advance-width" value="' . esc_attr( $ccfwp_scan_urls ) . '" name="ccfwp_settings[ccfwp_scan_urls]">';
 
 	echo '<div class="ccfwp-heading-title">' . esc_html__( 'Pages to generate critical css' ,'critical-css-for-wp');
 	echo '<div class="ccfwp-tooltip-box"><span class="dashicons dashicons-info"></span>
@@ -411,14 +411,14 @@ function ccfwp_advance_settings_callback() {
   </div></div>';
 	
 	$ccfwp_generate_urls = ( isset( $settings['ccfwp_generate_urls'] ) ) ? $settings['ccfwp_generate_urls'] : 4;
-	echo '<input type="text" value="' . esc_attr( $ccfwp_generate_urls ) . '" name="ccfwp_settings[ccfwp_generate_urls]">';
+	echo '<input type="number" class="ccfwp-advance-width"  value="' . esc_attr( $ccfwp_generate_urls ) . '" name="ccfwp_settings[ccfwp_generate_urls]">';
 
 	echo '<div class="ccfwp-heading-title">' . esc_html__( 'CSS Defer','critical-css-for-wp');
 	echo '<div class="ccfwp-tooltip-box"><span class="dashicons dashicons-info"></span>
     <span class="ccfwp-tooltip-text">' . esc_html__( 'By default plugin our plugin will add critical css and defer css loading. You can disable the deferring  of css if you have any issue.' ,'critical-css-for-wp') . '</span>
   </div></div>';
 	
-	echo '<select name="ccfwp_settings[ccfwp_defer_css]">';
+	echo '<select class="ccfwp-advance-width"  name="ccfwp_settings[ccfwp_defer_css]">';
 	$ccwp_defer_on  = ( isset( $settings['ccfwp_defer_css'] ) && $settings['ccfwp_defer_css'] == 'on' ) ? 'selected' : '';
 	$ccwp_defer_off = ( isset( $settings['ccfwp_defer_css'] ) && $settings['ccfwp_defer_css'] == 'off' ) ? 'selected' : '';
 	echo '<option value="on" ' . esc_attr( $ccwp_defer_on ) . '>' . esc_html__( 'Enable' ,'critical-css-for-wp') . ' </option>';
@@ -429,7 +429,7 @@ function ccfwp_advance_settings_callback() {
     <span class="ccfwp-tooltip-text">' . esc_html__( 'This option will only work when WP cron is disabled. Critical CSS will be generated plugin page is visited. There will be a gap of 1 minutes between two consecutive requests' ,'critical-css-for-wp') . '</span>
   </div></div>';
 	
-	echo '<select name="ccfwp_settings[ccfwp_generate_css]">';
+	echo '<select class="ccfwp-advance-width"  name="ccfwp_settings[ccfwp_generate_css]">';
 	$ccwp_generate_on  = ( isset( $settings['ccfwp_generate_css'] ) && $settings['ccfwp_generate_css'] == 'on' ) ? 'selected' : '';
 	$ccwp_generate_off = ( isset( $settings['ccfwp_generate_css'] ) && $settings['ccfwp_generate_css'] == 'off' ) ? 'selected' : '';
 	if(!$ccwp_generate_on){
@@ -442,7 +442,7 @@ function ccfwp_advance_settings_callback() {
 	echo '<div class="ccfwp-tooltip-box"><span class="dashicons dashicons-info"></span>
     <span class="ccfwp-tooltip-text">' . esc_html__( 'Amount of time all css is deferred to load. You can add any value for delay which seems good for your website.This value is in milliseconds(ms). [1000ms = 1sec] ','critical-css-for-wp') . '</span>
   </div></div>';
-	echo '<input type="number" value="' . esc_attr( intval( $settings['ccfwp_defer_time'] ) ) . '" name="ccfwp_settings[ccfwp_defer_time]"> ms';
+	echo '<input type="number" class="ccfwp-advance-width" value="' . esc_attr( intval( $settings['ccfwp_defer_time'] ) ) . '" name="ccfwp_settings[ccfwp_defer_time]"> ms';
 
 	echo '<div class="ccfwp-heading-title">' . esc_html__( 'Cache Alt path' ,'critical-css-for-wp');
 	echo '<div class="ccfwp-tooltip-box"><span class="dashicons dashicons-info"></span>
@@ -503,7 +503,7 @@ function ccfwp_settings_validate( $input ) {
 	foreach ( $defaults as $key => $value ) {
 		if (  isset( $input[ $key ] ) ) {
 			if($key == 'ccfwp_on_cp_type'){
-				$input[ $key ] = array_map( 'sanitize_text_field', $input[ $key ]);
+				$input[ $key ] = array_map( 'sanitize_text_field', wp_unslash($input[ $key ]));
 			} else if($key == 'ccfwp_on_home' || $key == 'ccfwp_scan_urls' || $key == 'ccfwp_generate_urls' || $key == 'ccfwp_defer_time' || $key == 'ccfwp_alt_cachepath'){
 				$input[ $key ] = absint( $input[ $key ] );
 			} else {
@@ -521,7 +521,7 @@ function ccfwp_send_query_message() {
 	if ( ! isset( $_POST['ccfwp_security_nonce'] ) ) {
 		return;
 	}
-	if ( ! wp_verify_nonce( wp_unslash( $_POST['ccfwp_security_nonce'] ), 'ccfwp_ajax_check_nonce' ) ) {
+	if ( ! wp_verify_nonce( $_POST['ccfwp_security_nonce'] , 'ccfwp_ajax_check_nonce' ) ) {
 		return;
 	}
 	$customer_type = 'Are you a premium customer ? No';
