@@ -375,19 +375,19 @@ function ccfwp_advance_settings_callback() {
 			echo '<h2> ' . esc_html__( 'Generate Critical Css For','critical-css-for-wp') . '</h2>';
 			echo '<ul>';
 			echo '<li>';
-			echo '<input class="" type="checkbox" name="ccfwp_settings[ccfwp_on_home]" value="1" ' . ( isset( $settings['ccfwp_on_home'] ) ? 'checked' : '' ) . ' /> ' . esc_html__( 'Home' ,'critical-css-for-wp');
+			echo '<label for="ccfwp_settings[ccfwp_on_home]"><input class="" type="checkbox" id="ccfwp_settings[ccfwp_on_home]" name="ccfwp_settings[ccfwp_on_home]" value="1" ' . ( isset( $settings['ccfwp_on_home'] ) ? 'checked' : '' ) . ' /> ' . '<label for="ccfwp_settings[ccfwp_on_home]">' . esc_html__( 'Home' ,'critical-css-for-wp'). '</label>';
 			echo '</li>';
 
 		foreach ( $post_types as $key => $value ) {
 			echo '<li>';
-			echo '<input class="" type="checkbox" name="ccfwp_settings[ccfwp_on_cp_type][' . esc_attr( $key ) . ']" value="1" ' . ( isset( $settings['ccfwp_on_cp_type'][ $key ] ) ? 'checked' : '' ) . ' /> ' .  esc_html( ucwords($value) ) ;
+			echo '<input class="" type="checkbox" id="ccfwp_settings[ccfwp_on_cp_type][' . esc_attr( $key ) . ']" name="ccfwp_settings[ccfwp_on_cp_type][' . esc_attr( $key ) . ']" value="1" ' . ( isset( $settings['ccfwp_on_cp_type'][ $key ] ) ? 'checked' : '' ) . ' /> ' .  '<label for="ccfwp_settings[ccfwp_on_cp_type][' . esc_attr( $key ) . ']"> '. esc_html( ucwords($value) ) .'</label>' ;
 			echo '</li>';
 		}
 
 		if ( $taxonomies ) {
 			foreach ( $taxonomies as $key => $value ) {
 				echo '<li>';
-				echo '<input class="" type="checkbox" name="ccfwp_settings[ccfwp_on_tax_type][' . esc_attr( $key ) . ']" value="1" ' . ( isset( $settings['ccfwp_on_tax_type'][ $key ] ) ? 'checked' : '' ) . ' /> ' . esc_html( ucwords( $value ) );
+				echo '<input class="" type="checkbox" id="ccfwp_settings[ccfwp_on_tax_type][' . esc_attr( $key ) . ']" name="ccfwp_settings[ccfwp_on_tax_type][' . esc_attr( $key ) . ']" value="1" ' . ( isset( $settings['ccfwp_on_tax_type'][ $key ] ) ? 'checked' : '' ) . ' /> ' .'<label for="ccfwp_settings[ccfwp_on_tax_type][' . esc_attr( $key ) . ']">'. esc_html( ucwords( $value ) ) .'</label>';
 				echo '</li>';
 			}
 		}
@@ -459,18 +459,28 @@ function ccfwp_advance_settings_callback() {
 
 }
 
+function ccfwp_options()
+{
+	$options = array(
+		array('name' => 'ccfwp_on_home', 'value' => 1, 'type' => 'number'),
+		array('name' => 'ccfwp_on_cp_type', 'value' => array('post' => 1), 'type' => 'array'),
+		array('name' => 'ccfwp_defer_css', 'value' => 'on', 'type' => 'string'),
+		array('name' => 'ccfwp_scan_urls', 'value' => 30, 'type' => 'number'),
+		array('name' => 'ccfwp_generate_urls', 'value' => 4, 'type' => 'number'),
+		array('name' => 'ccfwp_defer_time', 'value' => 300, 'type' => 'number'),
+		array('name' => 'ccfwp_alt_cachepath', 'value' => 0, 'type' => 'number'),
+		array('name' => 'ccfwp_generate_css', 'value' => 'off', 'type' => 'string'),
+	);
+	$options = apply_filters('ccfwp_options', $options);
+	return $options;
+}
 
 function ccfwp_defaults() {
-	$defaults = array(
-		'ccfwp_on_home'       => 1,
-		'ccfwp_on_cp_type'    => array( 'post' => 1 ),
-		'ccfwp_defer_css'     => 'on',
-		'ccfwp_scan_urls'     => 30,
-		'ccfwp_generate_urls' => 4,
-		'ccfwp_defer_time'    => 300,
-		'ccfwp_alt_cachepath' => 0,
-		'ccfwp_generate_css'  => 'off',
-	);
+	$default_options = ccfwp_options();
+	$defaults = array();
+	foreach ( $default_options as $option ) {
+		$defaults[ $option['name'] ] = $option['value'];
+	}
 	$settings = get_option( 'ccfwp_settings', $defaults );
 	return $settings;
 }
@@ -488,27 +498,21 @@ function ccfwp_settings_init() {
 }
 
 function ccfwp_settings_validate( $input ) {
+	$default_options = ccfwp_options();
 
-	$defaults = array(
-		'ccfwp_on_home'       => 1,
-		'ccfwp_on_cp_type'    => array( 'post' => 1 ),
-		'ccfwp_defer_css'     => 'on',
-		'ccfwp_scan_urls'     => 30,
-		'ccfwp_generate_urls' => 4,
-		'ccfwp_defer_time'    => 300,
-		'ccfwp_alt_cachepath' => 0,
-		'ccfwp_generate_css'  => 'off',
-	);
-
-	foreach ( $defaults as $key => $value ) {
+	foreach ( $default_options as  $value ) {
+		$key = $value['name'];
+		$type = $value['type'];
 		if (  isset( $input[ $key ] ) ) {
-			if($key == 'ccfwp_on_cp_type'){
-				$input[ $key ] = array_map( 'sanitize_text_field', wp_unslash($input[ $key ]));
-			} else if($key == 'ccfwp_on_home' || $key == 'ccfwp_scan_urls' || $key == 'ccfwp_generate_urls' || $key == 'ccfwp_defer_time' || $key == 'ccfwp_alt_cachepath'){
-				$input[ $key ] = absint( $input[ $key ] );
-			} else {
-				$input[ $key ] = sanitize_text_field( $input[ $key ] );
+			if($type == 'array'){
+				$input[ sanitize_key($key) ] = array_map( 'sanitize_text_field', wp_unslash($input[ $key ]));
+			} else if($key == 'number'){
+				$input[ sanitize_key($key) ] = absint( $input[ $key ] );
+			} else if($key == 'string'){
+				$input[ sanitize_key($key) ] = sanitize_text_field( $input[ $key ] );
 			}
+		}else{
+			$input[ sanitize_key($key) ] = sanitize_text_field( $input[ $key ] );
 		}
 	}
     return $input;

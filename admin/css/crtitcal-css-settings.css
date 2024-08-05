@@ -412,3 +412,6 @@ padding:5px;
   .ccfwp-advance-width{
     width:150px;
   }
+  .ccfwp-section-content label{
+    cursor: pointer;
+  }

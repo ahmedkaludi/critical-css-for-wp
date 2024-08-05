@@ -47,6 +47,19 @@ Support is provided in [Forum](https://wordpress.org/support/plugin/critical-css
 **Would you like to contribute?**
 You may now contribute to this Critical CSS For WP plugin on Github: [View repository](https://github.com/ahmedkaludi/critical-css-for-wp) on Github
 
+### Credits
+
+1. <strong> CSS from HTML extractor </strong>
+   - Author: Jan Decavele
+   - URL: https://github.com/JanDC/css-from-html-extractor
+   - License: The MIT License (MIT)
+   - License URL: https://github.com/JanDC/css-from-html-extractor?tab=License-1-ov-file
+
+2. <strong> PHP Secure Communications Library </strong>
+   - Author: DataTables
+   - URL:https://github.com/DataTables/DataTables
+   - License: The MIT License (MIT)
+   - License URL: https://github.com/DataTables/DataTables?tab=MIT-1-ov-file
 
 == Changelog ==
 
