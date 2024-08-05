@@ -464,6 +464,7 @@ function ccfwp_options( $get = null )
 	$options = array(
 		'ccfwp_on_home'=>array( 'value' => 1, 'type' => 'number'),
 		'ccfwp_on_cp_type'=>array( 'value' => array('post' => 1), 'type' => 'array'),
+		'ccfwp_on_tax_type' => array( 'value' => array('category' => 0), 'type' => 'array'),
 		'ccfwp_defer_css'=>array( 'value' => 'on', 'type' => 'string'),
 		'ccfwp_scan_urls'=>array( 'value' => 30, 'type' => 'number'),
 		'ccfwp_generate_urls'=>array( 'value' => 4, 'type' => 'number'),
@@ -509,14 +510,14 @@ function ccfwp_settings_validate( $input = array() ) {
 		if ( isset( $default_options[ $key ] ) ) {
 			$type = $default_options[ $key ]['type'];
 			if($type == 'array'){
-				$input[ sanitize_key($key) ] = array_map( 'sanitize_text_field', wp_unslash($input[ $key ]));
+				$input[ sanitize_key($key) ] = array_map( 'sanitize_text_field', wp_unslash($value));
 			} else if($type == 'number'){
-				$input[ sanitize_key($key) ] = absint( $input[ $key ] );
+				$input[ sanitize_key($key) ] = absint( $value );
 			}else{
-				$input[ sanitize_key($key) ] = sanitize_text_field( $input[ $key ] );
+				$input[ sanitize_key($key) ] = sanitize_text_field( $value );
 			}
 		} else{
-			$input[ sanitize_key($key) ] = sanitize_text_field( $input[ $key ] );
+			$input[ sanitize_key($key) ] = sanitize_text_field( $value );
 		}
 	}
 
