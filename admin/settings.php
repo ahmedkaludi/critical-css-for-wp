@@ -514,10 +514,15 @@ function ccfwp_settings_validate( $input = array() ) {
 			} else if($type == 'number'){
 				$input[ sanitize_key($key) ] = absint( $value );
 			}else{
-				$input[ sanitize_key($key) ] = sanitize_text_field( $value );
+				$input[ sanitize_key($key) ] = sanitize_text_field( wp_unslash($value) );
 			}
 		} else{
-			$input[ sanitize_key($key) ] = sanitize_text_field( $value );
+			if(is_array($value)){
+				$input[ sanitize_key($key) ] = array_map( 'sanitize_text_field', wp_unslash($value));
+			}else{
+				$input[ sanitize_key($key) ] = sanitize_text_field( wp_unslash($value) );
+			}
+			
 		}
 	}
 
