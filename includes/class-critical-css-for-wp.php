@@ -68,7 +68,7 @@ class Critical_Css_For_Wp {
 			10,
 			3
 		);
-		add_action( 'wp_head', array( $this, 'print_style_cc' ), 2 );
+		add_action( 'wp_enqueue_script', array( $this, 'ccfwp_add_styles' ) );
 
 		add_action( 'wp_ajax_ccfwp_showdetails_data', array( $this, 'ccfwp_showdetails_data' ) );
 
@@ -673,14 +673,13 @@ class Critical_Css_For_Wp {
 		return $permalink;
 	}
 
-	public function print_style_cc() {
+	public function ccfwp_add_styles() {
 
 		$user_dirname = $this->cachepath();
-		$settings     = ccfwp_defaults();
 		global $wp, $wpdb, $table_prefix;
-				$table_name         = $table_prefix . 'critical_css_for_wp_urls';
-				$table_name_escaped = esc_sql( $table_name );
-
+		$table_name         = $table_prefix . 'critical_css_for_wp_urls';
+		$table_name_escaped = esc_sql( $table_name );
+		var_dump('vokdsjbvihsd00');die();
 		$url = home_url( $wp->request );
 		if ( class_exists( 'FlexMLS_IDX' ) && isset( $_SESSION['ccwp_current_uri'] ) ) {
 			$url = esc_url( home_url( $_SESSION['ccwp_current_uri'] ) );
@@ -699,7 +698,10 @@ class Critical_Css_For_Wp {
 			$css .= $custom_css;
 			$css  = $this->ccfwp_clean_css( $css );
 
-			echo "<style type='text/css' id='critical-css-for-wp'>" . esc_html( $css ) . '</style>';
+			wp_register_style( 'critical-css-for-wp', false, array(), CRITICAL_CSS_FOR_WP_VERSION );
+			wp_enqueue_style( 'critical-css-for-wp', false, array(), CRITICAL_CSS_FOR_WP_VERSION );
+			wp_add_inline_style( 'critical-css-for-wp', $css );
+
 		} else {
 			$wpdb->query( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
@@ -1073,7 +1075,7 @@ class Critical_Css_For_Wp {
 				if ( $value['status'] == 'cached' ) {
 					$user_dirname = $this->cachepath();
 					$size         = ccwp_file_exists( $user_dirname . '/' . md5( trailingslashit( $value['url'] ) ) . '.css' ) ? filesize( $user_dirname . '/' . md5( trailingslashit( $value['url'] ) ) . '.css' ) : '';
-					if ( ! $size ) {
+					if ( ! $size && 0 != $size) {
 						$size = '<abbr title="' . esc_attr__( 'File is not in cached directory. Please recheck in advance option', 'critical-css-for-wp' ) . '">' . esc_html__( 'Deleted', 'critical-css-for-wp' ) . '</abbr>';
 					}
 				}

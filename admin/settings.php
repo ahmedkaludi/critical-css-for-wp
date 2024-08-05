@@ -331,10 +331,10 @@ function ccfwp_support_settings_callback() {
 		
 			<ul>
 				<li>
-					<input type="text" id="ccfwp_query_email" name="ccfwp_query_email" placeholder="<?php echo  esc_html__( 'email' ,'critical-css-for-wp');?>">
+					<input type="text" id="ccfwp_query_email" name="ccfwp_query_email" placeholder="<?php echo  esc_attr__( 'email' ,'critical-css-for-wp');?>">
 				</li>
 				<li>                    
-					<div><textarea rows="5" cols="60" id="ccfwp_query_message" name="ccfwp_query_message" placeholder="<?php echo  esc_html__( 'Write your query' ,'critical-css-for-wp');?>"></textarea></div>
+					<div><textarea rows="5" cols="60" id="ccfwp_query_message" name="ccfwp_query_message" placeholder="<?php echo  esc_attr__( 'Write your query' ,'critical-css-for-wp');?>"></textarea></div>
 					<span class="ccfwp-query-success ccfwp_hide"><strong><?php echo esc_html__( 'Message sent successfully, Please wait we will get back to you shortly' ,'critical-css-for-wp'); ?></strong></span>
 					<span class="ccfwp-query-error ccfwp_hide"><strong><?php echo esc_html__( 'Message not sent. please check your network connection' ,'critical-css-for-wp'); ?></strong></span>
 				</li>
@@ -449,7 +449,7 @@ function ccfwp_advance_settings_callback() {
     <span class="ccfwp-tooltip-text">' . esc_html__( 'Check this options if you critical css is getting overwritten or deleted ' ,'critical-css-for-wp'). '</span>
   </div></div>';
 	$alt_check = ( isset( $settings['ccfwp_alt_cachepath'] ) && $settings['ccfwp_alt_cachepath'] == 1 ) ? 'checked' : '';
-	echo '<p><input type="checkbox" value="1" name="ccfwp_settings[ccfwp_alt_cachepath]" ' . esc_attr($alt_check) . '> Alternative cache path</p>';
+	echo '<p><label for="ccfwp_settings[ccfwp_alt_cachepath]"><input type="checkbox" value="1" id="ccfwp_settings[ccfwp_alt_cachepath]" name="ccfwp_settings[ccfwp_alt_cachepath]" ' . esc_attr($alt_check) . '> '.esc_html__( 'Alternative cache path' ,'critical-css-for-wp').'</label></p>';
 
 	echo '</div>';
 	?>
