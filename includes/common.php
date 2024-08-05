@@ -214,6 +214,7 @@ function ccfwp_fetch_remote_content( $target_url ) {
  * @return string Human-readable size string.
  */
 function ccfwp_format_size($bytes, $precision = 2) {
+	$bytes = intval($bytes);
     $units = array('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
 
     $bytes = max($bytes, 0);
