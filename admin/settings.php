@@ -459,28 +459,33 @@ function ccfwp_advance_settings_callback() {
 
 }
 
-function ccfwp_options()
+function ccfwp_options( $get = null )
 {
 	$options = array(
-		array('name' => 'ccfwp_on_home', 'value' => 1, 'type' => 'number'),
-		array('name' => 'ccfwp_on_cp_type', 'value' => array('post' => 1), 'type' => 'array'),
-		array('name' => 'ccfwp_defer_css', 'value' => 'on', 'type' => 'string'),
-		array('name' => 'ccfwp_scan_urls', 'value' => 30, 'type' => 'number'),
-		array('name' => 'ccfwp_generate_urls', 'value' => 4, 'type' => 'number'),
-		array('name' => 'ccfwp_defer_time', 'value' => 300, 'type' => 'number'),
-		array('name' => 'ccfwp_alt_cachepath', 'value' => 0, 'type' => 'number'),
-		array('name' => 'ccfwp_generate_css', 'value' => 'off', 'type' => 'string'),
+		'ccfwp_on_home'=>array( 'value' => 1, 'type' => 'number'),
+		'ccfwp_on_cp_type'=>array( 'value' => array('post' => 1), 'type' => 'array'),
+		'ccfwp_defer_css'=>array( 'value' => 'on', 'type' => 'string'),
+		'ccfwp_scan_urls'=>array( 'value' => 30, 'type' => 'number'),
+		'ccfwp_generate_urls'=>array( 'value' => 4, 'type' => 'number'),
+		'ccfwp_defer_time'=>array( 'value' => 300, 'type' => 'number'),
+		'ccfwp_alt_cachepath'=>array( 'value' => 0, 'type' => 'number'),
+		'ccfwp_generate_css'=>array( 'value' => 'off', 'type' => 'string'),
 	);
-	$options = apply_filters('ccfwp_options', $options);
+	
+	if($get){
+		$return_options = array();
+		$get_val =  ('type' == $get) ? 'type' : 'value';
+
+		foreach ( $options as $key => $option ) {
+			$return_options[$key] = $option[$get_val];
+		}
+		return $return_options;
+	}
 	return $options;
 }
 
 function ccfwp_defaults() {
-	$default_options = ccfwp_options();
-	$defaults = array();
-	foreach ( $default_options as $option ) {
-		$defaults[ $option['name'] ] = $option['value'];
-	}
+	$defaults = ccfwp_options('value');
 	$settings = get_option( 'ccfwp_settings', $defaults );
 	return $settings;
 }
@@ -506,9 +511,9 @@ function ccfwp_settings_validate( $input ) {
 		if (  isset( $input[ $key ] ) ) {
 			if($type == 'array'){
 				$input[ sanitize_key($key) ] = array_map( 'sanitize_text_field', wp_unslash($input[ $key ]));
-			} else if($key == 'number'){
+			} else if($type == 'number'){
 				$input[ sanitize_key($key) ] = absint( $input[ $key ] );
-			} else if($key == 'string'){
+			} else if($type == 'string'){
 				$input[ sanitize_key($key) ] = sanitize_text_field( $input[ $key ] );
 			}
 		}else{
