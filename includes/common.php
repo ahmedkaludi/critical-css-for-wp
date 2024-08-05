@@ -205,3 +205,23 @@ function ccfwp_fetch_remote_content( $target_url ) {
     $content = wp_remote_retrieve_body( $response );
     return $content;
 }
+
+/**
+ * Format a size in bytes into a human-readable string (e.g., 1.5 MB).
+ *
+ * @param int $bytes Size in bytes.
+ * @param int $precision Number of decimal places to include.
+ * @return string Human-readable size string.
+ */
+function ccfwp_format_size($bytes, $precision = 2) {
+    $units = array('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
+
+    $bytes = max($bytes, 0);
+    $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+    $pow = min($pow, count($units) - 1);
+
+    // Calculate the formatted size
+    $formatted_size = $bytes / (1 << (10 * $pow));
+
+    return round($formatted_size, $precision) . ' ' . $units[$pow];
+}

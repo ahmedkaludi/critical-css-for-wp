@@ -1081,7 +1081,7 @@ class Critical_Css_For_Wp {
 				$formated_result[] = array(
 					'<div><abbr title="' . esc_attr( $value['cached_name'] ) . '">' . esc_url( $value['url'] ) . '</abbr>' . ( $value['status'] == 'failed' ? '<a href="#" data-section="all" data-id="' . esc_attr( $value['id'] ) . '" class="cwvpb-resend-single-url dashicons dashicons-controls-repeat"></a>' : '' ) . ' </div>',
 					'<span class="cwvpb-status-t">' . esc_html( $value['status'] ) . '</span>',
-					$size,
+					ccfwp_format_size($size),
 					$value['updated_at'],
 				);
 			}
@@ -1176,7 +1176,7 @@ class Critical_Css_For_Wp {
 				$formated_result[] = array(
 					'<abbr title="' . esc_attr( $value['cached_name'] ) . '">' . esc_url( $value['url'] ) . '</abbr>',
 					'<span class="cwvpb-status-t">' . esc_html( $value['status'] ) . '</span>',
-					$size,
+					ccfwp_format_size($size),
 					$value['updated_at'],
 				);
 			}
