@@ -284,7 +284,7 @@ label.switch {
   user-select: none;
 }
 div#ccfwp-wrap {
-    width: 100%;
+    width: 90%;
 }
 div#left-sidebar {
     width: 70%;
@@ -408,4 +408,10 @@ padding:5px;
   color:red;
   border:1 px red;
   padding:5px;
+  }
+  .ccfwp-advance-width{
+    width:150px;
+  }
+  .ccfwp-section-content label{
+    cursor: pointer;
   }

@@ -56,7 +56,7 @@ function ccwp_delay_js_main() {
 
 	add_action( 'wp_footer', 'ccwp_delay_js_load', PHP_INT_MAX );
 
-	if ( ccwp_check_js_defer() ) {
+	if ( ccfwp_check_js_defer() ) {
 		add_filter( 'rocket_delay_js_exclusions', 'ccwp_add_rocket_delay_js_exclusions' );
 		return;
 	}
@@ -143,8 +143,8 @@ function ccwp_delay_js_html( $html ) {
 }
 
 function ccwp_delay_exclude_js() {
-	$settings             = critical_css_defaults();
-	$inputs['exclude_js'] = array();
+
+	$inputs['exclude_js'] = apply_filters("ccwp_delay_exclude_js", array());
 	$excluded_files       = array();
 	if ( $inputs['exclude_js'] ) {
 		foreach ( $inputs['exclude_js'] as $i => $excluded_file ) {
@@ -160,13 +160,13 @@ function ccwp_delay_exclude_js() {
 }
 
 function ccwp_delay_js_load() {
-	$settings = critical_css_defaults();
+	$settings = ccfwp_defaults();
 	if ( ( isset( $settings['ccfwp_defer_css'] ) && $settings['ccfwp_defer_css'] == 'off' ) ) {
 		return;
 	}
 
 	$ccfwp_defer_time = intval( $settings['ccfwp_defer_time'] );
-		$js_content   = '<script type="text/javascript" id="ccwp-delayed-scripts" data-two-no-delay="true">
+		echo '<script type="text/javascript" id="ccwp-delayed-scripts" data-two-no-delay="true">
 			let ccwpDOMLoaded=!1;
 			let ccwp_loaded = false;
 			let resources_length=0;
@@ -202,7 +202,7 @@ function ccwp_delay_js_load() {
                 let gres = uag.match(gpat);
                 let cpat = /Chrome-Lighthouse/gm;
                 let cres = uag.match(cpat);
-                let wait_till=' . esc_attr( $ccfwp_defer_time ) . ';
+                let wait_till=' . esc_js( $ccfwp_defer_time ) . ';
                 let new_ua = "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Mobile Safari/537.36";
                 let new_ua2 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36";
                 if(gres || cres || uag==new_ua || uag==new_ua2){
@@ -320,6 +320,4 @@ function ccwp_delay_js_load() {
                 return link;
             }
 			</script>';
-
-	echo $js_content;
 }
