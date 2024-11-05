@@ -762,6 +762,10 @@ class Critical_Css_For_Wp {
 			$delay_flag       = false;
 			$excluded_scripts = array( 'ccwp-delayed-styles' );
 
+			if(function_exists('wp_is_mobile') &&  !wp_is_mobile()){
+				$excluded_scripts[] = 'bootstrap-css'; 
+			}
+
 			if ( ! empty( $excluded_scripts ) ) {
 				foreach ( $excluded_scripts as $excluded_script ) {
 					if ( strpos( $tag, $excluded_script ) !== false ) {
