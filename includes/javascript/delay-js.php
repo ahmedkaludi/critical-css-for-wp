@@ -86,7 +86,7 @@ function ccwp_delay_js_html( $html ) {
 		}
 		$delay_flag       = false;
 		$excluded_scripts = array(
-			'ccwp-delayed-scripts',
+			'ccwp-delayed-scripts'
 		);
 
 		if ( ! empty( $excluded_scripts ) ) {
