@@ -3,7 +3,7 @@ Contributors: magazine3
 Tags: Critical, Critical CSS, Core Web Vital, Cache, SEO
 Requires at least: 3.0
 Tested up to: 6.7
-Stable tag: 1.0.16
+Stable tag: 1.0.17
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -62,6 +62,10 @@ You may now contribute to this Critical CSS For WP plugin on Github: [View repos
    - License URL: https://github.com/DataTables/DataTables?tab=MIT-1-ov-file
 
 == Changelog ==
+
+= 1.0.17 (05 November 2024) = 
+* Fixed  :  Mobile PageSpeed score is low when theme is using bootstrap css #61 
+* Tested  : Test with WordPress 6.7 #60
 
 = 1.0.16 (05 August 2024) = 
 * Fixed  :  Compatibility with Denticare theme by Bold Themes #52
