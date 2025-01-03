@@ -147,7 +147,6 @@ class Critical_Css_For_Wp {
 		$settings           = ccfwp_defaults();
 		
 		$ccfwp_generate_css = isset( $settings['ccfwp_generation_type'] ) ? $settings['ccfwp_generation_type'] : 'auto';
-		error_log(print_r($ccfwp_generate_css, true));
 		if ( $ccfwp_generate_css == 'manual' ) {
 			return false;
 		}
@@ -494,7 +493,6 @@ class Critical_Css_For_Wp {
 		$target_url    = $current_url;
 		$user_dirname = $this->cachepath();
 		$content     = ccfwp_fetch_remote_content( $target_url);
-		//error_log($content);
 		$regex1       = '/<link(.*?)href="(.*?)"(.*?)>/';
 		preg_match_all( $regex1, $content, $matches1, PREG_SET_ORDER );
 		$regex2 = "/<link(.*?)href='(.*?)'(.*?)>/";
@@ -1505,7 +1503,6 @@ class Critical_Css_For_Wp {
 		$total_pages = (int) $wpdb->get_var(
 			"SELECT COUNT(*) FROM {$table_name_escaped}"
 		);
-		error_log( $total_pages );
 	
 		// Get cached count.
 		$cached = (int) $wpdb->get_var(
@@ -1514,7 +1511,7 @@ class Critical_Css_For_Wp {
 				'cached'
 			)
 		);
-		error_log( $cached );
+
 		// Get pending count.
 		$pending = (int) $wpdb->get_var(
 			$wpdb->prepare(
@@ -1522,7 +1519,7 @@ class Critical_Css_For_Wp {
 				'pending'
 			)
 		);
-		error_log( $pending );
+
 		// Get failed count.
 		$failed = (int) $wpdb->get_var(
 			$wpdb->prepare(
@@ -1530,7 +1527,7 @@ class Critical_Css_For_Wp {
 				'failed'
 			)
 		);
-		error_log( $failed );
+
 		return array(
 			'total_pages' => $total_pages,
 			'cached'      => $cached,
