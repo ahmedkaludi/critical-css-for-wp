@@ -536,13 +536,13 @@ function ccfwp_send_query_message() {
 	if ( ! isset( $_POST['ccfwp_security_nonce'] ) ) {
 		return;
 	}
-	if ( ! wp_verify_nonce( $_POST['ccfwp_security_nonce'] , 'ccfwp_ajax_check_nonce' ) ) {
+	if ( ! wp_verify_nonce( wp_unslash( $_POST['ccfwp_security_nonce'] ) , 'ccfwp_ajax_check_nonce' ) ) { //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: Using as nonce.
 		return;
 	}
 	$customer_type = 'Are you a premium customer ? No';
-	$message       = isset( $_POST['message'] ) ? ccfwp_sanitize_textarea_field( wp_unslash($_POST['message']) ) : '';
-	$email         = sanitize_email( $_POST['email'] );
-	$premium_cus   = isset( $_POST['premium_cus'] ) ? ccfwp_sanitize_textarea_field( wp_unslash( $_POST['premium_cus']) ) : '';
+	$message       = isset( $_POST['message'] ) ? ccfwp_sanitize_textarea_field( wp_unslash($_POST['message']) ) : ''; //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: $message is sanitized using ccfwp_sanitize_textarea_field
+	$email         = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
+	$premium_cus   = isset( $_POST['premium_cus'] ) ? ccfwp_sanitize_textarea_field( wp_unslash( $_POST['premium_cus']) ) : ''; //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: $premium_cus is sanitized using ccfwp_sanitize_textarea_field
 
 	if ( function_exists( 'wp_get_current_user' ) ) {
 
@@ -569,7 +569,7 @@ function ccfwp_send_query_message() {
 		$headers[] = 'Content-Type: text/html; charset=UTF-8';
 		$headers[] = 'From: ' . esc_attr( $user_email );
 		$headers[] = 'Reply-To: ' . esc_attr( $user_email );
-		// Load WP components, no themes.
+		
 		$sent = wp_mail( $sendto, $subject, $message, $headers );
 
 		if ( $sent ) {

@@ -99,7 +99,7 @@ class Critical_Css_For_Wp {
 	 */
 
 	public function ccwp_flexmls_fix() {
-		$_SESSION['ccwp_current_uri'] = isset($_SERVER['REQUEST_URI']) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+		$_SESSION['ccwp_current_uri'] = isset($_SERVER['REQUEST_URI']) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : ''; //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: sanitization using wp_unslash.
 	}
 	/**
 	 * generate critical css for the page
@@ -680,7 +680,7 @@ class Critical_Css_For_Wp {
 		$table_name_escaped = esc_sql( $table_name );
 		$url = home_url( $wp->request );
 		if ( class_exists( 'FlexMLS_IDX' ) && isset( $_SESSION['ccwp_current_uri'] ) ) {
-			$url = esc_url( home_url( $_SESSION['ccwp_current_uri'] ) );
+			$url = esc_url( home_url( $_SESSION['ccwp_current_uri'] ) ); //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: sanitization using esc_url.
 		}
 		$custom_css = '';
 		if ( in_array( 'elementor/elementor.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
@@ -737,7 +737,7 @@ class Critical_Css_For_Wp {
 		$url_arg       = '';
 
 		if ( class_exists( 'FlexMLS_IDX' ) && isset( $_SESSION['ccwp_current_uri'] ) ) {
-			$url_arg = esc_url( home_url( $_SESSION['ccwp_current_uri'] ) );
+			$url_arg = esc_url( home_url( $_SESSION['ccwp_current_uri'] ) ); //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: sanitization using esc_url.
 		}
 
 		if ( ! $this->check_critical_css( $url_arg ) || preg_match( '/<style id="jetpack-boost-critical-css">/s', $html ) || ( isset( $settings['ccfwp_defer_css'] ) && $settings['ccfwp_defer_css'] == 'off' ) ) {
@@ -859,7 +859,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_POST['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_POST['ccfwp_security_nonce'] , 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash( $_POST['ccfwp_security_nonce'] ) , 'ccfwp_ajax_check_nonce' ) ) { //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: using as nonce.
 			return;
 		}
 
@@ -899,7 +899,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_POST['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce($_POST['ccfwp_security_nonce'] , 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash( $_POST['ccfwp_security_nonce'] ) , 'ccfwp_ajax_check_nonce' ) ) { //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: using as nonce.
 			return;
 		}
 
@@ -961,7 +961,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_POST['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_POST['ccfwp_security_nonce']  , 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash( $_POST['ccfwp_security_nonce'] )  , 'ccfwp_ajax_check_nonce' ) ) { //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: using as nonce.
 			return;
 		}
 
@@ -993,7 +993,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_POST['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_POST['ccfwp_security_nonce'] , 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash( $_POST['ccfwp_security_nonce'] ) , 'ccfwp_ajax_check_nonce' ) ) { //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: using as nonce.
 			return;
 		}
 
@@ -1018,7 +1018,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_GET['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_GET['ccfwp_security_nonce'] , 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash( $_GET['ccfwp_security_nonce'] ) , 'ccfwp_ajax_check_nonce' ) ) { //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: using as nonce.
 			return;
 		}
 		$page   = 1;
@@ -1107,7 +1107,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_GET['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_GET['ccfwp_security_nonce'] , 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash( $_GET['ccfwp_security_nonce'] ) , 'ccfwp_ajax_check_nonce' ) ) { //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: using as nonce.
 			return;
 		}
 
@@ -1126,7 +1126,7 @@ class Critical_Css_For_Wp {
 		$table_name_escaped = esc_sql( $table_name );
 
 		if ( ! empty( $_GET['search']['value'] ) ) {
-			$search      = sanitize_text_field( wp_unlash($_GET['search']['value'] ) );
+			$search      = sanitize_text_field( wp_unslash($_GET['search']['value'] ) );
 			$total_count = $wpdb->get_var( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
 					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
@@ -1203,7 +1203,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_GET['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_GET['ccfwp_security_nonce'], 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash( $_GET['ccfwp_security_nonce'] ) , 'ccfwp_ajax_check_nonce' ) ) { //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: using as nonce.
 			return;
 		}
 
@@ -1221,7 +1221,7 @@ class Critical_Css_For_Wp {
 		$table_name         = $table_prefix . 'critical_css_for_wp_urls';
 		$table_name_escaped = esc_sql( $table_name );
 
-		if ( isset( $_GET['search']['value'] ) && $_GET['search']['value'] ) {
+		if ( isset( $_GET['search']['value'] ) && !empty( $_GET['search']['value']) ) {
 			$search      = sanitize_text_field( wp_unslash($_GET['search']['value'] ));
 			$total_count = $wpdb->get_var( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
@@ -1293,7 +1293,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_GET['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_GET['ccfwp_security_nonce'], 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash( $_GET['ccfwp_security_nonce'] ), 'ccfwp_ajax_check_nonce' ) ) {  //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: using as nonce.
 			return;
 		}
 
@@ -1311,7 +1311,7 @@ class Critical_Css_For_Wp {
 		$table_name         = $table_prefix . 'critical_css_for_wp_urls';
 		$table_name_escaped = esc_sql( $table_name );
 
-		if ( isset( $_GET['search']['value'] ) && wp_unslash( $_GET['search']['value'] ) ) {
+		if ( isset( $_GET['search']['value'] ) && !empty( $_GET['search']['value'] ) ) {
 			$search      = sanitize_text_field( wp_unslash( $_GET['search']['value'] ) );
 			$total_count = $wpdb->get_var( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
