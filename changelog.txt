@@ -1,3 +1,8 @@
+= 1.0.18 (03 January 2025) = 
+* Added  : Option to generate critical CSS manually: #58
+* Fixed  :  Nav Bar CSS changes when we activate the plugin. #54
+* Improved : Code improvement #63
+
 = 1.0.17 (05 November 2024) = 
 * Fixed  :  Mobile PageSpeed score is low when theme is using bootstrap css #61 
 * Tested  : Test with WordPress 6.7 #60

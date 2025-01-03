@@ -82,16 +82,22 @@ class Critical_Css_For_Wp {
 		add_action( 'wp_ajax_ccfwp_reset_urls_cache', array( $this, 'ccfwp_reset_urls_cache' ) );
 		add_action( 'wp_ajax_ccfwp_recheck_urls_cache', array( $this, 'ccfwp_recheck_urls_cache' ) );
 
-		add_action( 'wp_ajax_ccfwp_cc_all_cron', array( $this, 'every_one_minutes_event_func_crtlcss' ) );
+		add_action( 'wp_ajax_ccfwp_cc_all_cron', array( $this, 'ccfwp_generate_crtlcss_per_minute' ) );
 
-		add_filter( 'cron_schedules', array( $this, 'isa_add_every_one_hour_crtlcss' ) );
-		if ( ! wp_next_scheduled( 'isa_add_every_one_hour_crtlcss' ) ) {
+		add_filter( 'cron_schedules', array( $this, 'ccfwp_generate_crtlcss' ) );
+		if ( ! wp_next_scheduled( 'ccfwp_generate_crtlcss' ) ) {
 			if ( $this->ccfwp_is_wpcron_active() ) {
-				wp_schedule_event( time(), 'every_one_hour', 'isa_add_every_one_hour_crtlcss' );
+				wp_schedule_event( time(), 'every_30_seconds', 'ccfwp_generate_crtlcss' );
 			}
+		}else{
+			if ( ! $this->ccfwp_is_wpcron_active() ) {
+				wp_clear_scheduled_hook( 'ccfwp_generate_crtlcss' );
+			}
+
 		}
-		add_action( 'isa_add_every_one_hour_crtlcss', array( $this, 'every_one_minutes_event_func_crtlcss' ) );
+		add_action( 'ccfwp_generate_crtlcss', array( $this, 'ccfwp_generate_crtlcss_per_minute' ) );
 		add_action( 'current_screen', array( $this, 'ccfwp_custom_critical_css_generate' ) );
+		add_action( 'wp_ajax_ccfwp_generate_css', array( $this, 'ccfwp_generate_css_cache' ) );
 	}
 	/**
 	 * Add session variable for flexmls fix
@@ -99,7 +105,7 @@ class Critical_Css_For_Wp {
 	 */
 
 	public function ccwp_flexmls_fix() {
-		$_SESSION['ccwp_current_uri'] = isset($_SERVER['REQUEST_URI']) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+		$_SESSION['ccwp_current_uri'] = isset($_SERVER['REQUEST_URI']) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : ''; //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: sanitization using wp_unslash.
 	}
 	/**
 	 * generate critical css for the page
@@ -111,10 +117,25 @@ class Critical_Css_For_Wp {
 		if ( is_admin() && ! $this->ccfwp_is_wpcron_active() && $ccfwp_generate_css == 'on' ) {
 			$ccwp_last_cron_update = get_option( 'ccwp_last_altcron_update', 0 );
 			if ( $ccwp_last_cron_update < strtotime( '-1 minute' ) ) {
-				$this->every_one_minutes_event_func_crtlcss();
+				$this->ccfwp_generate_crtlcss_per_minute();
 				update_option( 'ccwp_last_altcron_update', time() );
 			}
 		}
+	}
+	//create a ajax to generate the css manually and return the updated status
+	public function ccfwp_generate_css_cache() {
+		// check for nonce and manage_option permission
+		if ( ! isset( $_POST['ccfwp_security_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ccfwp_security_nonce'] ) ), 'ccfwp_ajax_check_nonce' ) ) { //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: sanitization using wp_unslash.
+			wp_die();
+		}
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die();
+		}
+		$this->save_posts_url();
+		$this->save_terms_urls();
+		$this->save_others_urls();
+		$this->generate_css_on_interval();
+		wp_send_json($this->ccfwp_get_status_summary());
 	}
 
 	/**
@@ -122,12 +143,21 @@ class Critical_Css_For_Wp {
 	 * @return bool
 	 */
 	private function ccfwp_is_wpcron_active() {
+
+		$settings           = ccfwp_defaults();
+		
+		$ccfwp_generate_css = isset( $settings['ccfwp_generation_type'] ) ? $settings['ccfwp_generation_type'] : 'auto';
+		if ( $ccfwp_generate_css == 'manual' ) {
+			return false;
+		}
+
 		if ( ! defined( 'DISABLE_WP_CRON' ) ) {
 			return true;
 		}
 		if ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON == false ) {
 			return true;
 		}
+		
 		return false;
 	}
 	public function on_term_create( $term_id, $tt_id, $taxonomy ) {
@@ -233,8 +263,8 @@ class Critical_Css_For_Wp {
 	 * @param mixed $schedules
 	 * @return mixed
 	 */
-	public function isa_add_every_one_hour_crtlcss( $schedules ) {
-		$schedules['every_one_hour'] = array(
+	public function ccfwp_generate_crtlcss( $schedules ) {
+		$schedules['every_30_seconds'] = array(
 			'interval' => 30 * 1,
 			'display'  => __( 'Every 30 Seconds', 'critical-css-for-wp' ),
 		);
@@ -463,22 +493,17 @@ class Critical_Css_For_Wp {
 		$target_url    = $current_url;
 		$user_dirname = $this->cachepath();
 		$content     = ccfwp_fetch_remote_content( $target_url);
-		//error_log($content);
-		$regex1       = '/<link(.*?)href="(.*?)"(.*?)>/';
-		preg_match_all( $regex1, $content, $matches1, PREG_SET_ORDER );
-		$regex2 = "/<link(.*?)href='(.*?)'(.*?)>/";
-		preg_match_all( $regex2, $content, $matches2, PREG_SET_ORDER );
-		$matches = array_merge( $matches1, $matches2 );
-
+		$regex = '/<link(.*?)href=(["\'])(.*?)\2(.*?)>/';
+        preg_match_all($regex, $content, $matches, PREG_SET_ORDER);
 		$rowcss  = '';
 		$all_css = array();
 
 		if ( $matches ) {
 
 			foreach ( $matches as $mat ) {
-				if ( ( strpos( $mat[2], '.css' ) !== false ) && ( strpos( $mat[1], 'preload' ) === false ) ) {
-					$all_css[]  = $mat[2];
-					$rowcssdata = ccfwp_fetch_remote_content( $mat[2] );
+				if ( ( strpos( $mat[3], '.css' ) !== false ) && ( strpos( $mat[1], 'preload' ) === false ) ) {
+					$all_css[]  = $mat[3];
+					$rowcssdata = ccfwp_fetch_remote_content( $mat[3] );
 					$regexn     = '/@import\s*(url)?\s*\(?([^;]+?)\)?;/';
 
 					preg_match_all( $regexn, $rowcssdata, $matchen, PREG_SET_ORDER );
@@ -653,11 +678,15 @@ class Critical_Css_For_Wp {
 		);
 	}
 
-	public function every_one_minutes_event_func_crtlcss() {
-		$this->save_posts_url();
-		$this->save_terms_urls();
-		$this->save_others_urls();
-		$this->generate_css_on_interval();
+	public function ccfwp_generate_crtlcss_per_minute() {
+		$settings = ccfwp_defaults();
+		$ccfwp_generate_css = isset( $settings['ccfwp_generation_type'] ) ? $settings['ccfwp_generation_type'] : 'auto';
+		if ( $ccfwp_generate_css == 'auto' ) {
+			$this->save_posts_url();
+			$this->save_terms_urls();
+			$this->save_others_urls();
+			$this->generate_css_on_interval();
+		}
 	}
 
 	public function append_slash_permalink( $permalink ) {
@@ -680,7 +709,7 @@ class Critical_Css_For_Wp {
 		$table_name_escaped = esc_sql( $table_name );
 		$url = home_url( $wp->request );
 		if ( class_exists( 'FlexMLS_IDX' ) && isset( $_SESSION['ccwp_current_uri'] ) ) {
-			$url = esc_url( home_url( $_SESSION['ccwp_current_uri'] ) );
+			$url = esc_url( home_url( $_SESSION['ccwp_current_uri'] ) ); //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: sanitization using esc_url.
 		}
 		$custom_css = '';
 		if ( in_array( 'elementor/elementor.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
@@ -737,7 +766,7 @@ class Critical_Css_For_Wp {
 		$url_arg       = '';
 
 		if ( class_exists( 'FlexMLS_IDX' ) && isset( $_SESSION['ccwp_current_uri'] ) ) {
-			$url_arg = esc_url( home_url( $_SESSION['ccwp_current_uri'] ) );
+			$url_arg = esc_url( home_url( $_SESSION['ccwp_current_uri'] ) ); //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: sanitization using esc_url.
 		}
 
 		if ( ! $this->check_critical_css( $url_arg ) || preg_match( '/<style id="jetpack-boost-critical-css">/s', $html ) || ( isset( $settings['ccfwp_defer_css'] ) && $settings['ccfwp_defer_css'] == 'off' ) ) {
@@ -859,7 +888,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_POST['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_POST['ccfwp_security_nonce'] , 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash( $_POST['ccfwp_security_nonce'] ) , 'ccfwp_ajax_check_nonce' ) ) { //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: using as nonce.
 			return;
 		}
 
@@ -899,7 +928,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_POST['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce($_POST['ccfwp_security_nonce'] , 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash( $_POST['ccfwp_security_nonce'] ) , 'ccfwp_ajax_check_nonce' ) ) { //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: using as nonce.
 			return;
 		}
 
@@ -961,7 +990,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_POST['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_POST['ccfwp_security_nonce']  , 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash( $_POST['ccfwp_security_nonce'] )  , 'ccfwp_ajax_check_nonce' ) ) { //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: using as nonce.
 			return;
 		}
 
@@ -993,7 +1022,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_POST['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_POST['ccfwp_security_nonce'] , 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash( $_POST['ccfwp_security_nonce'] ) , 'ccfwp_ajax_check_nonce' ) ) { //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: using as nonce.
 			return;
 		}
 
@@ -1018,7 +1047,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_GET['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_GET['ccfwp_security_nonce'] , 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash( $_GET['ccfwp_security_nonce'] ) , 'ccfwp_ajax_check_nonce' ) ) { //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: using as nonce.
 			return;
 		}
 		$page   = 1;
@@ -1107,7 +1136,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_GET['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_GET['ccfwp_security_nonce'] , 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash( $_GET['ccfwp_security_nonce'] ) , 'ccfwp_ajax_check_nonce' ) ) { //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: using as nonce.
 			return;
 		}
 
@@ -1126,7 +1155,7 @@ class Critical_Css_For_Wp {
 		$table_name_escaped = esc_sql( $table_name );
 
 		if ( ! empty( $_GET['search']['value'] ) ) {
-			$search      = sanitize_text_field( wp_unlash($_GET['search']['value'] ) );
+			$search      = sanitize_text_field( wp_unslash($_GET['search']['value'] ) );
 			$total_count = $wpdb->get_var( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
 					//phpcs:ignore -- Reason: $table_name_escaped is escaped above.
@@ -1203,7 +1232,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_GET['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_GET['ccfwp_security_nonce'], 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash( $_GET['ccfwp_security_nonce'] ) , 'ccfwp_ajax_check_nonce' ) ) { //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: using as nonce.
 			return;
 		}
 
@@ -1221,7 +1250,7 @@ class Critical_Css_For_Wp {
 		$table_name         = $table_prefix . 'critical_css_for_wp_urls';
 		$table_name_escaped = esc_sql( $table_name );
 
-		if ( isset( $_GET['search']['value'] ) && $_GET['search']['value'] ) {
+		if ( isset( $_GET['search']['value'] ) && !empty( $_GET['search']['value']) ) {
 			$search      = sanitize_text_field( wp_unslash($_GET['search']['value'] ));
 			$total_count = $wpdb->get_var( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
@@ -1293,7 +1322,7 @@ class Critical_Css_For_Wp {
 		if ( ! isset( $_GET['ccfwp_security_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( $_GET['ccfwp_security_nonce'], 'ccfwp_ajax_check_nonce' ) ) {
+		if ( ! wp_verify_nonce( wp_unslash( $_GET['ccfwp_security_nonce'] ), 'ccfwp_ajax_check_nonce' ) ) {  //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason: using as nonce.
 			return;
 		}
 
@@ -1311,7 +1340,7 @@ class Critical_Css_For_Wp {
 		$table_name         = $table_prefix . 'critical_css_for_wp_urls';
 		$table_name_escaped = esc_sql( $table_name );
 
-		if ( isset( $_GET['search']['value'] ) && wp_unslash( $_GET['search']['value'] ) ) {
+		if ( isset( $_GET['search']['value'] ) && !empty( $_GET['search']['value'] ) ) {
 			$search      = sanitize_text_field( wp_unslash( $_GET['search']['value'] ) );
 			$total_count = $wpdb->get_var( //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				$wpdb->prepare(
@@ -1453,6 +1482,56 @@ class Critical_Css_For_Wp {
 
 		return trim( $css );
 	}
+
+	public function ccfwp_get_status_summary() {
+		global $wpdb, $table_prefix;
+	
+		$table_name = $table_prefix . 'critical_css_for_wp_urls';
+		$table_name_escaped = esc_sql($table_name);
+	
+		// Initialize the counters.
+		$total_pages = 0;
+		$cached = 0;
+		$pending = 0;
+		$failed = 0;
+	
+		// Get total pages count.
+		$total_pages = (int) $wpdb->get_var(
+			"SELECT COUNT(*) FROM {$table_name_escaped}"
+		);
+	
+		// Get cached count.
+		$cached = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM {$table_name_escaped} WHERE `status` = %s",
+				'cached'
+			)
+		);
+
+		// Get pending count.
+		$pending = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM {$table_name_escaped} WHERE `status` = %s",
+				'pending'
+			)
+		);
+
+		// Get failed count.
+		$failed = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM {$table_name_escaped} WHERE `status` = %s",
+				'failed'
+			)
+		);
+
+		return array(
+			'total_pages' => $total_pages,
+			'cached'      => $cached,
+			'pending'     => $pending,
+			'failed'      => $failed,
+		);
+	}
+	
 }
 
 $ccfwp_general_critical_css = new Critical_Css_For_Wp();

@@ -269,3 +269,57 @@ jQuery( document ).ready(function($) {
 
 	});
 });
+function ccfwp_generate_css_cache(callback) {
+    jQuery.ajax({
+        type: "POST",
+        url: ajaxurl,
+        data: {
+            action: 'ccfwp_generate_css',
+            ccfwp_security_nonce: ccfwp_localize_data.ccfwp_security_nonce
+        },
+        success: function(response) {
+            console.log('Cache generation response:', response);
+            if (typeof callback === 'function') {
+                callback(response);
+            }
+        },
+        error: function(response) {
+            console.error('Error during cache generation:', response);
+			alert('Error during cache generation, PLease try again');
+
+        },
+        dataType: 'json'
+    });
+}
+
+function ccfwp_generate_until_complete(button) {
+    ccfwp_generate_css_cache(function(status) {
+        if (!status || typeof status.total_pages === 'undefined' || typeof status.cached === 'undefined' || typeof status.failed === 'undefined') {
+            console.error('Invalid or undefined status response:', status);
+            button.prop('disabled', false).text('Generate Critical CSS');
+            return;
+        }
+		   document.getElementById("ccfwp-queue-count").innerHTML = status.total_pages - (status.cached + status.failed);
+			document.getElementById("ccfwp-cached-count").innerHTML = status.cached;
+			document.getElementById("ccfwp-total-count").innerHTML = status.total_pages;
+			document.querySelector('.ccfwp_progress_bar_body').style.width = (status.cached / status.total_pages) * 100 + '%';
+			document.querySelector('.ccfwp_progress_bar_body').innerHTML = (status.cached / status.total_pages) * 100 + '%';
+        if (status.total_pages > status.cached + status.failed) {
+	
+			button.prop('disabled', true).text('Generating...'+status.cached+'/'+status.total_pages);
+            // Recursively call until completion.
+            ccfwp_generate_until_complete(button);
+        } else {
+            console.log('Cache generation complete!');
+            button.prop('disabled', false).text('Generate Critical CSS');
+			window.location.reload();
+        }
+    });
+}
+
+jQuery(document).on('click', '.ccfwp-generate-css', function() {
+    const button = jQuery(this);
+    button.prop('disabled', true).text('Generating...');
+    ccfwp_generate_until_complete(button);
+});
+
