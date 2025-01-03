@@ -176,17 +176,17 @@ function ccfwp_urlslist_callback() {
 				<div class="ccfwp_cached_status_bar">
 				<div style="margin-top:20px;"><strong><?php echo esc_html__( 'Total :' ,'critical-css-for-wp'); ?></strong> 
 																 <?php
-																	echo esc_attr( $total_count ) . ' URLs';
+																	echo '<span id="ccfwp-total-count">'.esc_attr( $total_count ) . '</span> URLs';
 																	?>
 				 </div>
 				 <div><strong><?php echo esc_html__( 'In Progress :' ,'critical-css-for-wp'); ?></strong> 
 										 <?php
-											echo esc_attr( $queue_count ) . ' URLs';
+											echo '<span id="ccfwp-queue-count">'.esc_attr( $queue_count ) . '</span> URLs';
 											?>
 				 </div>
 				<div><strong><?php echo esc_html__( 'Critical CSS Optimized  :' ,'critical-css-for-wp'); ?></strong> 
 										<?php
-										echo esc_attr( $cached_count ) . ' URLs';
+										echo '<span id="ccfwp-cached-count">'.esc_attr( $cached_count ) . '</span> URLs';
 										?>
 				</div>
 				<?php
@@ -215,8 +215,19 @@ function ccfwp_urlslist_callback() {
 				</div>                                                                
 			</div> 
 			<!-- DataTable section -->
-			<div class="ccfwp-table-url-wrapper">                         
+			<div class="ccfwp-table-url-wrapper">  
+			<?php
+					$settings = ccfwp_defaults();
+					if ( isset( $settings['ccfwp_generation_type'] ) && $settings['ccfwp_generation_type'] == 'manual' ) {
+						?>
+						<a href="#" class="button button-primary ccfwp-generate-css"><?php echo esc_html__( 'Generate Critical CSS' ,'critical-css-for-wp'); ?></a> <br><br>
+						<p><b><?php echo esc_html__('Note:');?></b> <?php echo esc_html__('To ensure Manual Critical CSS generation works correctly, please keep this tab open. If you close the tab, the generation process will pause. You can resume it by clicking the "Generate" button again and keeping this tab open.','critical-css-for-wp');?></p>
+						<?php
+					}
+ 					?>                       
 			 <div id="cwvpb-global-tabs" style="margin-top: 10px;">
+				
+
 				<a data-id="cwvpb-general-container"><?php echo esc_html__( 'All' ,'critical-css-for-wp'); ?> (<?php echo esc_html( $total_count ); ?>)</a> |
 				<a data-id="cwvpb-queue-container"><?php echo esc_html__( 'In Queue' ,'critical-css-for-wp');?> (<?php echo esc_html( $queue_count ); ?>)</a> |
 				<a data-id="cwvpb-knowledge-container"><?php echo esc_html__( 'Completed' ,'critical-css-for-wp'); ?> (<?php echo esc_html( $cached_count ); ?>)</a> |
@@ -396,7 +407,16 @@ function ccfwp_advance_settings_callback() {
 		echo '</div>';
 	}
 	echo '<div class="ccfwp-section-content">';
-
+	echo '<div class="ccfwp-heading-title">' . esc_html__( 'CSS Generattion' ,'critical-css-for-wp');
+	echo '<div class="ccfwp-tooltip-box"><span class="dashicons dashicons-info"></span>
+	<span class="ccfwp-tooltip-text">' . esc_html__( 'Select the type of generation you want to use. Auto will generate css automatically and manual will generate css when user click on generate' ,'critical-css-for-wp') . '</span>
+  </div></div>';
+	echo '<select class="ccfwp-advance-width"  name="ccfwp_settings[ccfwp_generation_type]">';
+	$ccwp_generation_auto  = ( isset( $settings['ccfwp_generation_type'] ) && $settings['ccfwp_generation_type'] == 'auto' ) ? 'selected' : '';
+	$ccwp_generation_manual = ( isset( $settings['ccfwp_generation_type'] ) && $settings['ccfwp_generation_type'] == 'manual' ) ? 'selected' : '';
+	echo '<option value="auto" ' . esc_attr( $ccwp_generation_auto ) . '>' . esc_html__( 'Auto' ,'critical-css-for-wp') . ' </option>';
+	echo '<option value="manual" ' . esc_attr( $ccwp_generation_manual ) . '>' . esc_html__( 'Manual' ,'critical-css-for-wp') . '</option></select>';
+	
 	echo '<div class="ccfwp-heading-title">' . esc_html__( 'Pages to scan' ,'critical-css-for-wp');
 	echo '<div class="ccfwp-tooltip-box"><span class="dashicons dashicons-info"></span>
     <span class="ccfwp-tooltip-text">' . esc_html__( 'By default plugin will scan 30 urls and add that to processing queue. You can increase this value to quickly add pages to queue.In case your website seems slow you can decrease this value.We recommed not to increase this value above 1000.' ,'critical-css-for-wp') . '</span>
@@ -437,7 +457,7 @@ function ccfwp_advance_settings_callback() {
 	}
 	echo '<option value="on" ' . esc_attr( $ccwp_generate_on ) . '>' . esc_html__( 'Enable' ,'critical-css-for-wp') . ' </option>';
 	echo '<option value="off" ' . esc_attr( $ccwp_generate_off ) . '>' . esc_html__( 'Disable' ,'critical-css-for-wp') . '</option></select>';
-
+	
 	echo '<div class="ccfwp-heading-title">' . esc_html__( 'CSS Defer Delay' ,'critical-css-for-wp');
 	echo '<div class="ccfwp-tooltip-box"><span class="dashicons dashicons-info"></span>
     <span class="ccfwp-tooltip-text">' . esc_html__( 'Amount of time all css is deferred to load. You can add any value for delay which seems good for your website.This value is in milliseconds(ms). [1000ms = 1sec] ','critical-css-for-wp') . '</span>
@@ -471,6 +491,7 @@ function ccfwp_options( $get = null )
 		'ccfwp_defer_time'=>array( 'value' => 300, 'type' => 'number'),
 		'ccfwp_alt_cachepath'=>array( 'value' => 0, 'type' => 'number'),
 		'ccfwp_generate_css'=>array( 'value' => 'off', 'type' => 'string'),
+		'ccfwp_generation_type'=>array( 'value' => 'auto', 'type' => 'string'),
 	);
 	
 	if($get){

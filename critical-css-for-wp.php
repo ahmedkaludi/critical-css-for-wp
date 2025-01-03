@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CRITICAL_CSS_FOR_WP_VERSION', '1.0.17' );
+define( 'CRITICAL_CSS_FOR_WP_VERSION', '1.0.17.5' );
 define( 'CRITICAL_CSS_FOR_WP_PLUGIN_URI', plugin_dir_url( __FILE__ ) );
 define( 'CRITICAL_CSS_FOR_WP_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 
