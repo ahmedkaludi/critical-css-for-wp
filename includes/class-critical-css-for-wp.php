@@ -493,12 +493,9 @@ class Critical_Css_For_Wp {
 		$target_url    = $current_url;
 		$user_dirname = $this->cachepath();
 		$content     = ccfwp_fetch_remote_content( $target_url);
-		$regex1       = '/<link(.*?)href="(.*?)"(.*?)>/';
-		preg_match_all( $regex1, $content, $matches1, PREG_SET_ORDER );
-		$regex2 = "/<link(.*?)href='(.*?)'(.*?)>/";
-		preg_match_all( $regex2, $content, $matches2, PREG_SET_ORDER );
-		$matches = array_merge( $matches1, $matches2 );
-
+		$regex = '/<link(.*?)href=("|\')(.*?)\2(.*?)>/';
+		preg_match_all( $regex, $content, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER );
+		
 		$rowcss  = '';
 		$all_css = array();
 
