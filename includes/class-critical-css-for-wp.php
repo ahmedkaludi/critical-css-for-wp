@@ -493,18 +493,17 @@ class Critical_Css_For_Wp {
 		$target_url    = $current_url;
 		$user_dirname = $this->cachepath();
 		$content     = ccfwp_fetch_remote_content( $target_url);
-		$regex = '/<link(.*?)href=("|\')(.*?)\2(.*?)>/';
-		preg_match_all( $regex, $content, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER );
-		
+		$regex = '/<link(.*?)href=(["\'])(.*?)\2(.*?)>/';
+        preg_match_all($regex, $content, $matches, PREG_SET_ORDER);
 		$rowcss  = '';
 		$all_css = array();
 
 		if ( $matches ) {
 
 			foreach ( $matches as $mat ) {
-				if ( ( strpos( $mat[2], '.css' ) !== false ) && ( strpos( $mat[1], 'preload' ) === false ) ) {
-					$all_css[]  = $mat[2];
-					$rowcssdata = ccfwp_fetch_remote_content( $mat[2] );
+				if ( ( strpos( $mat[3], '.css' ) !== false ) && ( strpos( $mat[1], 'preload' ) === false ) ) {
+					$all_css[]  = $mat[3];
+					$rowcssdata = ccfwp_fetch_remote_content( $mat[3] );
 					$regexn     = '/@import\s*(url)?\s*\(?([^;]+?)\)?;/';
 
 					preg_match_all( $regexn, $rowcssdata, $matchen, PREG_SET_ORDER );
