@@ -2,8 +2,8 @@
 Contributors: magazine3
 Tags: Critical, Critical CSS, Core Web Vital, Cache, SEO
 Requires at least: 3.0
-Tested up to: 6.7
-Stable tag: 1.0.18
+Tested up to: 6.8
+Stable tag: 1.0.19
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,9 @@ You may now contribute to this Critical CSS For WP plugin on Github: [View repos
 
 == Changelog ==
 
+= 1.0.19 (14 May 2025) = 
+* Tested : Need to test with WordPress 6.8 #65
+
 = 1.0.18 (03 January 2025) = 
 * Added  : Option to generate critical CSS manually: #58
 * Fixed  :  Nav Bar CSS changes when we activate the plugin. #54
@@ -97,7 +100,5 @@ You may now contribute to this Critical CSS For WP plugin on Github: [View repos
 = 1.0.11 (07 November 2023) = 
 * Fixed : Critical Error while activating #38
 
-= 1.0.10 (13 September 2023) = 
-* Fixed : Post / Pages not adding to queue for generating #35
 
 Full changelog available [ at changelog.txt](https://plugins.svn.wordpress.org/critical-css-for-wp/trunk/changelog.txt)
