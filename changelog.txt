@@ -1,3 +1,6 @@
+= 1.0.19 (14 May 2025) = 
+* Tested : Need to test with WordPress 6.8 #65
+
 = 1.0.18 (03 January 2025) = 
 * Added  : Option to generate critical CSS manually: #58
 * Fixed  :  Nav Bar CSS changes when we activate the plugin. #54
