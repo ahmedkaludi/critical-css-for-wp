@@ -63,6 +63,9 @@ You may now contribute to this Critical CSS For WP plugin on Github: [View repos
 
 == Changelog ==
 
+= 1.0.20 (16 July 2025) = 
+* Tested : Tested upto  WordPress 6.8.2
+
 = 1.0.19 (14 May 2025) = 
 * Tested : Need to test with WordPress 6.8 #65
 
@@ -96,9 +99,6 @@ You may now contribute to this Critical CSS For WP plugin on Github: [View repos
 = 1.0.12 (09 January 2024) = 
 * Tested : Test with wordpress 6.4 and update readme.txt #41
 * Fixed : Category URLs are also getting cached even if the checkbox is not selected in the settings #40
-
-= 1.0.11 (07 November 2023) = 
-* Fixed : Critical Error while activating #38
 
 
 Full changelog available [ at changelog.txt](https://plugins.svn.wordpress.org/critical-css-for-wp/trunk/changelog.txt)
