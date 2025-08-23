@@ -446,7 +446,7 @@ function ccfwp_advance_settings_callback() {
 
 	echo '<div class="ccfwp-heading-title">' . esc_html__( 'Generate CSS on Plugin Page reload','critical-css-for-wp');
 	echo '<div class="ccfwp-tooltip-box"><span class="dashicons dashicons-info"></span>
-    <span class="ccfwp-tooltip-text">' . esc_html__( 'This option will only work when WP cron is disabled. Critical CSS will be generated plugin page is visited. There will be a gap of 1 minutes between two consecutive requests' ,'critical-css-for-wp') . '</span>
+    <span class="ccfwp-tooltip-text">' . esc_html__( 'This option disables the WP cron event. Critical CSS will be generated on plugin page visit. There will be a gap of 1 minutes between two consecutive requests' ,'critical-css-for-wp') . '</span>
   </div></div>';
 	
 	echo '<select class="ccfwp-advance-width"  name="ccfwp_settings[ccfwp_generate_css]">';
