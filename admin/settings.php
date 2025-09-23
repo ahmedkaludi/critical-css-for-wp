@@ -221,7 +221,7 @@ function ccfwp_urlslist_callback() {
 					if ( isset( $settings['ccfwp_generation_type'] ) && $settings['ccfwp_generation_type'] == 'manual' ) {
 						?>
 						<a href="#" class="button button-primary ccfwp-generate-css"><?php echo esc_html__( 'Generate Critical CSS' ,'critical-css-for-wp'); ?></a> <br><br>
-						<p><b><?php echo esc_html__('Note:');?></b> <?php echo esc_html__('To ensure Manual Critical CSS generation works correctly, please keep this tab open. If you close the tab, the generation process will pause. You can resume it by clicking the "Generate" button again and keeping this tab open.','critical-css-for-wp');?></p>
+						<p><b><?php echo esc_html__('Note:', 'critical-css-for-wp');?></b> <?php echo esc_html__('To ensure Manual Critical CSS generation works correctly, please keep this tab open. If you close the tab, the generation process will pause. You can resume it by clicking the "Generate" button again and keeping this tab open.','critical-css-for-wp');?></p>
 						<?php
 					}
  					?>                       
