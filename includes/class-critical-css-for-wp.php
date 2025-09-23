@@ -1497,13 +1497,13 @@ class Critical_Css_For_Wp {
 	
 		// Get total pages count.
 		$total_pages = (int) $wpdb->get_var(
-			"SELECT COUNT(*) FROM {$table_name_escaped}"
+			"SELECT COUNT(*) FROM {$table_name_escaped}"  //phpcs:ignore -- Reason: Using custom query on non-core tables.
 		);
 	
 		// Get cached count.
 		$cached = (int) $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$table_name_escaped} WHERE `status` = %s",
+				"SELECT COUNT(*) FROM {$table_name_escaped} WHERE `status` = %s",  //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				'cached'
 			)
 		);
@@ -1511,7 +1511,7 @@ class Critical_Css_For_Wp {
 		// Get pending count.
 		$pending = (int) $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$table_name_escaped} WHERE `status` = %s",
+				"SELECT COUNT(*) FROM {$table_name_escaped} WHERE `status` = %s",  //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				'pending'
 			)
 		);
@@ -1519,7 +1519,7 @@ class Critical_Css_For_Wp {
 		// Get failed count.
 		$failed = (int) $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$table_name_escaped} WHERE `status` = %s",
+				"SELECT COUNT(*) FROM {$table_name_escaped} WHERE `status` = %s",  //phpcs:ignore -- Reason: Using custom query on non-core tables.
 				'failed'
 			)
 		);
