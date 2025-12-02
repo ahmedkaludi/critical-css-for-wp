@@ -2,8 +2,8 @@
 Contributors: magazine3
 Tags: Critical, Critical CSS, Core Web Vital, Cache, SEO
 Requires at least: 3.0
-Tested up to: 6.8
-Stable tag: 1.0.21
+Tested up to: 6.9
+Stable tag: 1.0.22
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -62,6 +62,9 @@ You may now contribute to this Critical CSS For WP plugin on Github: [View repos
    - License URL: https://github.com/DataTables/DataTables?tab=MIT-1-ov-file
 
 == Changelog ==
+
+= 1.0.22 (02 December 2025) = 
+* Tested  : Tested with WordPress 6.9
 
 = 1.0.21 (23 September 2025) = 
 * Improved : Plugin check improvements #70
