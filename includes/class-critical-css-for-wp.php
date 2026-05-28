@@ -145,20 +145,17 @@ class Critical_Css_For_Wp {
 	private function ccfwp_is_wpcron_active() {
 
 		$settings           = ccfwp_defaults();
-		
-		$ccfwp_generate_css = isset( $settings['ccfwp_generation_type'] ) ? $settings['ccfwp_generation_type'] : 'auto';
-		if ( $ccfwp_generate_css == 'manual' ) {
+
+		$ccfwp_generation_type = isset( $settings['ccfwp_generation_type'] ) ? $settings['ccfwp_generation_type'] : 'auto';
+		$ccfwp_generate_css = isset( $settings['ccfwp_generate_css'] ) ? $settings['ccfwp_generate_css'] : 'off';
+		if ( $ccfwp_generation_type == 'manual' ) {
+			return false;
+		}
+		if ( $ccfwp_generate_css == 'on' ) {
 			return false;
 		}
 
-		if ( ! defined( 'DISABLE_WP_CRON' ) ) {
-			return true;
-		}
-		if ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON == false ) {
-			return true;
-		}
-		
-		return false;
+		return true;
 	}
 	public function on_term_create( $term_id, $tt_id, $taxonomy ) {
 
